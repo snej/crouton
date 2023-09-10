@@ -35,6 +35,12 @@ namespace crouton {
         explicit URLRef(const char* str)           {parse(str);}
         explicit URLRef(std::string const& str)    :URLRef(str.c_str()) { }
 
+        URLRef(std::string_view scheme,
+                std::string_view hostname,
+                uint16_t port = 0,
+                std::string_view path = "/",
+                std::string_view query = "");
+
         /// Parses a URL, updating the properties. Returns false on error.
         [[nodiscard]] bool tryParse(const char*);
 
@@ -43,14 +49,30 @@ namespace crouton {
 
         std::string_view scheme;
         std::string_view hostname;
-        uint16_t port = 0;
+        uint16_t         port = 0;
         std::string_view path;
         std::string_view query;
 
         /// Lowercased version of `scheme`
         std::string normalizedScheme() const;
 
-    protected:
+        /// Returns the path with URL escapes decoded.
+        std::string unescapedPath() const   {return unescape(path);}
+
+        /// Returns the value for a key in the query, or "" if not found.
+        std::string_view queryValueForKey(std::string_view key);
+
+        /// Recombines the parts back into a URL. Useful if you've changed them.
+        std::string reencoded() const;
+
+        //---- static utility functions:
+
+        /// URL-escapes ("percent-escapes") a string.
+        /// If `except `is given, characters in that string will not be escaped.
+        static std::string escape(std::string_view, const char* except = nullptr);
+
+        /// Decodes a URL-escaped string.
+        static std::string unescape(std::string_view);
     };
 
 
@@ -61,11 +83,22 @@ namespace crouton {
         explicit URL(std::string_view str)  :URL(std::string(str)) { }
         explicit URL(const char* str)       :URL(std::string(str)) { }
 
+        URL(std::string_view scheme,
+            std::string_view hostname,
+            uint16_t port = 0,
+            std::string_view path = "/",
+            std::string_view query = "");
+
         URL(URL const& url)                 :URL(url.asString()) { }
         URL& operator=(URL const& url)      {_str = url._str; parse(_str.c_str()); return *this;}
 
         std::string const& asString() const {return _str;}
         operator std::string() const        {return _str;}
+
+        void reencode() {
+            _str = reencoded();
+            parse(_str.c_str());
+        }
 
     private:
         std::string _str;
