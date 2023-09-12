@@ -32,7 +32,7 @@ namespace uWS {
 
 namespace crouton {
 
-    /** A WebSocket client connection. */
+    /** Abstract base class of WebSocket connections. */
     class WebSocket {
     public:
 
@@ -101,7 +101,7 @@ namespace crouton {
         /// This should only be called after `readyToClose` has returned `true`.
         ASYNC<void> close();
 
-        /// Closes the connection immediately.
+        /// Closes the connection immediately. Not recommended.
         virtual void disconnect();
 
         virtual ~WebSocket();
@@ -128,6 +128,7 @@ namespace crouton {
     };
 
 
+    /** A client WebSocket connection. */
     class ClientWebSocket final : public WebSocket {
     public:
         /// Constructs a WebSocket, but doesn't connect yet.
@@ -160,6 +161,8 @@ namespace crouton {
     };
 
 
+
+    /** A server WebSocket connection. To be used in an HTTPHandler route function. */
     class ServerWebSocket final : public WebSocket {
     public:
         ServerWebSocket();
