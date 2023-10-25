@@ -15,9 +15,9 @@
 
 
 #include "Codec.hh"
-#include "BLIPProtocol.hh"
-#include "Endian.hh"
-#include "util/Logging.hh"
+#include "crouton/io/blip/BLIPProtocol.hh"
+#include "crouton/util/Logging.hh"
+#include "support/Endian.hh"
 #include <algorithm>
 #include <mutex>
 #include <spdlog/fmt/fmt.h>

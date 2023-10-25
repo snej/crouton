@@ -17,13 +17,13 @@
 //
 
 #pragma once
-#include "CoCondition.hh"
-#include "Coroutine.hh"
+#include "crouton/CoCondition.hh"
+#include "crouton/Coroutine.hh"
 #include "Internal.hh"
-#include "util/Bytes.hh"
-#include "util/Logging.hh"
-#include "Scheduler.hh"
-#include "io/uv/UVBase.hh"
+#include "crouton/util/Bytes.hh"
+#include "crouton/util/Logging.hh"
+#include "crouton/Scheduler.hh"
+#include "crouton/io/uv/UVBase.hh"
 
 #include <algorithm>
 #include <concepts>

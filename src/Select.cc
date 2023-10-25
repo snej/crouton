@@ -16,8 +16,8 @@
 // limitations under the License.
 //
 
-#include "Select.hh"
-#include "Scheduler.hh"
+#include "crouton/Select.hh"
+#include "crouton/Scheduler.hh"
 
 namespace crouton {
 

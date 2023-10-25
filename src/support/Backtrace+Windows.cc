@@ -18,7 +18,7 @@
 
 #ifdef _WIN32
 
-#include "Backtrace.hh"
+#include "support/Backtrace.hh"
 #include <csignal>
 #include <exception>
 #include <iostream>
@@ -26,7 +26,7 @@
 #include <sstream>
 #include <string.h>
 #include <algorithm>
-#include "util/betterassert.hh"
+#include "crouton/util/betterassert.hh"
 
 #pragma comment(lib, "Dbghelp.lib")
 #include <Windows.h>

@@ -16,7 +16,7 @@
 // limitations under the License.
 //
 
-#include "Crouton.hh"
+#include "crouton/Crouton.hh"
 #include <iostream>
 
 using namespace std;

@@ -31,6 +31,14 @@ xcode_deps: debug release
 	cp build_cmake/release/vendor/libuv/libuv*.a build_cmake/release/xcodedeps/
 	cp build_cmake/release/vendor/mbedtls/library/libmbed*.a build_cmake/release/xcodedeps/
 
+blip:
+	mkdir -p build_cmake/debug/
+	cd build_cmake/debug && cmake -DCMAKE_BUILD_TYPE=Debug -DCROUTON_BUILD_BLIP=1 ../..
+	cd build_cmake/debug && cmake --build . --target BLIP --target CroutonTests
+	mkdir -p build_cmake/release/
+	cd build_cmake/release && cmake -DCMAKE_BUILD_TYPE=MinSizeRel -DCROUTON_BUILD_BLIP=1 ../..
+	cd build_cmake/release && cmake --build . --target BLIP
+
 esp:
 	cd tests/ESP32 && idf.py build
 

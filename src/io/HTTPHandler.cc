@@ -16,8 +16,8 @@
 // limitations under the License.
 //
 
-#include "io/HTTPHandler.hh"
-#include "util/Logging.hh"
+#include "crouton/io/HTTPHandler.hh"
+#include "crouton/util/Logging.hh"
 #include <llhttp.h>
 #include <sstream>
 

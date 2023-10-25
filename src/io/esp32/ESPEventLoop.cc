@@ -16,10 +16,10 @@
 // limitations under the License.
 //
 
-#include "EventLoop.hh"
-#include "Future.hh"
-#include "util/Logging.hh"
-#include "Task.hh"
+#include "crouton/EventLoop.hh"
+#include "crouton/Future.hh"
+#include "crouton/util/Logging.hh"
+#include "crouton/Task.hh"
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>

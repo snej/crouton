@@ -54,8 +54,8 @@
 
 #pragma once
 
-#include "Error.hh"
-#include "util/Logging.hh"
+#include "crouton/Error.hh"
+#include "crouton/util/Logging.hh"
 
 #if defined(_WIN32)
 #   if !defined(_CRT_SECURE_NO_DEPRECATE)

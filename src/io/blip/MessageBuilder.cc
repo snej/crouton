@@ -10,11 +10,11 @@
 // the file licenses/APL2.txt.
 //
 
-#include "MessageBuilder.hh"
-#include "BLIPIO.hh"
-#include "BLIPProtocol.hh"
-#include "StringUtils.hh"
-#include "util/Varint.hh"
+#include "crouton/io/blip/MessageBuilder.hh"
+#include "crouton/io/blip/BLIPIO.hh"
+#include "crouton/io/blip/BLIPProtocol.hh"
+#include "support/StringUtils.hh"
+#include "crouton/util/Varint.hh"
 #include <ostream>
 
 namespace crouton::io::blip {

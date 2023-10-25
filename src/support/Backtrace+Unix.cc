@@ -18,9 +18,9 @@
 
 #ifndef _WIN32
 
-#include "Backtrace.hh"
-#include "StringUtils.hh"
-#include "util/betterassert.hh"
+#include "support/Backtrace.hh"
+#include "support/StringUtils.hh"
+#include "crouton/util/betterassert.hh"
 #include <iostream>
 
 #include <dlfcn.h>          // dladdr()

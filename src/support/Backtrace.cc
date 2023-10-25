@@ -16,7 +16,7 @@
 // limitations under the License.
 //
 
-#include "Backtrace.hh"
+#include "support/Backtrace.hh"
 #include <csignal>
 #include <exception>
 #include <iostream>
@@ -24,7 +24,7 @@
 #include <sstream>
 #include <string.h>
 #include <algorithm>
-#include "util/betterassert.hh"
+#include "crouton/util/betterassert.hh"
 
 
 #pragma mark - COMMON CODE:

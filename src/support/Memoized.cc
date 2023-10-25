@@ -17,8 +17,8 @@
 //
 
 #include "Memoized.hh"
-#include "Backtrace.hh"
-#include "StringUtils.hh"
+#include "support/Backtrace.hh"
+#include "support/StringUtils.hh"
 
 namespace crouton {
     using namespace std;

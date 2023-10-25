@@ -16,7 +16,7 @@
 // limitations under the License.
 //
 
-#include "util/MiniFormat.hh"
+#include "crouton/util/MiniFormat.hh"
 #include <iostream>
 #include <sstream>
 

@@ -16,8 +16,8 @@
 // limitations under the License.
 //
 
-#include "util/Logging.hh"
-#include "io/Process.hh"
+#include "crouton/util/Logging.hh"
+#include "crouton/io/Process.hh"
 
 #if CROUTON_USE_SPDLOG
 #include <spdlog/cfg/env.h>

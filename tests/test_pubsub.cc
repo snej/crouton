@@ -17,9 +17,9 @@
 //
 
 #include "tests.hh"
-#include "PubSub.hh"
-#include "StringUtils.hh"
-#include "io/FileStream.hh"
+#include "crouton/PubSub.hh"
+#include "support/StringUtils.hh"
+#include "crouton/io/FileStream.hh"
 
 using namespace std;
 using namespace crouton;

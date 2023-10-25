@@ -16,10 +16,10 @@
 // limitations under the License.
 //
 
-#include "Coroutine.hh"
-#include "Memoized.hh"
-#include "util/Logging.hh"
-#include "Scheduler.hh"
+#include "crouton/Coroutine.hh"
+#include "support/Memoized.hh"
+#include "crouton/util/Logging.hh"
+#include "crouton/Scheduler.hh"
 
 #include <charconv>
 #include <iostream>

@@ -16,8 +16,8 @@
 // limitations under the License.
 //
 
-#include "io/IStream.hh"
-#include "util/Bytes.hh"
+#include "crouton/io/IStream.hh"
+#include "crouton/util/Bytes.hh"
 #include <cstring> // for memcpy
 
 namespace crouton::io {

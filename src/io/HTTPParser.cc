@@ -16,10 +16,10 @@
 // limitations under the License.
 //
 
-#include "io/HTTPParser.hh"
-#include "io/IStream.hh"
-#include "Future.hh"
-#include "StringUtils.hh"
+#include "crouton/io/HTTPParser.hh"
+#include "crouton/io/IStream.hh"
+#include "crouton/Future.hh"
+#include "support/StringUtils.hh"
 #include "llhttp.h"
 
 #include <iostream>

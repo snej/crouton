@@ -16,7 +16,7 @@
 // limitations under the License.
 //
 
-#include "io/AddrInfo.hh"
+#include "crouton/io/AddrInfo.hh"
 #include "UVInternal.hh"
 
 namespace crouton::io {

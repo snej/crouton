@@ -16,9 +16,9 @@
 // limitations under the License.
 //
 
-#include "io/URL.hh"
-#include "Error.hh"
-#include "StringUtils.hh"
+#include "crouton/io/URL.hh"
+#include "crouton/Error.hh"
+#include "support/StringUtils.hh"
 #include <cstring>
 
 namespace crouton::io {

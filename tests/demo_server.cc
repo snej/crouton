@@ -16,9 +16,9 @@
 // limitations under the License.
 //
 
-#include "Crouton.hh"
-#include "io/TCPServer.hh"
-#include "util/Logging.hh"
+#include "crouton/Crouton.hh"
+#include "crouton/io/TCPServer.hh"
+#include "crouton/util/Logging.hh"
 #include <functional>
 #include <iomanip>
 #include <iostream>

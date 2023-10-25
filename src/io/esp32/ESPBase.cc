@@ -16,8 +16,8 @@
 // limitations under the License.
 //
 
-#include "ESPBase.hh"
-#include "Misc.hh"
+#include "crouton/ESPBase.hh"
+#include "crouton/Misc.hh"
 #include <esp_random.h>
 #include <lwip/err.h>
 

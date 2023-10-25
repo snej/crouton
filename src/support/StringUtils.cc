@@ -16,8 +16,8 @@
 // limitations under the License.
 //
 
-#include "StringUtils.hh"
-#include "util/Bytes.hh"
+#include "support/StringUtils.hh"
+#include "crouton/util/Bytes.hh"
 
 namespace crouton {
 

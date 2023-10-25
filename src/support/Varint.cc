@@ -16,8 +16,8 @@
 // limitations under the License.
 //
 
-#include "util/Varint.hh"
-#include "Error.hh"
+#include "crouton/util/Varint.hh"
+#include "crouton/Error.hh"
 
 namespace crouton::uvarint {
 

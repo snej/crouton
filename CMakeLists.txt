@@ -153,8 +153,6 @@ target_include_directories( LibCrouton PUBLIC
 
 target_include_directories( LibCrouton PRIVATE
     src/
-    src/io/
-    src/support/
 )
 
 target_link_libraries( LibCrouton INTERFACE
@@ -259,7 +257,7 @@ if (NOT CROUTON_IOS)
     )
 
     target_include_directories( CroutonTests PRIVATE
-        src/support/
+        src/
         vendor/catch2/
     )
 

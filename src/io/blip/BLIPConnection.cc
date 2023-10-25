@@ -16,9 +16,9 @@
 // limitations under the License.
 //
 
-#include "BLIPConnection.hh"
-#include "io/WebSocket.hh"
-#include "Task.hh"
+#include "crouton/io/blip/BLIPConnection.hh"
+#include "crouton/io/WebSocket.hh"
+#include "crouton/Task.hh"
 #include <spdlog/fmt/fmt.h>
 #include <spdlog/fmt/ostr.h>    // Makes custom types loggable via `operator <<` overloads
 

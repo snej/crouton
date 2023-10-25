@@ -16,9 +16,9 @@
 // limitations under the License.
 //
 
-#include "io/Filesystem.hh"
+#include "crouton/io/Filesystem.hh"
 #include "UVInternal.hh"
-#include "Defer.hh"
+#include "support/Defer.hh"
 
 #include <cstring>
 

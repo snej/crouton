@@ -16,8 +16,8 @@
 // limitations under the License.
 //
 
-#include "io/mbed/TLSSocket.hh"
-#include "io/ISocket.hh"
+#include "crouton/io/mbed/TLSSocket.hh"
+#include "crouton/io/ISocket.hh"
 #include "Internal.hh"
 #include "TLSContext.hh"
 #include <optional>

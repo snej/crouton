@@ -16,11 +16,11 @@
 // limitations under the License.
 //
 
-#include "Scheduler.hh"
-#include "EventLoop.hh"
+#include "crouton/Scheduler.hh"
+#include "crouton/EventLoop.hh"
 #include "Internal.hh"
-#include "util/Logging.hh"
-#include "Task.hh"
+#include "crouton/util/Logging.hh"
+#include "crouton/Task.hh"
 
 namespace crouton {
     using namespace std;

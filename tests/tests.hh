@@ -16,8 +16,8 @@
 // limitations under the License.
 //
 
-#include "Crouton.hh"
-#include "util/Logging.hh"
+#include "crouton/Crouton.hh"
+#include "crouton/util/Logging.hh"
 #include <iostream>
 
 #include "catch_amalgamated.hpp"

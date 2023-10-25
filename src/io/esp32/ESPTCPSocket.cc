@@ -18,12 +18,12 @@
 
 // <https://www.nongnu.org/lwip/2_0_x/raw_api.html>
 
-#include "ESPTCPSocket.hh"
-#include "CoCondition.hh"
-#include "ESPBase.hh"
+#include "crouton/ESPTCPSocket.hh"
+#include "crouton/CoCondition.hh"
+#include "crouton/ESPBase.hh"
 #include "Internal.hh"
-#include "util/Logging.hh"
-#include "io/AddrInfo.hh"
+#include "crouton/util/Logging.hh"
+#include "crouton/io/AddrInfo.hh"
 
 #include <esp_log.h>
 #include <lwip/pbuf.h>

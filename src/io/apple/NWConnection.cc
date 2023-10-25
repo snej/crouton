@@ -18,8 +18,8 @@
 
 #ifdef __APPLE__
 
-#include "io/apple/NWConnection.hh"
-#include "util/Logging.hh"
+#include "crouton/io/apple/NWConnection.hh"
+#include "crouton/util/Logging.hh"
 
 #include <Network/Network.h>
 #include <Security/SecBase.h>

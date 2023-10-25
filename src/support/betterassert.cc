@@ -16,13 +16,13 @@
 // limitations under the License.
 //
 
-#include "util/betterassert.hh"
+#include "crouton/util/betterassert.hh"
 #include <exception> // for std::terminate()
 #include <stdio.h>
 #include <string.h>
 
 #ifdef _MSC_VER
-#include "asprintf.h"
+#include "crouton/asprintf.h"
 #endif
 
 #ifndef __cold

@@ -16,8 +16,8 @@
 // limitations under the License.
 //
 
-#include "CoCondition.hh"
-#include "util/Logging.hh"
+#include "crouton/CoCondition.hh"
+#include "crouton/util/Logging.hh"
 
 namespace crouton {
 

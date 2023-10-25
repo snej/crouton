@@ -16,8 +16,8 @@
 // limitations under the License.
 //
 
-#include "io/HTTPConnection.hh"
-#include "io/ISocket.hh"
+#include "crouton/io/HTTPConnection.hh"
+#include "crouton/io/ISocket.hh"
 #include "Internal.hh"
 #include "llhttp.h"
 #include <sstream>

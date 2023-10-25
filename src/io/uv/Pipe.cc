@@ -16,7 +16,7 @@
 // limitations under the License.
 //
 
-#include "io/Pipe.hh"
+#include "crouton/io/Pipe.hh"
 #include "UVInternal.hh"
 
 namespace crouton::io {

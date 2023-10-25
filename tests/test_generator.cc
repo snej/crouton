@@ -17,7 +17,7 @@
 //
 
 #include "tests.hh"
-#include "Select.hh"
+#include "crouton/Select.hh"
 
 
 // An example Generator of successive integers.

@@ -16,10 +16,10 @@
 // limitations under the License.
 //
 
-#include "io/TCPServer.hh"
-#include "io/TCPSocket.hh"
+#include "crouton/io/TCPServer.hh"
+#include "crouton/io/TCPSocket.hh"
 #include "UVInternal.hh"
-#include "util/Logging.hh"
+#include "crouton/util/Logging.hh"
 
 namespace crouton::io {
     using namespace std;

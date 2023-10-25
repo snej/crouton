@@ -17,8 +17,8 @@
 //
 
 #include "tests.hh"
-#include "BLIPIO.hh"
-#include "StringUtils.hh"
+#include "crouton/io/blip/BLIP.hh"
+#include "support/StringUtils.hh"
 
 using namespace std;
 using namespace crouton::io::blip;

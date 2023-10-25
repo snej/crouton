@@ -16,10 +16,10 @@
 // limitations under the License.
 //
 
-#include "io/AddrInfo.hh"
-#include "ESPBase.hh"
-#include "CoCondition.hh"
-#include "util/Logging.hh"
+#include "crouton/io/AddrInfo.hh"
+#include "crouton/ESPBase.hh"
+#include "crouton/CoCondition.hh"
+#include "crouton/util/Logging.hh"
 #include <lwip/dns.h>
 
 namespace crouton::io {

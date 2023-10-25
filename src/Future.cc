@@ -16,8 +16,8 @@
 // limitations under the License.
 //
 
-#include "Future.hh"
-#include "util/Logging.hh"
+#include "crouton/Future.hh"
+#include "crouton/util/Logging.hh"
 
 namespace crouton {
 

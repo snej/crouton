@@ -11,9 +11,9 @@
 //
 
 #pragma once
-#include "Message.hh"
-#include "MessageBuilder.hh"
-#include "Future.hh"
+#include "crouton/io/blip/Message.hh"
+#include "crouton/io/blip/MessageBuilder.hh"
+#include "crouton/Future.hh"
 #include <ostream>
 
 namespace crouton::io::blip {

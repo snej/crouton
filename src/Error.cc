@@ -16,10 +16,10 @@
 // limitations under the License.
 //
 
-#include "Error.hh"
-#include "Backtrace.hh"
+#include "crouton/Error.hh"
+#include "support/Backtrace.hh"
 #include "Internal.hh"
-#include "util/Logging.hh"
+#include "crouton/util/Logging.hh"
 #include <cstring>
 #include <iostream>
 #include <mutex>

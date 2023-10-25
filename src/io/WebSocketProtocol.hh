@@ -41,7 +41,7 @@
 #define WEBSOCKETPROTOCOL_UWS_H
 
 //COUCHBASE: Copied definitions of endian functions here, from original Networking.h
-// #include "Networking.h"
+// #include "crouton/Networking.h"
 #include <limits>
 #ifdef __APPLE__
 #    include <libkern/OSByteOrder.h>

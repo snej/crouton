@@ -10,13 +10,13 @@
 // the file licenses/APL2.txt.
 //
 
-#include "Message.hh"
-#include "MessageBuilder.hh"
+#include "crouton/io/blip/Message.hh"
+#include "crouton/io/blip/MessageBuilder.hh"
 #include "MessageOut.hh"
-#include "BLIPIO.hh"
+#include "crouton/io/blip/BLIPIO.hh"
 #include "Codec.hh"
-#include "util/Varint.hh"
-#include "StringUtils.hh"
+#include "crouton/util/Varint.hh"
+#include "support/StringUtils.hh"
 #include <iostream>
 #include <sstream>
 

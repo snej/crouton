@@ -1,5 +1,5 @@
-#include "Crouton.hh"
-#include "util/Logging.hh"
+#include "crouton/Crouton.hh"
+#include "crouton/util/Logging.hh"
 
 #include "sdkconfig.h"
 #include <freertos/FreeRTOS.h>

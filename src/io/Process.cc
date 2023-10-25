@@ -16,9 +16,9 @@
 // limitations under the License.
 //
 
-#include "io/Process.hh"
-#include "util/Logging.hh"
-#include "Task.hh"
+#include "crouton/io/Process.hh"
+#include "crouton/util/Logging.hh"
+#include "crouton/Task.hh"
 #include <cstdio>
 
 #ifndef ESP_PLATFORM

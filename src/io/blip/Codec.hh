@@ -11,7 +11,7 @@
 //
 
 #pragma once
-#include "util/Bytes.hh"
+#include "crouton/util/Bytes.hh"
 #include <zlib.h>
 
 namespace crouton::io::blip {

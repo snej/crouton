@@ -16,8 +16,8 @@
 // limitations under the License.
 //
 
-#include "Backtrace.hh"
-#include "StringUtils.hh"
+#include "crouton/Backtrace.hh"
+#include "support/StringUtils.hh"
 #include <esp_debug_helpers.h>
 #include <iostream>
 

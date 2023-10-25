@@ -16,8 +16,8 @@
 // limitations under the License.
 //
 
-#include "Crouton.hh"
-#include "BLIP.hh"
+#include "crouton/Crouton.hh"
+#include "crouton/BLIP.hh"
 #include <iostream>
 #include <vector>
 

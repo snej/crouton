@@ -16,10 +16,10 @@
 // limitations under the License.
 //
 
-#include "io/WebSocket.hh"
-#include "util/Logging.hh"
-#include "Misc.hh"
-#include "StringUtils.hh"
+#include "crouton/io/WebSocket.hh"
+#include "crouton/util/Logging.hh"
+#include "crouton/Misc.hh"
+#include "support/StringUtils.hh"
 #include "Internal.hh"
 #include "WebSocketProtocol.hh"
 #include <mbedtls/base64.h>

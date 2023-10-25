@@ -17,7 +17,7 @@
 //
 
 #pragma once
-#include "Error.hh"
+#include "crouton/Error.hh"
 
 namespace crouton::io::esp {
 

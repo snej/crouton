@@ -17,9 +17,9 @@
 //
 
 #pragma once
-#include "CoCondition.hh"
-#include "io/ISocket.hh"
-#include "io/IStream.hh"
+#include "crouton/CoCondition.hh"
+#include "crouton/io/ISocket.hh"
+#include "crouton/io/IStream.hh"
 #include <mutex>
 #include <vector>
 

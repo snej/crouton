@@ -10,14 +10,14 @@
 // the file licenses/APL2.txt.
 //
 
-#include "BLIPIO.hh"
-#include "Error.hh"
+#include "crouton/io/blip/BLIPIO.hh"
+#include "crouton/Error.hh"
 #include "Internal.hh"
 #include "MessageOut.hh"
-#include "util/Logging.hh"
-#include "util/Varint.hh"
-#include "StringUtils.hh"
-#include "Task.hh"
+#include "crouton/util/Logging.hh"
+#include "crouton/util/Varint.hh"
+#include "support/StringUtils.hh"
+#include "crouton/Task.hh"
 #include <ranges>
 #include <spdlog/fmt/fmt.h>
 #include <spdlog/fmt/ostr.h>    // Makes custom types loggable via `operator <<` overloads

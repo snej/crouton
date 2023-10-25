@@ -16,10 +16,10 @@
 // limitations under the License.
 //
 
-#include "CoroLifecycle.hh"
-#include "util/Logging.hh"
-#include "Memoized.hh"
-#include "Scheduler.hh"
+#include "crouton/CoroLifecycle.hh"
+#include "crouton/util/Logging.hh"
+#include "support/Memoized.hh"
+#include "crouton/Scheduler.hh"
 #include <mutex>
 #include <ranges>
 #include <sstream>

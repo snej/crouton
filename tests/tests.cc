@@ -17,12 +17,12 @@
 //
 
 #include "tests.hh"
-#include "Actor.hh"
-#include "Misc.hh"
-#include "Producer.hh"
-#include "util/MiniFormat.hh"
-#include "util/Relation.hh"
-#include "io/uv/UVBase.hh"
+#include "crouton/Actor.hh"
+#include "crouton/Misc.hh"
+#include "crouton/Producer.hh"
+#include "crouton/util/MiniFormat.hh"
+#include "crouton/util/Relation.hh"
+#include "crouton/io/uv/UVBase.hh"
 
 
 void RunCoroutine(Future<void> (*test)()) {

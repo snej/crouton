@@ -16,8 +16,8 @@
 // limitations under the License.
 //
 
-#include "io/Framer.hh"
-#include "util/Varint.hh"
+#include "crouton/io/Framer.hh"
+#include "crouton/util/Varint.hh"
 
 namespace crouton::io {
     using namespace std;
