@@ -145,7 +145,8 @@ namespace crouton {
     private:
         struct SuspensionImpl;
         friend class Suspension;
-        
+        friend void lifecycle::ended(coro_handle);
+
         Scheduler();
         ~Scheduler();
         static Scheduler& _create();

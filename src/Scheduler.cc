@@ -309,6 +309,8 @@ namespace crouton {
                 sus._handle = nullptr;
             }
         }
+        if (auto i = ranges::find(_ready, h); i != _ready.end())
+            _ready.erase(i);
     }
 
     /// Called from "normal" code.
@@ -325,14 +327,7 @@ namespace crouton {
 
 
     bool Scheduler::isReady(coro_handle h) const {
-#if 1
-        for (auto &x : _ready)
-            if (x == h)
-                return true;
-        return false;
-#else // Xcode 14.2 doesn't support this yet:
         return std::ranges::any_of(_ready, [=](auto x) {return x == h;});
-#endif
     }
 
     bool Scheduler::isWaiting(coro_handle h) const {

@@ -388,6 +388,8 @@ namespace crouton::lifecycle {
     }
 
     void ended(coro_handle h) {
+        assert(!Scheduler::current().isReady(h));
+        assert(!Scheduler::current().isWaiting(h));
         unique_lock<mutex> lock(sCorosMutex);
         auto i = _getInfoIter(h);
         auto& info = i->second;

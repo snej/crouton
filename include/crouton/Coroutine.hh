@@ -95,12 +95,7 @@ namespace crouton {
     class CoroutineImplBase {
     public:
         CoroutineImplBase() = default;
-
-        ~CoroutineImplBase() {
-            // FYI, a coroutine impl (`promise_type`) is destructed when its coroutine handle's
-            // `destroy` method is called.
-            lifecycle::ended(_handle);
-        }
+        ~CoroutineImplBase();
 
         coro_handle handle() const                  {assert(_handle); return _handle;}
 

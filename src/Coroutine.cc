@@ -28,6 +28,14 @@ namespace crouton {
     using namespace std;
 
 
+    CoroutineImplBase::~CoroutineImplBase() {
+        // FYI, a coroutine impl (`promise_type`) is destructed when its coroutine handle's
+        // `destroy` method is called.
+        Scheduler::current().destroying(_handle);
+        lifecycle::ended(_handle);
+    }
+
+
 #pragma mark - COMUTEX:
 
 
