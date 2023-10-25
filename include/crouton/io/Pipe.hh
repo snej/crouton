@@ -27,8 +27,10 @@ namespace crouton::io {
     /** A bidirectional stream. Currently can only be created in ephemeral pairs. */
     class Pipe : public Stream {
     public:
+        using Ref = std::shared_ptr<Pipe>;
+
         /// Creates a pair of connected Pipes.
-        static std::pair<Pipe,Pipe> createPair();
+        static std::pair<Ref,Ref> createPair();
 
         /// Creates a Pipe on an open file descriptor, which must be a pipe or Unix domain socket.
         explicit Pipe(int fd);

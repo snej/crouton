@@ -38,11 +38,9 @@ namespace crouton::io::apple {
 
     /** A TCP client connection using Apple's Network.framework.
         Supports TLS. */
-    class NWConnection final : public IStream, public ISocket {
+    class NWConnection final : public ISocket, private IStream {
     public:
-        NWConnection() = default;
-        explicit NWConnection(bool useTLS)                  :_useTLS(useTLS) { }
-        ~NWConnection();
+        static std::shared_ptr<NWConnection> create()     {return std::make_shared<NWConnection>();}
 
         void useTLS(bool tls)                               {_useTLS = tls;}
 
@@ -55,14 +53,17 @@ namespace crouton::io::apple {
 
         ASYNC<void> closeWrite() override    {return _writeOrShutdown({}, true);}
 
-        IStream& stream() override               {return *this;}
+        std::shared_ptr<IStream> stream() override;
 
+        explicit NWConnection(bool useTLS =false)           :_useTLS(useTLS) { }
+        ~NWConnection();
+
+    private:
         virtualASYNC<ConstBytes> readNoCopy(size_t maxLen = 65536) override;
         virtualASYNC<ConstBytes> peekNoCopy() override;
         ASYNC<void> write(ConstBytes b) override {return _writeOrShutdown(b, false);}
         using IStream::write;
         
-    private:
         virtualASYNC<ConstBytes> _readNoCopy(size_t maxLen, bool peek);
         ASYNC<void> _writeOrShutdown(ConstBytes, bool shutdown);
         void _close();

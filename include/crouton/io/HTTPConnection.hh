@@ -52,8 +52,7 @@ namespace crouton::io::http {
         ASYNC<void> closeResponse();
 
         URL                      _url;
-        std::unique_ptr<ISocket> _socket;
-        IStream*                 _stream = nullptr;
+        std::shared_ptr<IStream> _stream;
         bool                     _sent = false;
     };
 

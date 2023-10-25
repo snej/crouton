@@ -148,7 +148,7 @@ namespace crouton {
 
 
     // Internal base class of FutureState<T>.
-    class FutureStateBase {
+    class FutureStateBase : public std::enable_shared_from_this<FutureStateBase> {
     public:
         bool hasResult() const                       {return _state.load() == Ready;}
 
@@ -159,7 +159,7 @@ namespace crouton {
         virtual void setError(Error) = 0;
         virtual Error getError() = 0;
 
-        using ChainCallback = std::function<void(FutureStateBase&,FutureStateBase&)>;
+        using ChainCallback = std::function<void(std::shared_ptr<FutureStateBase>,FutureStateBase&)>;
 
         template <typename U>
         Future<U> chain(ChainCallback fn) {
@@ -345,8 +345,9 @@ namespace crouton {
     template <typename T>
     template <typename FN, typename U>  requires(!std::is_void_v<T>)
     Future<U> Future<T>::then(FN fn) {
-        return _state->template chain<U>([fn](FutureStateBase& baseState, FutureStateBase& myBaseState) {
-            auto& state = static_cast<FutureState<U>&>(baseState);
+        return _state->template chain<U>([fn](std::shared_ptr<FutureStateBase> baseState,
+                                              FutureStateBase& myBaseState) mutable {
+            auto& state = static_cast<FutureState<U>&>(*baseState);
             T&& result = static_cast<FutureState<T>&>(myBaseState).resultValue();
             if constexpr (std::is_void_v<U>) {
                 fn(std::move(result));
@@ -361,8 +362,9 @@ namespace crouton {
     template <typename T>
     template <typename FN, typename U>  requires(std::is_void_v<T>)
     Future<U> Future<T>::then(FN fn) {
-        return _state->template chain<U>([fn](FutureStateBase& baseState, FutureStateBase&) {
-            auto& state = dynamic_cast<FutureState<U>&>(baseState);
+        return _state->template chain<U>([fn](std::shared_ptr<FutureStateBase> baseState,
+                                              FutureStateBase&) mutable {
+            auto& state = dynamic_cast<FutureState<U>&>(*baseState);
             if constexpr (std::is_void_v<U>) {
                 fn();
                 state.setResult();

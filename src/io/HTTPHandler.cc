@@ -24,10 +24,9 @@
 namespace crouton::io::http {
     using namespace std;
 
-    Handler::Handler(std::shared_ptr<ISocket> socket, vector<Route> const& routes)
-    :_socket(std::move(socket))
-    ,_stream(_socket->stream())
-    ,_parser(_stream, Parser::Request)
+    Handler::Handler(std::shared_ptr<IStream> stream, vector<Route> const& routes)
+    :_stream(std::move(stream))
+    ,_parser(*_stream, Parser::Request)
     ,_routes(routes)
     { }
 
@@ -94,17 +93,17 @@ namespace crouton::io::http {
         for (auto &h : headers)
             out << h.first << ": " << h.second << "\r\n";
         out << "\r\n";
-        return _stream.write(out.str());
+        return _stream->write(out.str());
     }
 
 
     Future<void> Handler::writeToBody(string str) {
-        return _stream.write(std::move(str));   //TODO: Write via the Parser
+        return _stream->write(std::move(str));   //TODO: Write via the Parser
     }
 
 
     Future<void> Handler::endBody() {
-        return _stream.close();
+        return _stream->close();
     }
 
 
@@ -138,7 +137,7 @@ namespace crouton::io::http {
 
     Future<IStream*> Handler::Response::rawStream() {
         AWAIT finishHeaders();
-        RETURN &_handler->_stream;
+        RETURN _handler->_stream.get();
     }
 
 }

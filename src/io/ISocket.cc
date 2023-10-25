@@ -30,27 +30,26 @@
 
 namespace crouton::io {
 
-    std::unique_ptr<ISocket> ISocket::newSocket(bool useTLS) {
+    std::shared_ptr<ISocket> ISocket::newSocket(bool useTLS) {
 #if defined(__APPLE__)
-        return std::make_unique<apple::NWConnection>(useTLS);
+        return std::make_shared<apple::NWConnection>(useTLS);
 #elif defined(ESP_PLATFORM)
         if (useTLS)
-            return std::make_unique<mbed::TLSSocket>();
+            return std::make_shared<mbed::TLSSocket>();
         else
-            return std::make_unique<esp::TCPSocket>();
+            return std::make_shared<esp::TCPSocket>();
 #else
         if (useTLS)
-            return std::make_unique<mbed::TLSSocket>();
+            return std::make_shared<mbed::TLSSocket>();
         else
-            return std::make_unique<TCPSocket>();
+            return std::make_shared<TCPSocket>();
 #endif
     }
 
 
-    Task ISocket::closeAndFree(std::unique_ptr<ISocket> sock) {
-        AWAIT sock->close();
-        // unique_ptr destructor will free ISocket
+    void closeThenRelease(std::shared_ptr<ISocket> &&sock) {
+        // Final release is deferred until the end of the 'then' callback.
+        (void) sock->close().then([sock]() mutable {sock.reset();});
     }
-
 
 }

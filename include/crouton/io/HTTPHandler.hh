@@ -81,7 +81,7 @@ namespace crouton::io::http {
         };
 
         /// Constructs an HTTPHandler on a socket, given its routing table.
-        explicit Handler(std::shared_ptr<ISocket>, std::vector<Route> const&);
+        explicit Handler(std::shared_ptr<IStream>, std::vector<Route> const&);
 
         /// Reads the request, calls the handler (or writes an error) and closes the socket.
         ASYNC<void> run();
@@ -95,9 +95,8 @@ namespace crouton::io::http {
         ASYNC<void> writeToBody(string);
         ASYNC<void> endBody();
 
-        std::shared_ptr<ISocket> _socket;
-        IStream&                 _stream;
-        Parser               _parser;
+        std::shared_ptr<IStream> _stream;
+        Parser                   _parser;
         std::vector<Route> const&_routes;
     };
 

@@ -62,9 +62,8 @@ namespace crouton::io::mbed {
     class TLSSocket::Impl {
     public:
 
-        Impl(std::unique_ptr<ISocket> socket, TLSContext& context, string const& hostname)
-        :_socket(std::move(socket))
-        ,_stream(_socket->stream())
+        Impl(std::shared_ptr<IStream> stream, TLSContext& context, string const& hostname)
+        :_stream(std::move(stream))
         ,_context(context)
         {
             mbedtls_ssl_init(&_ssl);
@@ -91,7 +90,7 @@ namespace crouton::io::mbed {
 
         // Coroutine that opens the underlying stream and then runs the TLS handshake.
         Future<void> handshake() {
-            AWAIT _stream.open();
+            AWAIT _stream->open();
             _tcpOpen = true;
 
             int status;
@@ -180,9 +179,9 @@ namespace crouton::io::mbed {
                 _tlsOpen = false;
                 if (fully) {
                     _tcpOpen = _tlsOpen = false;
-                    AWAIT _stream.close();
+                    AWAIT _stream->close();
                 } else {
-                    AWAIT _stream.closeWrite();
+                    AWAIT _stream->closeWrite();
                 }
                 _tcpOpen = false;
                 //cerr << "TLSStream is now closed.\n";
@@ -202,7 +201,7 @@ namespace crouton::io::mbed {
                 result = MBEDTLS_ERR_SSL_WANT_WRITE;  // still busy with the last write
             else {
                 //cerr << "[async write " << length << "] " << endl;
-                _pendingWrite.emplace(_stream.write(string((char*)buf, length)));
+                _pendingWrite.emplace(_stream->write(string((char*)buf, length)));
                 result = int(length);
             }
             //cerr << "-> " << result << endl;
@@ -229,7 +228,7 @@ namespace crouton::io::mbed {
             } else if (!_readEOF) {
                 // We've read the entire buffer; time to read again:
                 //cerr << "[async read] " << endl;
-                _pendingRead.emplace(_stream.readNoCopy(100000));
+                _pendingRead.emplace(_stream->readNoCopy(100000));
                 _readBuf = ConstBytes{};
                 result = MBEDTLS_ERR_SSL_WANT_READ;
             } else {
@@ -264,8 +263,7 @@ namespace crouton::io::mbed {
 
 
     private:
-        std::unique_ptr<ISocket>    _socket;            // The underlying TCP socket
-        IStream&                    _stream;            // The socket's stream
+        std::shared_ptr<IStream>    _stream;            // The socket's stream
         TLSContext&                 _context;           // The shared mbedTLS context
         mbedtls_ssl_context         _ssl;               // The mbedTLS SSL object
         optional<Future<void>>      _pendingWrite;      // In-progress write operation, if any
@@ -295,16 +293,19 @@ namespace crouton::io::mbed {
     Future<void> TLSSocket::open() {
         precondition(!_impl);
         NotReentrant nr(_busy);
-        auto stream = ISocket::newSocket(false);
-        stream->bind(_binding->address, _binding->port);
-        stream->setNoDelay(_binding->noDelay);
-        stream->keepAlive(_binding->keepAlive);
-        _impl = make_unique<Impl>(std::move(stream),
+        auto socket = ISocket::newSocket(false);
+        socket->bind(*_binding);
+        _impl = make_unique<Impl>(socket->stream(),
                                   TLSContext::defaultClientContext(),
                                   _binding->address);
         _binding = nullptr;
         return _impl->handshake();
     }
+
+    shared_ptr<IStream> TLSSocket::stream() {
+        return shared_ptr<IStream>(shared_from_this(), static_cast<IStream*>(this));
+    }
+
 
     Future<ConstBytes> TLSSocket::readNoCopy(size_t maxLen)  {
         return _readNoCopy(maxLen, false);

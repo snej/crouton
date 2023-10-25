@@ -147,6 +147,11 @@ namespace crouton::io::apple {
     }
 
 
+    shared_ptr<IStream> NWConnection::stream() {
+        return shared_ptr<IStream>(shared_from_this(), static_cast<IStream*>(this));
+    }
+
+
     void NWConnection::clearReadBuf() {
         if (_content) {
             dispatch_release(_content);

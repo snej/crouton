@@ -82,7 +82,7 @@ static vector<http::Handler::Route> sRoutes = {
 
 static Task connectionTask(std::shared_ptr<TCPSocket> client) {
     Log->info("-- Accepted connection");
-    http::Handler handler(client, sRoutes);
+    http::Handler handler(client->stream(), sRoutes);
     AWAIT handler.run();
     Log->info("-- Done!\n");
 }

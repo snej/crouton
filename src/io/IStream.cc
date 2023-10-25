@@ -23,6 +23,13 @@
 namespace crouton::io {
     using namespace std;
 
+
+    void closeThenRelease(std::shared_ptr<IStream> &&stream) {
+        // Final release is deferred until the end of the 'then' callback.
+        (void) stream->close().then([=]() mutable {stream.reset();});
+    }
+
+    
     Future<size_t> IStream::read(MutableBytes buf) {
         size_t bytesRead = 0;
         while (bytesRead < buf.size()) {

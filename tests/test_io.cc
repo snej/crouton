@@ -143,10 +143,10 @@ TEST_CASE("Read a socket", "[uv]") {
         AWAIT socket->connect("example.com", 80);
 
         cerr << "-- Connected! Test Writing...\n";
-        AWAIT socket->stream().write("GET / HTTP/1.1\r\nHost: example.com\r\nConnection: close\r\n\r\n");
+        AWAIT socket->stream()->write("GET / HTTP/1.1\r\nHost: example.com\r\nConnection: close\r\n\r\n");
 
         cerr << "-- Test Reading...\n";
-        string result = AWAIT socket->stream().readAll();
+        string result = AWAIT socket->stream()->readAll();
 
         cerr << "HTTP response:\n" << result << endl;
         CHECK(result.starts_with("HTTP/1.1 "));
@@ -161,20 +161,21 @@ TEST_CASE("Read a socket", "[uv]") {
 TEST_CASE("Read a TLS socket", "[uv]") {
     RunCoroutine([]() -> Future<void> {
         cerr << "-- Creating TLSStream\n";
-        mbed::TLSSocket tlsStream;
-        tlsStream.bind("example.com", 443);
+        auto tlsSock = mbed::TLSSocket::create();
+        tlsSock->bind("example.com", 443);
 
         cerr << "-- Test Connecting...\n";
-        AWAIT tlsStream.open();
+        AWAIT tlsSock->open();
+        auto tlsStream = tlsSock->stream();
 
         cerr << "-- Test connected! Writing...\n";
-        AWAIT tlsStream.write("GET / HTTP/1.1\r\nHost: example.com\r\nConnection: close\r\n\r\n");
+        AWAIT tlsStream->write("GET / HTTP/1.1\r\nHost: example.com\r\nConnection: close\r\n\r\n");
 
         cerr << "-- Test Reading...\n";
-        string result = AWAIT tlsStream.readAll();
+        string result = AWAIT tlsStream->readAll();
         cerr << "-- Test Read: " << result << endl;
 
-        AWAIT tlsStream.close();
+        AWAIT tlsStream->close();
         RETURN noerror;
     });
 }
@@ -234,17 +235,18 @@ TEST_CASE("readdir", "[uv]") {
 
 staticASYNC<string> readNWSocket(const char* hostname, bool tls) {
     cerr << "Connecting...\n";
-    apple::NWConnection socket;
-    socket.bind(hostname, (tls ? 443 : 80));
-    socket.useTLS(tls);
-    AWAIT socket.open();
+    auto socket = apple::NWConnection::create();
+    socket->bind(hostname, (tls ? 443 : 80));
+    socket->useTLS(tls);
+    AWAIT socket->open();
 
     cerr << "Writing...\n";
-    AWAIT socket.write("GET / HTTP/1.1\r\nHost: example.com\r\nConnection: close\r\n\r\n");
+    auto stream = socket->stream();
+    AWAIT stream->write("GET / HTTP/1.1\r\nHost: example.com\r\nConnection: close\r\n\r\n");
 
     cerr << "Reading...\n";
-    string result = AWAIT socket.readAll();
-    AWAIT socket.close();
+    string result = AWAIT stream->readAll();
+    AWAIT stream->close();
     RETURN result;
 }
 

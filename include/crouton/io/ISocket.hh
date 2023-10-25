@@ -24,12 +24,13 @@
 namespace crouton::io {
     class IStream;
 
-    /** Abstract interface for opening a network connection. */
-    class ISocket {
+    /** Abstract interface for opening a network connection.
+        @note  Should always be created as a shared_ptr. */
+    class ISocket : public std::enable_shared_from_this<ISocket> {
     public:
 
         /// Factory method: Creates a new ISocket instance of a default subclass.
-        static std::unique_ptr<ISocket> newSocket(bool useTLS);
+        static std::shared_ptr<ISocket> newSocket(bool useTLS);
 
         /// Specifies the address and port to connect to, and whether to use TLS.
         virtual void bind(string const& address, uint16_t port) {
@@ -56,12 +57,9 @@ namespace crouton::io {
         virtual bool isOpen() const =0;
 
         /// The socket's data stream.
-        virtual IStream& stream() =0;
+        virtual std::shared_ptr<IStream> stream() =0;
 
         virtualASYNC<void> close() =0;
-
-        /// Convenience function that calls `close`, waits for completion, then deletes.
-        static Task closeAndFree(std::unique_ptr<ISocket>);
 
         virtual ~ISocket() = default;
 
@@ -72,10 +70,14 @@ namespace crouton::io {
             unsigned keepAlive = 0;
         };
 
-        void bind(binding);
+        void bind(binding b)                            {_binding = std::make_unique<binding>(b);}
 
     protected:
         std::unique_ptr<binding> _binding;
     };
+
+    
+    /// Convenience function that calls `close`, waits for completion, then deletes.
+    void closeThenRelease(std::shared_ptr<ISocket>&&);
 
 }

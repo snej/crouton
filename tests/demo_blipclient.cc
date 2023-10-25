@@ -17,7 +17,7 @@
 //
 
 #include "crouton/Crouton.hh"
-#include "crouton/BLIP.hh"
+#include "crouton/io/blip/BLIP.hh"
 #include <iostream>
 #include <vector>
 

@@ -23,10 +23,10 @@ namespace crouton::io {
     using namespace std;
     using namespace crouton::io::uv;
 
-    pair<Pipe,Pipe> Pipe::createPair() {
+    pair<Pipe::Ref,Pipe::Ref> Pipe::createPair() {
         uv_file fds[2];
         check(uv_pipe(fds, UV_NONBLOCK_PIPE, UV_NONBLOCK_PIPE), "creating pipes");
-        return std::pair<Pipe,Pipe>(fds[0], fds[1]);
+        return { make_shared<Pipe>(fds[0]), make_shared<Pipe>(fds[1]) };
     }
 
 

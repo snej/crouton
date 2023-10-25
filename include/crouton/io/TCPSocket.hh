@@ -26,17 +26,18 @@ struct uv_tcp_s;
 namespace crouton::io {
 
     /** A TCP socket. (For TLS connections, use TLSSocket or NWConnection.) */
-    class TCPSocket : public ISocket, public Stream {
+    class TCPSocket : public ISocket, private Stream {
     public:
-        TCPSocket();
+        static std::shared_ptr<TCPSocket> create()  {return std::make_shared<TCPSocket>();}
 
         /// Opens the socket to the bound address. Resolves once opened.
         ASYNC<void> open() override;
 
         bool isOpen() const override                {return Stream::isOpen();}
-        IStream& stream() override                  {return *this;}
+        std::shared_ptr<IStream> stream() override;
         ASYNC<void> close() override                {return Stream::close();}
 
+        TCPSocket();
     protected:
         friend class TCPServer;
 

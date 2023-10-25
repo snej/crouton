@@ -109,4 +109,8 @@ namespace crouton::io {
         ASYNC<void> write(std::initializer_list<ConstBytes> buffers);
     };
 
+
+    /// Convenience function that calls `close`, waits for completion, then releases.
+    void closeThenRelease(std::shared_ptr<IStream>&&);
+
 }

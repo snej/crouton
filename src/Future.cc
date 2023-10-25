@@ -135,17 +135,18 @@ namespace crouton {
     // Updates the chained FutureState based on my `then` callback.
     void FutureStateBase::resolveChain() {
         assert(_state == Ready);
+        std::shared_ptr<FutureStateBase> chainedFuture(std::move(_chainedFuture));
+        ChainCallback chainedCallback(std::move(_chainedCallback));
+
         if (auto x = getError()) {
-            _chainedFuture->setError(x);
+            chainedFuture->setError(x);
         } else {
             try {
-                _chainedCallback(*_chainedFuture, *this);
+                chainedCallback(chainedFuture, *this);
             } catch(...) {
-                _chainedFuture->setError(Error(std::current_exception()));
+                chainedFuture->setError(Error(std::current_exception()));
             }
         }
-        _chainedFuture = nullptr;
-        _chainedCallback = nullptr;
     }
 
 }

@@ -28,24 +28,26 @@ namespace crouton {
 namespace crouton::io::mbed {
 
     /*** A TCP socket with TLS, using mbedTLS. */
-    class TLSSocket : public IStream, public ISocket {
+    class TLSSocket : public ISocket, private IStream {
     public:
-        TLSSocket();
-        ~TLSSocket();
+        static std::shared_ptr<TLSSocket> create()  {return std::make_shared<TLSSocket>();}
+
 
         bool isOpen() const override;
         ASYNC<void> open() override;
         ASYNC<void> close() override;
         ASYNC<void> closeWrite() override;
 
-        IStream& stream() override              {return *this;}
+        std::shared_ptr<IStream> stream() override;
 
+        TLSSocket();
+        ~TLSSocket();
+    private:
         ASYNC<ConstBytes> readNoCopy(size_t maxLen = 65536) override;
         ASYNC<ConstBytes> peekNoCopy() override;
         ASYNC<void> write(ConstBytes) override;
         using IStream::write;
 
-    private:
         ASYNC<ConstBytes> _readNoCopy(size_t maxLen, bool peek);
 
         class Impl;

@@ -63,4 +63,9 @@ namespace crouton::io {
         RETURN noerror;
     }
 
+
+    shared_ptr<IStream> TCPSocket::stream() {
+        return shared_ptr<IStream>(shared_from_this(), static_cast<Stream*>(this));
+    }
+
 }

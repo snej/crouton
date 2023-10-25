@@ -57,9 +57,9 @@ namespace crouton::io::http {
             port = tls ? 443 : 80;
 
         // Create the socket:
-        _socket = ISocket::newSocket(tls);
-        _socket->bind(string(_url.hostname), port);
-        _stream = &_socket->stream();
+        auto socket = ISocket::newSocket(tls);
+        socket->bind(string(_url.hostname), port);
+        _stream = socket->stream();
     }
 
 
@@ -80,8 +80,8 @@ namespace crouton::io::http {
                 RETURN Error(CroutonError::InvalidArgument, "HTTPRequest with body stream must have a Content-Length");
         }
 
-        if (!_socket->isOpen())
-            AWAIT _socket->open();
+        if (!_stream->isOpen())
+            AWAIT _stream->open();
 
         // Prepend my URL's path, if any, to the request uri:
         if (!req.uri.empty() && !req.uri.starts_with('/'))
@@ -132,7 +132,7 @@ namespace crouton::io::http {
 
 
     void Connection::close() {
-        ISocket::closeAndFree(std::move(_socket));
+        closeThenRelease(std::move(_stream));
     }
 
 
