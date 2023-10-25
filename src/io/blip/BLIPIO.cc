@@ -15,6 +15,7 @@
 #include "Internal.hh"
 #include "MessageOut.hh"
 #include "util/Logging.hh"
+#include "util/Varint.hh"
 #include "StringUtils.hh"
 #include "Task.hh"
 #include <ranges>
@@ -38,7 +39,7 @@ namespace crouton::io::blip {
     using namespace std;
 
     /// Maximum amount of metadata added to a frame (MessageNo, flags, checksum)
-    static constexpr size_t kMaxFrameOverhead = kMaxVarintSize + sizeof(FrameFlags)
+    static constexpr size_t kMaxFrameOverhead = uvarint::kMaxSize + sizeof(FrameFlags)
                                                     + Codec::kChecksumSize;
     /// Size of regular frame, in bytes.
     static constexpr size_t kDefaultFrameSize = 4096;
@@ -51,33 +52,6 @@ namespace crouton::io::blip {
 
     /// Logger
     LoggerRef LBLIP = MakeLogger("BLIP");
-
-
-    uint64_t readUVarint(ConstBytes& bytes) {
-        uint64_t n = 0;
-        int shift = 0;
-        auto end = std::min(bytes.begin() + 10, bytes.end());
-        for (auto i = bytes.begin(); i != end; ++i) {
-            if (auto b = uint8_t(*i); b & 0x80) {
-                n |= uint64_t(b & 0x7F) << shift;
-                shift += 7;
-            } else {
-                bytes = ConstBytes(i + 1, bytes.end());
-                return n | (uint64_t(b) << shift);
-            }
-        }
-        Error(BLIPError::InvalidFrame).raise("invalid varint");
-    }
-
-    size_t putUVarint(uint64_t n, void* dst) {
-        uint8_t* i = (uint8_t*)dst;
-        while (n >= 0x80) {
-            *i++ = (n & 0xFF) | 0x80;
-            n >>= 7;
-        }
-        *i++ = (uint8_t)n;
-        return i - (uint8_t*)dst;
-    }
 
 
 #pragma mark - OUTBOX:
@@ -283,7 +257,7 @@ namespace crouton::io::blip {
         maxSize += kMaxFrameOverhead;
 
         MutableBytes out(frameBuf, maxSize);
-        writeUVarint(uint64_t(msg->_number), out);
+        uvarint::write(uint64_t(msg->_number), out);
         auto flagsPos = (FrameFlags*)out.data();
         out = out.without_first(1);
 
@@ -332,8 +306,8 @@ namespace crouton::io::blip {
 
     MessageInRef BLIPIO::receive(ConstBytes frame) {
         _totalBytesRead += frame.size();
-        MessageNo msgNo = MessageNo(readUVarint(frame));
-        uint64_t f = readUVarint(frame);
+        MessageNo msgNo = MessageNo(uvarint::read(frame));
+        uint64_t f = uvarint::read(frame);
         if (f > 0x80)
             Error::raise(BLIPError::InvalidFrame, "unknown frame flags");
         FrameFlags flags = FrameFlags(f);
@@ -448,7 +422,7 @@ namespace crouton::io::blip {
         }
 
         // Acks have no checksum and don't go through the codec; just read the byte count:
-        auto byteCount = readUVarint(body);
+        auto byteCount = uvarint::read(body);
         msg->receivedAck(uint32_t(byteCount));
         if (frozen && !msg->needsAck()) 
             thawMessage(msg);

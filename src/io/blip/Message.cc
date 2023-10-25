@@ -15,6 +15,7 @@
 #include "MessageOut.hh"
 #include "BLIPIO.hh"
 #include "Codec.hh"
+#include "util/Varint.hh"
 #include "StringUtils.hh"
 #include <iostream>
 #include <sstream>
@@ -159,7 +160,7 @@ namespace crouton::io::blip {
             char buf[10];
             MutableBytes out(buf, sizeof(buf));
             ConstBytes dst = codec.write(frame, out, mode);
-            _propertiesSize = readUVarint(dst);
+            _propertiesSize = uvarint::read(dst);
             if (_propertiesSize > kMaxPropertiesSize)
                 crouton::Error::raise(BLIPError::PropertiesTooLarge);
             _properties.reserve(_propertiesSize);
@@ -216,7 +217,7 @@ namespace crouton::io::blip {
             // Send an ACK after enough data has been received of this message:
             auto msgType = FrameFlags(isResponse() ? kAckResponseType : kAckRequestType);
             char buf[10];
-            string payload(buf, putUVarint(_rawBytesReceived, buf));
+            string payload(buf, uvarint::put(_rawBytesReceived, buf));
             _connection->send(make_shared<MessageOut>(_connection,
                                                       FrameFlags(msgType|kUrgent|kNoReply),
                                                       payload, _number));

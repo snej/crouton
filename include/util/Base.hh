@@ -54,8 +54,8 @@
 #endif
 #endif
 
-#if __has_attribute(pure)
-#define Pure        __attribute__((pure))
+#if __has_attribute(__pure__)
+#define Pure        __attribute__((__pure__))
 #else
 #define Pure
 #endif

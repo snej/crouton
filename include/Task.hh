@@ -17,6 +17,7 @@
 //
 
 #pragma once
+#include "CoCondition.hh"
 #include "Scheduler.hh"
 
 #include <atomic>
@@ -36,11 +37,15 @@ namespace crouton {
         /// Lets the task coroutine know it should stop. Its next `co_yield` will return false.
         void interrupt()                    {_shared->interrupt = true;}
 
+        /// Await this to block until the Task completes.
+        Blocker<Error>& join()              {return _shared->done;}
+
     private:
         friend class Scheduler;
         friend class TaskImpl;
 
         struct shared {
+            Blocker<Error>    done;
             std::atomic<bool> alive = true;
             std::atomic<bool> interrupt = false;
         };
@@ -87,13 +92,20 @@ namespace crouton {
             return yielder(_shared);
         }
 
-        void return_void() {
+        void unhandled_exception() {
+            lifecycle::threw(_handle);
             _shared->alive = false;
+            _shared->done.notify(Error(std::current_exception()));
+        }
+
+
+        void return_void() {
             lifecycle::returning(handle());
+            _shared->alive = false;
+            _shared->done.notify(noerror);
         }
 
         SuspendFinal<true> final_suspend() noexcept {
-            _shared->alive = false;
             return {};
         }
 

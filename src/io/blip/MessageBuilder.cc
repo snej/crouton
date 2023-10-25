@@ -14,6 +14,7 @@
 #include "BLIPIO.hh"
 #include "BLIPProtocol.hh"
 #include "StringUtils.hh"
+#include "util/Varint.hh"
 #include <ostream>
 
 namespace crouton::io::blip {
@@ -93,8 +94,8 @@ namespace crouton::io::blip {
             size_t propertiesSize = properties.size();
             if (propertiesSize > kMaxPropertiesSize)
                 Error::raise(BLIPError::PropertiesTooLarge);
-            char  buf[kMaxVarintSize];
-            _out << string_view(buf, putUVarint(propertiesSize, buf));
+            char  buf[uvarint::kMaxSize];
+            _out << string_view(buf, uvarint::put(propertiesSize, buf));
             _out << properties;
             _wroteProperties = true;
         }

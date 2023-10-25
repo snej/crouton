@@ -114,6 +114,8 @@
 		27B3307C2AB911250066C8DA /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278F7E332AA015C0005B12F2 /* Security.framework */; };
 		27B330832AB911470066C8DA /* demo_blipclient.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B330822AB911470066C8DA /* demo_blipclient.cc */; };
 		27B330852AB914D40066C8DA /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B3306F2AB4BE590066C8DA /* libz.tbd */; };
+		27BCD2F62AE98994009DFCED /* Framer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27BCD2F52AE98994009DFCED /* Framer.cc */; };
+		27BCD2F92AE98D10009DFCED /* Varint.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27BCD2F82AE98D10009DFCED /* Varint.cc */; };
 		27E98EDF2AC2099E002F3D35 /* test_generator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E98EDE2AC2099E002F3D35 /* test_generator.cc */; };
 		27ED1C722AABF47200ADC971 /* CoroLifecycle.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27ED1C702AABF47200ADC971 /* CoroLifecycle.hh */; };
 		27ED1C732AABF47200ADC971 /* CoroLifecycle.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27ED1C712AABF47200ADC971 /* CoroLifecycle.cc */; };
@@ -612,6 +614,10 @@
 		27BA40742AA502DD0011BB86 /* Result.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Result.hh; sourceTree = "<group>"; };
 		27BCD2CE2AE73844009DFCED /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		27BCD2CF2AE738DF009DFCED /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		27BCD2F42AE98960009DFCED /* Framer.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Framer.hh; sourceTree = "<group>"; };
+		27BCD2F52AE98994009DFCED /* Framer.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Framer.cc; sourceTree = "<group>"; };
+		27BCD2F72AE98C9C009DFCED /* Varint.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Varint.hh; sourceTree = "<group>"; };
+		27BCD2F82AE98D10009DFCED /* Varint.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Varint.cc; sourceTree = "<group>"; };
 		27E98EDE2AC2099E002F3D35 /* test_generator.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_generator.cc; sourceTree = "<group>"; };
 		27E98EE02AC21940002F3D35 /* Awaitable.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Awaitable.hh; sourceTree = "<group>"; };
 		27ED1C702AABF47200ADC971 /* CoroLifecycle.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CoroLifecycle.hh; sourceTree = "<group>"; };
@@ -1054,8 +1060,9 @@
 				27B3306A2AB391F30066C8DA /* Bytes.hh */,
 				277E8A432ABA50FB00E78CB1 /* LinkedList.hh */,
 				278F7F222AAA98FE005B12F2 /* Logging.hh */,
-				277B65282AD766EF006F053D /* Relation.hh */,
 				277B6C272AE06CDA006F053D /* MiniFormat.hh */,
+				277B65282AD766EF006F053D /* Relation.hh */,
+				27BCD2F72AE98C9C009DFCED /* Varint.hh */,
 			);
 			path = util;
 			sourceTree = "<group>";
@@ -1127,6 +1134,7 @@
 				279D5D402A8FE08D005C3066 /* AddrInfo.hh */,
 				272730502A8EC61D000CCA22 /* FileStream.hh */,
 				278F7E4D2AA2ADFD005B12F2 /* Filesystem.hh */,
+				27BCD2F42AE98960009DFCED /* Framer.hh */,
 				272A85282A97B2090083D947 /* HTTPConnection.hh */,
 				278F7E582AA93D5A005B12F2 /* HTTPHandler.hh */,
 				278F7E382AA1489B005B12F2 /* HTTPParser.hh */,
@@ -1150,6 +1158,7 @@
 			isa = PBXGroup;
 			children = (
 				272A85292A97B2090083D947 /* HTTPConnection.cc */,
+				27BCD2F52AE98994009DFCED /* Framer.cc */,
 				278F7E592AA93D5A005B12F2 /* HTTPHandler.cc */,
 				278F7E392AA1489B005B12F2 /* HTTPParser.cc */,
 				278F7E562AA7EDBF005B12F2 /* ISocket.cc */,
@@ -1491,6 +1500,7 @@
 				277B6C282AE06CDA006F053D /* MiniFormat.cc */,
 				278F7E3E2AA24FEE005B12F2 /* StringUtils.hh */,
 				27B330572AB278870066C8DA /* StringUtils.cc */,
+				27BCD2F82AE98D10009DFCED /* Varint.cc */,
 			);
 			path = support;
 			sourceTree = "<group>";
@@ -1808,6 +1818,7 @@
 				278F767B2A9FEF54005B12F2 /* TLSSocket.cc in Sources */,
 				278F7E572AA7EDBF005B12F2 /* ISocket.cc in Sources */,
 				2788E3542AC38B5E00254A88 /* Select.cc in Sources */,
+				27BCD2F62AE98994009DFCED /* Framer.cc in Sources */,
 				278F7F202AAA9212005B12F2 /* bundled_fmtlib_format.cpp in Sources */,
 				278F7E5B2AA93D5A005B12F2 /* HTTPHandler.cc in Sources */,
 				277B652E2AD9FCDC006F053D /* Backtrace+Unix.cc in Sources */,
@@ -1824,6 +1835,7 @@
 				27ED1C732AABF47200ADC971 /* CoroLifecycle.cc in Sources */,
 				278F7F1C2AAA9212005B12F2 /* async.cpp in Sources */,
 				279D5D432A8FE08D005C3066 /* AddrInfo.cc in Sources */,
+				27BCD2F92AE98D10009DFCED /* Varint.cc in Sources */,
 				277E8A422ABA4AA200E78CB1 /* CoCondition.cc in Sources */,
 				27B330582AB278870066C8DA /* StringUtils.cc in Sources */,
 				272730552A8ED3D1000CCA22 /* Future.cc in Sources */,

@@ -38,13 +38,13 @@ namespace crouton::io {
         virtual bool isOpen() const =0;
 
         /// Resolves once the stream has opened.
-        virtualASYNC<void> open() = 0;
+        virtualASYNC<void> open() =0;
 
         /// Closes the stream; resolves when it's closed.
-        virtualASYNC<void> close() = 0;
+        virtualASYNC<void> close() =0;
 
         /// Closes the write side, but not the read side. (Like a socket's `shutdown`.)
-        virtualASYNC<void> closeWrite() = 0;
+        virtualASYNC<void> closeWrite() =0;
 
         //---- Reading:
 

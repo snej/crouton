@@ -65,7 +65,6 @@ namespace crouton::io {
 
         virtual ~ISocket() = default;
 
-    protected:
         struct binding {
             string address;
             uint16_t port;
@@ -73,6 +72,9 @@ namespace crouton::io {
             unsigned keepAlive = 0;
         };
 
+        void bind(binding);
+
+    protected:
         std::unique_ptr<binding> _binding;
     };
 

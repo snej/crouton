@@ -114,6 +114,7 @@ add_library( LibCrouton STATIC
     src/Scheduler.cc
     src/Select.cc
 
+    src/io/Framer.cc
     src/io/HTTPConnection.cc
     src/io/HTTPHandler.cc
     src/io/HTTPParser.cc
@@ -143,6 +144,7 @@ add_library( LibCrouton STATIC
     src/support/Logging.cc
     src/support/MiniFormat.cc
     src/support/StringUtils.cc
+    src/support/Varint.cc
 )
 
 target_include_directories( LibCrouton PUBLIC

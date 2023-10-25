@@ -13,6 +13,7 @@
 #include "MessageOut.hh"
 #include "BLIPIO.hh"
 #include "Codec.hh"
+#include "util/Varint.hh"
 
 namespace crouton::io::blip {
     using namespace std;
@@ -183,7 +184,7 @@ namespace crouton::io::blip {
             return {};
         ConstBytes in(_payload);
         // This assumes the message starts with properties, which start with a UVarInt32.
-        auto propertiesSize = readUVarint(in);
+        auto propertiesSize = uvarint::read(in);
         if (propertiesSize > in.size())
             crouton::Error::raise(BLIPError::InvalidFrame, "Invalid properties size in BLIP frame");
         return {in.first(propertiesSize), in.without_first(propertiesSize)};

@@ -61,19 +61,6 @@ namespace crouton::io::blip {
 
     extern LoggerRef LBLIP;
 
-
-#pragma mark - VARINTS:
-
-
-    constexpr size_t kMaxVarintSize = 10;
-
-    uint64_t readUVarint(ConstBytes& bytes);
-    size_t putUVarint(uint64_t n, void* dst);
-
-    inline void writeUVarint(uint64_t n, MutableBytes& out) {
-        out = out.without_first(putUVarint(n, out.data()));
-    }
-
 }
 
 namespace crouton {

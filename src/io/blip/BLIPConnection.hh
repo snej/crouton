@@ -31,14 +31,33 @@ namespace crouton::io::blip {
     class MessageBuilder;
 
 
-    /** A BLIP WebSocket connection. Glues a `BLIPIO` to a `WebSocket`.
-        You should first create and connect the ClientWebSocket or ServerWebSocket,
-        then pass it to the BLIPConnection constructor, then call `start`. */
-    class BLIPConnection {
+    /** A map from message Profile strings to handler functions. */
+    class Dispatcher {
     public:
         using RequestHandler = std::function<void(MessageInRef)>;
         using RequestHandlerItem = std::pair<const string,RequestHandler>;
 
+        explicit Dispatcher(std::initializer_list<RequestHandlerItem> = {});
+
+        /// Registers a handler for incoming requests with a specific `Profile` property value.
+        /// The profile string `"*"` is a wild-card that matches any message.
+        void setRequestHandler(string profile, RequestHandler);
+
+        /// Calls the handler for a message. 
+        /// If there is none, responds with a {BLIP,404} error.
+        /// If the handler fails, responds with a {BLIP, 500} error.
+        void dispatchRequest(MessageInRef);
+
+    private:
+        std::unordered_map<string,RequestHandler> _handlers;
+    };
+
+
+    /** A BLIP WebSocket connection. Glues a `BLIPIO` to a `WebSocket`.
+        You should first create and connect the ClientWebSocket or ServerWebSocket,
+        then pass it to the BLIPConnection constructor, then call `start`. */
+    class BLIPConnection : private Dispatcher {
+    public:
         /// Constructs a BLIPConnection and registers any given request handlers.
         explicit BLIPConnection(std::unique_ptr<ws::WebSocket> ws,
                                 std::initializer_list<RequestHandlerItem> = {});
@@ -46,7 +65,9 @@ namespace crouton::io::blip {
 
         /// Registers a handler for incoming requests with a specific `Profile` property value.
         /// The profile string `"*"` is a wild-card that matches any message.
-        void setRequestHandler(string profile, RequestHandler);
+        void setRequestHandler(string profile, RequestHandler h) {
+            Dispatcher::setRequestHandler(profile, h);
+        }
 
         /// Begins listening for incoming messages and sending outgoing ones.
         /// You should register your request handlers before calling this.
@@ -71,15 +92,10 @@ namespace crouton::io::blip {
     private:
         Task outputTask();
         Task inputTask();
-        void dispatchRequest(MessageInRef);
-
-        using HandlerMap = std::unordered_map<string,RequestHandler>;
 
         BLIPIO                          _io;
         std::unique_ptr<ws::WebSocket>  _socket;
-        HandlerMap                      _handlers;
         std::optional<Task>             _outputTask, _inputTask;
-        Blocker<void>                   _outputDone, _inputDone;
     };
 
 }
