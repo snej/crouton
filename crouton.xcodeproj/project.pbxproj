@@ -31,15 +31,15 @@
 		275EB3F22ACDCC5D0022ED53 /* MessageOut.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330612AB373430066C8DA /* MessageOut.hh */; settings = {ATTRIBUTES = (Private, ); }; };
 		275EB3F32ACDCC5D0022ED53 /* Message.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B3304D2AB2763B0066C8DA /* Message.hh */; settings = {ATTRIBUTES = (Public, ); }; };
 		275EB3F42ACDCC5D0022ED53 /* MessageBuilder.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B3305B2AB36F1D0066C8DA /* MessageBuilder.hh */; settings = {ATTRIBUTES = (Public, ); }; };
-		275EB3FE2ACDCC5D0022ED53 /* BLIPConnection.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330712AB8FF790066C8DA /* BLIPConnection.hh */; settings = {ATTRIBUTES = (Public, ); }; };
+		275EB3FE2ACDCC5D0022ED53 /* Connection.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330712AB8FF790066C8DA /* Connection.hh */; settings = {ATTRIBUTES = (Public, ); }; };
 		275EB4012ACDCC5D0022ED53 /* BLIPIO.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B3304E2AB2763B0066C8DA /* BLIPIO.hh */; settings = {ATTRIBUTES = (Public, ); }; };
 		275EB4022ACDCC5D0022ED53 /* Codec.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330662AB384880066C8DA /* Codec.hh */; settings = {ATTRIBUTES = (Private, ); }; };
-		275EB40C2ACDCC5D0022ED53 /* BLIPProtocol.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330512AB2763B0066C8DA /* BLIPProtocol.hh */; settings = {ATTRIBUTES = (Public, ); }; };
+		275EB40C2ACDCC5D0022ED53 /* Protocol.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330512AB2763B0066C8DA /* Protocol.hh */; settings = {ATTRIBUTES = (Public, ); }; };
 		275EB4152ACDCC5D0022ED53 /* MessageBuilder.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B3305A2AB36F1D0066C8DA /* MessageBuilder.cc */; };
 		275EB41B2ACDCC5D0022ED53 /* MessageOut.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B330622AB373430066C8DA /* MessageOut.cc */; };
 		275EB4262ACDCC5D0022ED53 /* Message.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B3304F2AB2763B0066C8DA /* Message.cc */; };
 		275EB4302ACDCC5D0022ED53 /* Codec.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B330652AB384870066C8DA /* Codec.cc */; };
-		275EB4322ACDCC5D0022ED53 /* BLIPConnection.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B330722AB8FF790066C8DA /* BLIPConnection.cc */; };
+		275EB4322ACDCC5D0022ED53 /* Connection.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B330722AB8FF790066C8DA /* Connection.cc */; };
 		275EB4372ACDCC5D0022ED53 /* BLIPIO.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B330502AB2763B0066C8DA /* BLIPIO.cc */; };
 		275EB4402ACDCD660022ED53 /* libBLIP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 275EB43F2ACDCC5D0022ED53 /* libBLIP.a */; };
 		275EB4412ACDCD760022ED53 /* libBLIP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 275EB43F2ACDCC5D0022ED53 /* libBLIP.a */; };
@@ -100,14 +100,14 @@
 		279D5D662A952DD1005C3066 /* Pipe.cc in Sources */ = {isa = PBXBuildFile; fileRef = 279D5D642A952DD1005C3066 /* Pipe.cc */; };
 		27B330522AB2763B0066C8DA /* Message.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B3304D2AB2763B0066C8DA /* Message.hh */; };
 		27B330532AB2763B0066C8DA /* BLIPIO.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B3304E2AB2763B0066C8DA /* BLIPIO.hh */; };
-		27B330562AB2763B0066C8DA /* BLIPProtocol.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330512AB2763B0066C8DA /* BLIPProtocol.hh */; };
+		27B330562AB2763B0066C8DA /* Protocol.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330512AB2763B0066C8DA /* Protocol.hh */; };
 		27B330582AB278870066C8DA /* StringUtils.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B330572AB278870066C8DA /* StringUtils.cc */; };
 		27B3305D2AB36F1D0066C8DA /* MessageBuilder.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B3305B2AB36F1D0066C8DA /* MessageBuilder.hh */; };
 		27B330632AB373430066C8DA /* MessageOut.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330612AB373430066C8DA /* MessageOut.hh */; };
 		27B330682AB384880066C8DA /* Codec.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330662AB384880066C8DA /* Codec.hh */; };
 		27B3306E2AB4BD0B0066C8DA /* test_blip.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B3306D2AB4BD0B0066C8DA /* test_blip.cc */; };
 		27B330702AB4BE590066C8DA /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B3306F2AB4BE590066C8DA /* libz.tbd */; };
-		27B330732AB8FF790066C8DA /* BLIPConnection.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330712AB8FF790066C8DA /* BLIPConnection.hh */; };
+		27B330732AB8FF790066C8DA /* Connection.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330712AB8FF790066C8DA /* Connection.hh */; };
 		27B330792AB911250066C8DA /* libcrouton.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 272728DB2A8D6604000CCA22 /* libcrouton.a */; };
 		27B3307A2AB911250066C8DA /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278F7E312AA015B0005B12F2 /* CoreFoundation.framework */; };
 		27B3307B2AB911250066C8DA /* Network.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27F6030B2A9FBA5E006FA1D0 /* Network.framework */; };
@@ -593,7 +593,7 @@
 		27B3304E2AB2763B0066C8DA /* BLIPIO.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BLIPIO.hh; sourceTree = "<group>"; };
 		27B3304F2AB2763B0066C8DA /* Message.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Message.cc; sourceTree = "<group>"; };
 		27B330502AB2763B0066C8DA /* BLIPIO.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BLIPIO.cc; sourceTree = "<group>"; };
-		27B330512AB2763B0066C8DA /* BLIPProtocol.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = BLIPProtocol.hh; sourceTree = "<group>"; };
+		27B330512AB2763B0066C8DA /* Protocol.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Protocol.hh; sourceTree = "<group>"; };
 		27B330572AB278870066C8DA /* StringUtils.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = StringUtils.cc; sourceTree = "<group>"; };
 		27B3305A2AB36F1D0066C8DA /* MessageBuilder.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MessageBuilder.cc; sourceTree = "<group>"; };
 		27B3305B2AB36F1D0066C8DA /* MessageBuilder.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MessageBuilder.hh; sourceTree = "<group>"; };
@@ -606,8 +606,8 @@
 		27B3306C2AB3C3B40066C8DA /* Queue.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Queue.hh; sourceTree = "<group>"; };
 		27B3306D2AB4BD0B0066C8DA /* test_blip.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_blip.cc; sourceTree = "<group>"; };
 		27B3306F2AB4BE590066C8DA /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.0.sdk/usr/lib/libz.tbd; sourceTree = DEVELOPER_DIR; };
-		27B330712AB8FF790066C8DA /* BLIPConnection.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = BLIPConnection.hh; sourceTree = "<group>"; };
-		27B330722AB8FF790066C8DA /* BLIPConnection.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BLIPConnection.cc; sourceTree = "<group>"; };
+		27B330712AB8FF790066C8DA /* Connection.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Connection.hh; sourceTree = "<group>"; };
+		27B330722AB8FF790066C8DA /* Connection.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Connection.cc; sourceTree = "<group>"; };
 		27B330812AB911250066C8DA /* demo_blipclient */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = demo_blipclient; sourceTree = BUILT_PRODUCTS_DIR; };
 		27B330822AB911470066C8DA /* demo_blipclient.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = demo_blipclient.cc; sourceTree = "<group>"; };
 		27B330842AB912D30066C8DA /* BLIP.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = BLIP.hh; sourceTree = "<group>"; };
@@ -1511,7 +1511,7 @@
 			isa = PBXGroup;
 			children = (
 				275EB3EA2ACDC7450022ED53 /* README.md */,
-				27B330722AB8FF790066C8DA /* BLIPConnection.cc */,
+				27B330722AB8FF790066C8DA /* Connection.cc */,
 				27B330502AB2763B0066C8DA /* BLIPIO.cc */,
 				27B3304F2AB2763B0066C8DA /* Message.cc */,
 				27B3305A2AB36F1D0066C8DA /* MessageBuilder.cc */,
@@ -1526,9 +1526,9 @@
 		27BCD2FA2AE99605009DFCED /* blip */ = {
 			isa = PBXGroup;
 			children = (
-				27B330512AB2763B0066C8DA /* BLIPProtocol.hh */,
 				27B330842AB912D30066C8DA /* BLIP.hh */,
-				27B330712AB8FF790066C8DA /* BLIPConnection.hh */,
+				27B330512AB2763B0066C8DA /* Protocol.hh */,
+				27B330712AB8FF790066C8DA /* Connection.hh */,
 				27B3304E2AB2763B0066C8DA /* BLIPIO.hh */,
 				27B3304D2AB2763B0066C8DA /* Message.hh */,
 				27B3305B2AB36F1D0066C8DA /* MessageBuilder.hh */,
@@ -1559,7 +1559,7 @@
 				278F7E3A2AA1489B005B12F2 /* HTTPParser.hh in Headers */,
 				27ED1C722AABF47200ADC971 /* CoroLifecycle.hh in Headers */,
 				279D5D422A8FE08D005C3066 /* AddrInfo.hh in Headers */,
-				27B330732AB8FF790066C8DA /* BLIPConnection.hh in Headers */,
+				27B330732AB8FF790066C8DA /* Connection.hh in Headers */,
 				277E8A462ABA7A1800E78CB1 /* Error.hh in Headers */,
 				27F49CD62A9E4E8E00BFB24C /* Backtrace.hh in Headers */,
 				277B6C292AE06CDA006F053D /* MiniFormat.hh in Headers */,
@@ -1574,7 +1574,7 @@
 				278F7E5A2AA93D5A005B12F2 /* HTTPHandler.hh in Headers */,
 				278F7E4C2AA28642005B12F2 /* WebSocketProtocol.hh in Headers */,
 				27F603042A9EB826006FA1D0 /* IStream.hh in Headers */,
-				27B330562AB2763B0066C8DA /* BLIPProtocol.hh in Headers */,
+				27B330562AB2763B0066C8DA /* Protocol.hh in Headers */,
 				278F767A2A9FEF54005B12F2 /* TLSSocket.hh in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1583,9 +1583,9 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				275EB3FE2ACDCC5D0022ED53 /* BLIPConnection.hh in Headers */,
+				275EB3FE2ACDCC5D0022ED53 /* Connection.hh in Headers */,
 				275EB4012ACDCC5D0022ED53 /* BLIPIO.hh in Headers */,
-				275EB40C2ACDCC5D0022ED53 /* BLIPProtocol.hh in Headers */,
+				275EB40C2ACDCC5D0022ED53 /* Protocol.hh in Headers */,
 				275EB3F32ACDCC5D0022ED53 /* Message.hh in Headers */,
 				275EB3F42ACDCC5D0022ED53 /* MessageBuilder.hh in Headers */,
 				275EB4022ACDCC5D0022ED53 /* Codec.hh in Headers */,
@@ -1869,7 +1869,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				275EB4322ACDCC5D0022ED53 /* BLIPConnection.cc in Sources */,
+				275EB4322ACDCC5D0022ED53 /* Connection.cc in Sources */,
 				275EB4372ACDCC5D0022ED53 /* BLIPIO.cc in Sources */,
 				275EB4302ACDCC5D0022ED53 /* Codec.cc in Sources */,
 				275EB4262ACDCC5D0022ED53 /* Message.cc in Sources */,

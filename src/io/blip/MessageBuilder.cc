@@ -12,7 +12,7 @@
 
 #include "crouton/io/blip/MessageBuilder.hh"
 #include "crouton/io/blip/BLIPIO.hh"
-#include "crouton/io/blip/BLIPProtocol.hh"
+#include "crouton/io/blip/Protocol.hh"
 #include "support/StringUtils.hh"
 #include "crouton/util/Varint.hh"
 #include <ostream>

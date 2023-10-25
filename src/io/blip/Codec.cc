@@ -15,7 +15,7 @@
 
 
 #include "Codec.hh"
-#include "crouton/io/blip/BLIPProtocol.hh"
+#include "crouton/io/blip/Protocol.hh"
 #include "crouton/util/Logging.hh"
 #include "support/Endian.hh"
 #include <algorithm>

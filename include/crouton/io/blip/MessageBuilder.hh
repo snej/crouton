@@ -11,7 +11,8 @@
 //
 
 #pragma once
-#include "Message.hh"
+#include "crouton/io/blip/Message.hh"
+
 #include <functional>
 #include <initializer_list>
 #include <sstream>

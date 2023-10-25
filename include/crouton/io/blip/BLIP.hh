@@ -13,7 +13,7 @@
 #pragma once
 #include "crouton/Crouton.hh"
 
-#include "crouton/io/blip/BLIPConnection.hh"
+#include "crouton/io/blip/Connection.hh"
 #include "crouton/io/blip/BLIPIO.hh"
 #include "crouton/io/blip/Message.hh"
 #include "crouton/io/blip/MessageBuilder.hh"

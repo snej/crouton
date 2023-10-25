@@ -187,7 +187,7 @@ endif()
 
 if (CROUTON_BUILD_BLIP)
     add_library( BLIP STATIC
-        src/io/blip/BLIPConnection.cc
+        src/io/blip/Connection.cc
         src/io/blip/BLIPIO.cc
         src/io/blip/Message.cc
         src/io/blip/MessageBuilder.cc

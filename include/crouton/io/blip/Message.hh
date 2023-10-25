@@ -9,9 +9,9 @@
 //
 
 #pragma once
-#include "BLIPProtocol.hh"
-#include "crouton/util/Bytes.hh"
+#include "crouton/io/blip/Protocol.hh"
 #include "crouton/Future.hh"
+#include "crouton/util/Bytes.hh"
 
 namespace crouton::io::blip {
     class BLIPIO;

@@ -1,5 +1,5 @@
 //
-// BLIPConnection.cc
+// Connection.cc
 //
 // Copyright 2023-Present Couchbase, Inc. All rights reserved.
 //
@@ -16,7 +16,7 @@
 // limitations under the License.
 //
 
-#include "crouton/io/blip/BLIPConnection.hh"
+#include "crouton/io/blip/Connection.hh"
 #include "crouton/io/WebSocket.hh"
 #include "crouton/Task.hh"
 #include <spdlog/fmt/fmt.h>
@@ -59,23 +59,23 @@ namespace crouton::io::blip {
 
 
 
-    BLIPConnection::BLIPConnection(std::unique_ptr<ws::WebSocket> ws,
+    Connection::Connection(std::unique_ptr<ws::WebSocket> ws,
                                    std::initializer_list<RequestHandlerItem> handlers)
     :Dispatcher(handlers)
     ,_socket(std::move(ws))
     { }
 
-    BLIPConnection::~BLIPConnection() = default;
+    Connection::~Connection() = default;
 
 
-    void BLIPConnection::start() {
-        LBLIP->info("BLIPConnection starting");
+    void Connection::start() {
+        LBLIP->info("Connection starting");
         _outputTask.emplace(outputTask());
         _inputTask.emplace(inputTask());
     }
 
 
-    Task BLIPConnection::outputTask() {
+    Task Connection::outputTask() {
         do {
             Result<string> frame = AWAIT _io.output();
             if (!frame)
@@ -85,11 +85,11 @@ namespace crouton::io::blip {
     }
 
 
-    Task BLIPConnection::inputTask() {
+    Task Connection::inputTask() {
         do {
             Result<ws::Message> frame = AWAIT _socket->receive();
             if (!frame || frame->type == ws::Message::Close) {
-                LBLIP->info("BLIPConnection received WebSocket CLOSE");
+                LBLIP->info("Connection received WebSocket CLOSE");
                 break;
             }
             MessageInRef msg = _io.receive(*frame);
@@ -100,19 +100,19 @@ namespace crouton::io::blip {
     }
 
 
-    ASYNC<MessageInRef> BLIPConnection::sendRequest(MessageBuilder& msg) {
+    ASYNC<MessageInRef> Connection::sendRequest(MessageBuilder& msg) {
         return _io.sendRequest(msg);
     }
 
 
-    Future<void> BLIPConnection::close(ws::CloseCode code, string message, bool immediate) {
-        LBLIP->info("BLIPConnection closing with code {} \"{}\"", int(code), message);
+    Future<void> Connection::close(ws::CloseCode code, string message, bool immediate) {
+        LBLIP->info("Connection closing with code {} \"{}\"", int(code), message);
         if (immediate)
             _io.stop();
         else
             _io.closeSend();
         AWAIT _outputTask->join();
-        LBLIP->debug("BLIPConnection now sending WebSocket CLOSE...");
+        LBLIP->debug("Connection now sending WebSocket CLOSE...");
         AWAIT _socket->send(ws::Message{code, message});
         AWAIT _inputTask->join();
         AWAIT _socket->close();

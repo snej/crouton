@@ -1,5 +1,5 @@
 //
-// BLIPProtocol.hh
+// Protocol.hh
 //
 // Copyright 2017-Present Couchbase, Inc.
 //
@@ -11,10 +11,8 @@
 //
 
 #pragma once
-#include "crouton/util/Bytes.hh"
 #include "crouton/Error.hh"
 #include "crouton/util/Logging.hh"
-#include <cstdint>
 
 namespace crouton::io::blip {
 
@@ -51,6 +49,7 @@ namespace crouton::io::blip {
     constexpr size_t kIncomingAckThreshold = 50000;
 
 
+    /** Errors produced by BLIP APIs. */
     enum class BLIPError : errorcode_t {
         InvalidFrame = 1,
         PropertiesTooLarge,

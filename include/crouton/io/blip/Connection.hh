@@ -1,5 +1,5 @@
 //
-// BLIPConnection.hh
+// Connection.hh
 //
 // Copyright 2023-Present Couchbase, Inc. All rights reserved.
 //
@@ -17,11 +17,11 @@
 //
 
 #pragma once
-#include "BLIPIO.hh"
-#include "crouton/io/WebSocket.hh"
+#include "crouton/io/blip/BLIPIO.hh"
+#include "crouton/io/blip/Message.hh"
 #include "crouton/CoCondition.hh"
-#include "Message.hh"
 #include "crouton/Task.hh"
+#include "crouton/io/WebSocket.hh"
 
 #include <functional>
 #include <optional>
@@ -55,13 +55,13 @@ namespace crouton::io::blip {
 
     /** A BLIP WebSocket connection. Glues a `BLIPIO` to a `WebSocket`.
         You should first create and connect the ClientWebSocket or ServerWebSocket,
-        then pass it to the BLIPConnection constructor, then call `start`. */
-    class BLIPConnection : private Dispatcher {
+        then pass it to the Connection constructor, then call `start`. */
+    class Connection : private Dispatcher {
     public:
-        /// Constructs a BLIPConnection and registers any given request handlers.
-        explicit BLIPConnection(std::unique_ptr<ws::WebSocket> ws,
+        /// Constructs a Connection and registers any given request handlers.
+        explicit Connection(std::unique_ptr<ws::WebSocket> ws,
                                 std::initializer_list<RequestHandlerItem> = {});
-        ~BLIPConnection();
+        ~Connection();
 
         /// Registers a handler for incoming requests with a specific `Profile` property value.
         /// The profile string `"*"` is a wild-card that matches any message.

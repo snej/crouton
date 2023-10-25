@@ -11,22 +11,24 @@
 //
 
 #pragma once
-#include "crouton/util/Bytes.hh"
-#include "Codec.hh"
+#include "crouton/io/blip/Message.hh"
 #include "crouton/Future.hh"
 #include "crouton/Generator.hh"
 #include "crouton/Queue.hh"
-#include "Message.hh"
-#include "crouton/Queue.hh"
+#include "crouton/util/Bytes.hh"
 
 #include <algorithm>
 #include <unordered_map>
 #include <vector>
 
 namespace crouton::io::blip {
+    class Deflater;
+    class Inflater;
     class MessageBuilder;
     class MessageOut;
 
+    /** Lower-level transport-agnostic BLIP API. It doesn't care where frames come from or where
+        they go. Usually you'll want to use BLIPConnection instead, for BLIP-over-WebSocket. */
     class BLIPIO {
     public:
         BLIPIO();
@@ -87,7 +89,7 @@ namespace crouton::io::blip {
         void freezeMessage(MessageOutRef);
         void thawMessage(MessageOutRef);
         Generator<string> frameGenerator();
-        ConstBytes createNextFrame(MessageOutRef, uint8_t*);
+        ConstBytes createNextFrame(MessageOutRef, uint8_t*, Deflater&);
 
         MessageInRef pendingRequest(MessageNo, FrameFlags);
         MessageInRef pendingResponse(MessageNo, FrameFlags);
@@ -103,8 +105,7 @@ namespace crouton::io::blip {
             bool urgent() const;
         };
 
-        Deflater                    _outputCodec;       // Compressor for outgoing frames
-        Inflater                    _inputCodec;        // Decompressor for incoming frames
+        std::unique_ptr<Inflater>   _inputCodec;        // Decompressor for incoming frames
         Outbox                      _outbox;            // Round-robin queue of msgs being sent
         Outbox                      _wayOutBox;         // Messages waiting to be sent
         std::vector<MessageOutRef>  _icebox;            // Outgoing msgs on hold awaiting ACK

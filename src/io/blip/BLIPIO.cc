@@ -12,6 +12,7 @@
 
 #include "crouton/io/blip/BLIPIO.hh"
 #include "crouton/Error.hh"
+#include "Codec.hh"
 #include "Internal.hh"
 #include "MessageOut.hh"
 #include "crouton/util/Logging.hh"
@@ -99,7 +100,8 @@ namespace crouton::io::blip {
 
 
     BLIPIO::BLIPIO()
-    :_frameGenerator(frameGenerator())
+    :_inputCodec(make_unique<Inflater>())
+    ,_frameGenerator(frameGenerator())
     { }
 
 
@@ -220,6 +222,7 @@ namespace crouton::io::blip {
     /** Sends the next frame. */
     Generator<string> BLIPIO::frameGenerator() {
         auto frameBuf = make_unique<uint8_t[]>(kMaxFrameOverhead + kBigFrameSize);
+        Deflater outputCodec;
         Generator<MessageOutRef> generator = _outbox.generate();
 
         LBLIP->debug("Starting frameGenerator loop...");
@@ -229,7 +232,7 @@ namespace crouton::io::blip {
             if (!msgp)
                 break;  // stop when I close
 
-            ConstBytes frame = createNextFrame(*std::move(msgp), frameBuf.get());
+            ConstBytes frame = createNextFrame(*std::move(msgp), frameBuf.get(), outputCodec);
 
             // Now yield the frame from the Generator ...
             // returns once my client has read it and called `co_await` again
@@ -242,7 +245,7 @@ namespace crouton::io::blip {
     }
 
 
-    ConstBytes BLIPIO::createNextFrame(MessageOutRef msg, uint8_t* frameBuf) {
+    ConstBytes BLIPIO::createNextFrame(MessageOutRef msg, uint8_t* frameBuf, Deflater& outputCodec) {
         // Assign the message number for new requests.
         if (msg->_number == MessageNo::None) {
             _lastMessageNo = _lastMessageNo + 1;
@@ -263,7 +266,7 @@ namespace crouton::io::blip {
 
         // Ask the MessageOut to write data to fill the buffer:
         auto prevBytesSent = msg->_bytesSent;
-        msg->nextFrameToSend(_outputCodec, out, frameFlags);
+        msg->nextFrameToSend(outputCodec, out, frameFlags);
         *flagsPos = frameFlags;
         ConstBytes frame(frameBuf, out.data());
 
@@ -344,7 +347,7 @@ namespace crouton::io::blip {
 
         // Append the frame to the message:
         if (msg) {
-            MessageIn::ReceiveState state = msg->receivedFrame(_inputCodec, frame, flags);
+            MessageIn::ReceiveState state = msg->receivedFrame(*_inputCodec, frame, flags);
             if (type == kRequestType) {
                 if (state == MessageIn::kEnd /*|| state == MessageIn::kBeginning*/) {
                     // Message complete!
