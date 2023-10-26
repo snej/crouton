@@ -37,7 +37,7 @@ namespace crouton::io {
         /// True if the stream is open.
         virtual bool isOpen() const =0;
 
-        /// Resolves once the stream has opened.
+        /// Opens the stream, if it wasn't already open; resolves when it's open.
         virtualASYNC<void> open() =0;
 
         /// Closes the stream; resolves when it's closed.

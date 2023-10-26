@@ -41,4 +41,6 @@
 #ifndef ESP_PLATFORM
 #include "crouton/io/FileStream.hh"
 #include "crouton/io/Filesystem.hh"
+#include "crouton/io/LocalSocket.hh"
+#include "crouton/io/Pipe.hh"
 #endif

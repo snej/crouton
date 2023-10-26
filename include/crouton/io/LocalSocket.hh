@@ -1,5 +1,5 @@
 //
-// Pipe.hh
+// LocalSocket.hh
 //
 // Copyright 2023-Present Couchbase, Inc. All rights reserved.
 //
@@ -21,21 +21,19 @@
 
 namespace crouton::io {
 
-    /** Pipes are **one-directional** streams that come in pairs.
-        The data written to one Pipe can be read from the other.
-        If you need a bidirectional stream pair, use `LocalSocket`. */
-    class Pipe : public Stream {
+    /** LocalSockets are bidirectional streams that come in pairs.
+        The data written to either one can be read from the other. */
+    class LocalSocket : public Stream {
     public:
-        using Ref = std::shared_ptr<Pipe>;
+        using Ref = std::shared_ptr<LocalSocket>;
 
-        /// Creates a pair of connected Pipes. The first is the reader, the second is the writer.
-        /// @warning  Trying to send data the wrong direction will throw a broken-pipe error.
+        /// Creates a pair of connected bidirectional Streams.
         static std::pair<Ref,Ref> createPair();
 
         ASYNC<void> open() override;
 
         // private by convention
-        explicit Pipe(int fd) :_fd(fd) { }
+        explicit LocalSocket(int fd) :_fd(fd) { }
 
     private:
         int _fd;

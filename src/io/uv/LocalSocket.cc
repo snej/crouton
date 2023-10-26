@@ -1,5 +1,5 @@
 //
-// Pipe.cc
+// LocalSocket.cc
 //
 // Copyright 2023-Present Couchbase, Inc. All rights reserved.
 //
@@ -16,32 +16,32 @@
 // limitations under the License.
 //
 
-#include "crouton/io/Pipe.hh"
+#include "crouton/io/LocalSocket.hh"
 #include "UVInternal.hh"
 
 namespace crouton::io {
     using namespace std;
     using namespace crouton::io::uv;
 
-    pair<Pipe::Ref,Pipe::Ref> Pipe::createPair() {
-        uv_file fds[2];
-        check(uv_pipe(fds, UV_NONBLOCK_PIPE, UV_NONBLOCK_PIPE), "creating pipes");
-        return { make_shared<Pipe>(fds[0]), make_shared<Pipe>(fds[1]) };
+
+    pair<LocalSocket::Ref,LocalSocket::Ref> LocalSocket::createPair() {
+        uv_os_sock_t fds[2];
+        check(uv_socketpair(SOCK_STREAM, 0, fds, UV_NONBLOCK_PIPE, UV_NONBLOCK_PIPE),
+              "creating a SocketPair");
+        return { make_shared<LocalSocket>(fds[0]), make_shared<LocalSocket>(fds[1]) };
     }
 
 
-    Future<void> Pipe::open() {
+    Future<void> LocalSocket::open() {
         if (_fd >= 0) {
-            auto pipe = new uv_pipe_t;
-            int err = uv_pipe_init(curLoop(), pipe, false);
-            if (err == 0)
-                err = uv_pipe_open(pipe, _fd);
-            if (err) {
-                closeHandle(pipe);
-                return Error(UVError(err), "opening a pipe");
+            auto tcpHandle = new uv_tcp_t;
+            uv_tcp_init(curLoop(), tcpHandle);
+            if (int err = uv_tcp_open(tcpHandle, _fd)) {
+                closeHandle(tcpHandle);
+                return Error(UVError(err), "opening a SocketPair");
             }
-            _fd = 0;
-            opened((uv_stream_t*)pipe);
+            _fd = -1;
+            opened((uv_stream_t*)tcpHandle);
         }
         return Future<void>();
     }
