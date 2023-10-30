@@ -46,6 +46,18 @@ TEST_CASE("Randomize") {
 }
 
 
+TEST_CASE("Result") {
+    Result<bool> result = true;
+    CHECK(result.ok());
+    CHECK(result);
+    CHECK(!result.isError());
+    CHECK(result.error() == noerror);
+    
+    Result<bool> r2 = result;
+    CHECK(r2.ok());
+}
+
+
 TEST_CASE("Empty Error", "[error]") {
     Error err;
     CHECK(!err);

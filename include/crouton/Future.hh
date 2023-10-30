@@ -248,7 +248,7 @@ namespace crouton {
             return lifecycle::suspendingTo(coro, _handle, _state->suspend(coro));
         }
         [[nodiscard]] Result<T> await_resume() noexcept {
-            Result<T> result = std::move(_state)->result();
+            Result<T> result(std::move(_state)->result());
             _state = nullptr;
             return result;
         }

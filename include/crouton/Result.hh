@@ -24,9 +24,9 @@
 
 namespace crouton {
 
-    /** A `Result<T>` is either empty, or holds a value of type T or an `Error`.
+    /** A `Result<T>` is either empty, or holds a value of type `T`, or an `Error`.
         (A `Result<void>` has no explicit value, but still distinguishes between empty/nonempty.)
-        It's used as a return value, and as the contents of a `Future<T>`. */
+        It's commonly used as a return type, and in the implementation of `Future<T>`. */
     template <typename T>
     class Result {
     public:
@@ -35,23 +35,27 @@ namespace crouton {
         Result() noexcept               :_value(noerror) { }
         Result(Error err) noexcept      :_value(err) { }
 
-        template <typename U> requires (!std::is_void_v<T> && std::constructible_from<T, U>)
+        template <typename U> requires (!std::is_void_v<T> && std::constructible_from<T, U>
+                                            && !std::same_as<std::remove_reference_t<U>, Result<T>>)
         Result(U&& val)                 :_value(std::forward<U>(val)) { }
 
-        template <typename U> requires (!std::is_void_v<T> && std::constructible_from<T, U>)
+        template <typename U> requires (!std::is_void_v<T> && std::constructible_from<T, U>
+                                            && !std::same_as<std::remove_reference_t<U>, Result<T>>)
         Result& operator=(U&& val)      {set(std::forward<U>(val)); return *this;}
 
         Result& operator=(Error err)    {_value = err; return *this;}
 
-        Result(Result&& r) noexcept = default;
-        Result(Result const& r) = default;
-        Result& operator=(Result const& r) = default;
-        Result& operator=(Result&& r) noexcept = default;
+        Result(Result&& r) noexcept             = default;
+        Result(Result const& r)                 = default;
+        Result& operator=(Result const& r)      = default;
+        Result& operator=(Result&& r) noexcept  = default;
 
+        /// Stores a value (same as `operator=`)
         template <typename U> requires (!std::is_void_v<T> && std::constructible_from<T, U>)
         void set(U&& val)                           {_value = std::forward<U>(val);}
 
-        void set()  requires (std::is_void_v<T>)    {_value = TT();}
+        /// Stores an (empty) value in a `Result<void>`.
+        void set() requires (std::is_void_v<T>)     {_value = TT();}
 
         /// True if there is a T value.
         bool ok() const noexcept Pure               {return _value.index() == 0;}
@@ -68,7 +72,8 @@ namespace crouton {
             return err && *err;
         }
 
-        /// True if there's a value, false if empty. If there's an error, raises it.
+        /// True if there's a value, false if empty. If there's an error, throws it.
+        /// @throws Exception
         explicit operator bool() const {
             if (Error const* err = std::get_if<Error>(&_value)) [[unlikely]] {
                 if (*err) [[unlikely]]
@@ -86,32 +91,40 @@ namespace crouton {
         }
 
         /// Returns the value, or throws the error as an exception.
+        /// @throws Exception
         TT const& value() const &  requires (!std::is_void_v<T>) {
             raise_if();
             return std::get<T>(_value);
         }
 
+        /// Returns the value, or throws the error as an exception.
+        /// @throws Exception
         TT& value() &  requires (!std::is_void_v<T>) {
             raise_if();
             return std::get<T>(_value);
         }
 
         /// Returns the value, or throws the error as an exception.
-        /// If the Result is empty, throws CroutonError::EmptyResult.
+        /// @throws Exception
         TT&& value() &&  requires (!std::is_void_v<T>) {
             raise_if();
             return std::get<T>(std::move(_value));
         }
 
         /// There's no value to return, but this checks for an error and if so throws it.
+        /// @throws Exception
         void value() const &  requires (std::is_void_v<T>) {
             raise_if();
         }
 
+        /// The `*` and `->` operators can be used to access the value.
+        /// @note  Unlike `std::optional`, these _do_ check whether there's a value.
+        /// @throws Exception
         TT& operator*()              requires (!std::is_void_v<T>)  {return value();}
         TT const& operator*() const  requires (!std::is_void_v<T>)  {return value();}
         TT* operator->()             requires (!std::is_void_v<T>)  {return &value();}
 
+        /// Writes either the value or the error to the stream.
         friend std::ostream& operator<<(std::ostream& out, Result const& r) {
             if (r.ok()) {
                 return out << std::get<T>(r._value);
