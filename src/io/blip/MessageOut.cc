@@ -52,7 +52,7 @@ namespace crouton::io::blip {
             } while (frame.size() >= 1024);
 
             if (codec.unflushedBytes() > 0)
-                crouton::Error::raise(BLIPError::CompressionError, "Compression buffer overflow");
+                crouton::Error::raise(ProtocolError::CompressionError, "Compression buffer overflow");
 
             if (mode == Codec::Mode::SyncFlush) {
                 size_t bytesWritten = (frameSize - Codec::kChecksumSize) - frame.size();
@@ -187,7 +187,7 @@ namespace crouton::io::blip {
         // This assumes the message starts with properties, which start with a UVarInt32.
         auto propertiesSize = uvarint::read(in);
         if (propertiesSize > in.size())
-            crouton::Error::raise(BLIPError::InvalidFrame, "Invalid properties size in BLIP frame");
+            crouton::Error::raise(ProtocolError::InvalidFrame, "Invalid properties size in BLIP frame");
         return {in.first(propertiesSize), in.without_first(propertiesSize)};
     }
 

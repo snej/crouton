@@ -26,8 +26,8 @@
 #include <spdlog/fmt/ostr.h>    // Makes custom types loggable via `operator <<` overloads
 
 namespace crouton {
-    string ErrorDomainInfo<io::blip::BLIPError>::description(errorcode_t code) {
-        using enum io::blip::BLIPError;
+    string ErrorDomainInfo<io::blip::ProtocolError>::description(errorcode_t code) {
+        using enum io::blip::ProtocolError;
         static constexpr NameEntry names[] = {
             {int(InvalidFrame),         "invalid BLIP frame"},
             {int(PropertiesTooLarge),   "message properties too large"},
@@ -314,7 +314,7 @@ namespace crouton::io::blip {
         MessageNo msgNo = MessageNo(uvarint::read(frame));
         uint64_t f = uvarint::read(frame);
         if (f > 0x80)
-            Error::raise(BLIPError::InvalidFrame, "unknown frame flags");
+            Error::raise(ProtocolError::InvalidFrame, "unknown frame flags");
         FrameFlags flags = FrameFlags(f);
 
         LBLIP->debug("Received frame: {} {} {}{}{}{}, length {}",
@@ -383,7 +383,7 @@ namespace crouton::io::blip {
         } else {
             string err = fmt::format("Bad incoming REQ {} ({})", minifmt::write(msgNo),
                                      (msgNo <= _numRequestsReceived ? "already finished" : "too high"));
-            Error::raise(BLIPError::InvalidFrame, err);
+            Error::raise(ProtocolError::InvalidFrame, err);
         }
         return msg;
     }
@@ -402,7 +402,7 @@ namespace crouton::io::blip {
         } else {
             string err = fmt::format("Bad incoming RES {} ({})", minifmt::write(msgNo),
                                      (msgNo <= _lastMessageNo ? "no request waiting" : "too high"));
-            Error::raise(BLIPError::InvalidFrame, err);
+            Error::raise(ProtocolError::InvalidFrame, err);
         }
         return msg;
     }

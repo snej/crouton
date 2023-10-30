@@ -58,10 +58,10 @@ namespace crouton::io::blip {
         uint32_t chk;
         static_assert(kChecksumSize == sizeof(chk), "kChecksumSize is wrong");
         if (!input.readAll(&chk, sizeof(chk)))
-            Error::raise(BLIPError::InvalidFrame, "BLIP message ends before checksum");
+            Error::raise(ProtocolError::InvalidFrame, "BLIP message ends before checksum");
         chk = endian::decodeBig(chk);
         if (chk != _checksum)
-            Error::raise(BLIPError::BadChecksum);
+            Error::raise(ProtocolError::BadChecksum);
     }
 
     // Uncompressed write: just copies input bytes to output (updating checksum)
@@ -78,7 +78,7 @@ namespace crouton::io::blip {
     void ZlibCodec::check(int ret) const {
         if (ret < 0 && ret != Z_BUF_ERROR) {
             string msg = fmt::format("zlib error {}: {}", ret, (_z.msg ? _z.msg : "???"));
-            Error::raise(BLIPError::CompressionError, msg);
+            Error::raise(ProtocolError::CompressionError, msg);
         }
     }
 

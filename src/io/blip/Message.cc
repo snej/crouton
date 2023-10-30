@@ -163,7 +163,7 @@ namespace crouton::io::blip {
             ConstBytes dst = codec.write(frame, out, mode);
             _propertiesSize = uvarint::read(dst);
             if (_propertiesSize > kMaxPropertiesSize)
-                crouton::Error::raise(BLIPError::PropertiesTooLarge);
+                crouton::Error::raise(ProtocolError::PropertiesTooLarge);
             _properties.reserve(_propertiesSize);
             // Copy any properties into _properties, and any body after that into _body:
             _properties.append(string_view(dst.read(_propertiesSize)));
@@ -180,7 +180,7 @@ namespace crouton::io::blip {
                 // Finished the properties:
                 state = kBeginning;
                 if (_propertiesSize > 0 && _properties[_propertiesSize - 1] != 0)
-                    crouton::Error::raise(BLIPError::InvalidFrame, "message properties not null-terminated");
+                    crouton::Error::raise(ProtocolError::InvalidFrame, "message properties not null-terminated");
             }
         } else {
             state = kBeginning;
@@ -199,7 +199,7 @@ namespace crouton::io::blip {
         if (!(frameFlags & kMoreComing)) {
             // Completed!
             if (state < kBeginning)
-                crouton::Error::raise(BLIPError::InvalidFrame, "message ends before end of properties");
+                crouton::Error::raise(ProtocolError::InvalidFrame, "message ends before end of properties");
             _complete = true;
             state = kEnd;
             LBLIP->info("Finished receiving {}", minifmt::write(*this));

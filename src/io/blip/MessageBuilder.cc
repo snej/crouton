@@ -93,7 +93,7 @@ namespace crouton::io::blip {
             _properties.clear();
             size_t propertiesSize = properties.size();
             if (propertiesSize > kMaxPropertiesSize)
-                Error::raise(BLIPError::PropertiesTooLarge);
+                Error::raise(ProtocolError::PropertiesTooLarge);
             char  buf[uvarint::kMaxSize];
             _out << string_view(buf, uvarint::put(propertiesSize, buf));
             _out << properties;

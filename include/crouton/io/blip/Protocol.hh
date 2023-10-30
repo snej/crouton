@@ -49,12 +49,22 @@ namespace crouton::io::blip {
     constexpr size_t kIncomingAckThreshold = 50000;
 
 
-    /** Errors produced by BLIP APIs. */
-    enum class BLIPError : errorcode_t {
+    /** Fatal errors in the BLIP network protocol. */
+    enum class ProtocolError : errorcode_t {
         InvalidFrame = 1,
         PropertiesTooLarge,
         CompressionError,
         BadChecksum,
+    };
+
+
+    /** Application-level errors returned in BLIP responses with error domain "BLIP". */
+    enum class AppError : errorcode_t {
+        BadRequest = 400,
+        Forbidden = 403,
+        NotFound = 404,
+        MethodNotAllowed = 405,
+        ServerError = 500,
     };
 
 
@@ -64,8 +74,13 @@ namespace crouton::io::blip {
 
 namespace crouton {
 
-    template <> struct ErrorDomainInfo<io::blip::BLIPError> {
-        static constexpr string_view name = "BLIP";
+    template <> struct ErrorDomainInfo<io::blip::ProtocolError> {
+        static constexpr string_view name = "BLIP Protocol";
+        static string description(errorcode_t);
+    };
+
+    template <> struct ErrorDomainInfo<io::blip::AppError> {
+        static constexpr string_view name = "BLIP RPC";
         static string description(errorcode_t);
     };
 
