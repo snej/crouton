@@ -17,7 +17,7 @@
 //
 
 #pragma once
-#include "crouton/Future.hh"
+#include "crouton/CroutonFwd.hh"
 
 #include <optional>
 #include <vector>

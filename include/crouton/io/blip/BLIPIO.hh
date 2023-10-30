@@ -12,10 +12,8 @@
 
 #pragma once
 #include "crouton/io/blip/Message.hh"
-#include "crouton/Future.hh"
-#include "crouton/Generator.hh"
+#include "crouton/CroutonFwd.hh"
 #include "crouton/Queue.hh"
-#include "crouton/util/Bytes.hh"
 
 #include <algorithm>
 #include <unordered_map>

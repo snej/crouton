@@ -11,8 +11,9 @@
 //
 
 #include "MessageOut.hh"
-#include "crouton/io/blip/BLIPIO.hh"
 #include "Codec.hh"
+#include "crouton/Future.hh"
+#include "crouton/io/blip/BLIPIO.hh"
 #include "crouton/util/Varint.hh"
 
 namespace crouton::io::blip {

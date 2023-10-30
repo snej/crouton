@@ -19,6 +19,7 @@
 #pragma once
 #ifdef __APPLE__
 
+#include "crouton/CroutonFwd.hh"
 #include "crouton/io/ISocket.hh"
 #include "crouton/io/IStream.hh"
 #include "crouton/Error.hh"
@@ -51,7 +52,7 @@ namespace crouton::io::apple {
 
         ASYNC<void> close() override;
 
-        ASYNC<void> closeWrite() override    {return _writeOrShutdown({}, true);}
+        ASYNC<void> closeWrite() override;
 
         std::shared_ptr<IStream> stream() override;
 
@@ -61,7 +62,7 @@ namespace crouton::io::apple {
     private:
         virtualASYNC<ConstBytes> readNoCopy(size_t maxLen = 65536) override;
         virtualASYNC<ConstBytes> peekNoCopy() override;
-        ASYNC<void> write(ConstBytes b) override {return _writeOrShutdown(b, false);}
+        ASYNC<void> write(ConstBytes b) override;
         using IStream::write;
         
         virtualASYNC<ConstBytes> _readNoCopy(size_t maxLen, bool peek);

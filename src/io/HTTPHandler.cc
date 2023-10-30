@@ -17,6 +17,7 @@
 //
 
 #include "crouton/io/HTTPHandler.hh"
+#include "crouton/Future.hh"
 #include "crouton/util/Logging.hh"
 #include <llhttp.h>
 #include <sstream>

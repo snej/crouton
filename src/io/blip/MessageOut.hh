@@ -13,7 +13,7 @@
 #pragma once
 #include "crouton/io/blip/Message.hh"
 #include "crouton/io/blip/MessageBuilder.hh"
-#include "crouton/Future.hh"
+#include "crouton/CroutonFwd.hh"
 #include <ostream>
 
 namespace crouton::io::blip {

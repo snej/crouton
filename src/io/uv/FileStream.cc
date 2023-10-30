@@ -17,6 +17,7 @@
 //
 
 #include "crouton/io/FileStream.hh"
+#include "crouton/Future.hh"
 #include "UVInternal.hh"
 
 namespace crouton::io {
@@ -173,6 +174,10 @@ namespace crouton::io {
     // than the overridden method's multiple calls to _write.
     Future<void> FileStream::write(const ConstBytes buffers[], size_t nBuffers) {
         return pwritev(buffers, nBuffers, -1);
+    }
+
+    ASYNC<void> FileStream::closeWrite() {
+        return Future<void>(); // no-op
     }
 
 

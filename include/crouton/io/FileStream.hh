@@ -51,7 +51,7 @@ namespace crouton::io {
         ASYNC<void> close() override;
 
         /// Closes the write side, but not the read side. (Like a socket's `shutdown`.)
-        ASYNC<void> closeWrite() override    {return Future<void>();}
+        ASYNC<void> closeWrite() override;
 
         ASYNC<ConstBytes> readNoCopy(size_t maxLen = 65536) override;
         ASYNC<ConstBytes> peekNoCopy() override;

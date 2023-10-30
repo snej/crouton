@@ -17,6 +17,7 @@
 //
 
 #include "crouton/io/TCPSocket.hh"
+#include "crouton/Future.hh"
 #include "crouton/io/AddrInfo.hh"
 #include "UVInternal.hh"
 
@@ -67,5 +68,8 @@ namespace crouton::io {
     shared_ptr<IStream> TCPSocket::stream() {
         return shared_ptr<IStream>(shared_from_this(), static_cast<Stream*>(this));
     }
+
+    bool TCPSocket::isOpen() const                {return Stream::isOpen();}
+    ASYNC<void> TCPSocket::close()                {return Stream::close();}
 
 }

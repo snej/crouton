@@ -17,6 +17,7 @@
 //
 
 #include "crouton/io/ISocket.hh"
+#include "crouton/Future.hh"
 #include "crouton/io/TCPSocket.hh"
 #include "crouton/io/mbed/TLSSocket.hh"
 
@@ -44,6 +45,12 @@ namespace crouton::io {
         else
             return std::make_shared<TCPSocket>();
 #endif
+    }
+
+
+    ASYNC<void> ISocket::connect(string const& address, uint16_t port) {
+        bind(address, port);
+        return open();
     }
 
 

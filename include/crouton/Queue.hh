@@ -19,6 +19,7 @@
 #pragma once
 #include "crouton/CoCondition.hh"
 #include "crouton/Error.hh"
+#include "crouton/Future.hh"
 #include "crouton/Generator.hh"
 #include "crouton/Result.hh"
 #include "crouton/Task.hh"

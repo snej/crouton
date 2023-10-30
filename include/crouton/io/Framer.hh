@@ -17,6 +17,7 @@
 //
 
 #pragma once
+#include "crouton/Future.hh"
 #include "crouton/io/IStream.hh"
 
 namespace crouton::io {

@@ -30,6 +30,9 @@
 #include "crouton/Select.hh"
 #include "crouton/Task.hh"
 
+#include "crouton/util/Bytes.hh"
+#include "crouton/util/Logging.hh"
+
 #include "crouton/io/AddrInfo.hh"
 #include "crouton/io/HTTPConnection.hh"
 #include "crouton/io/HTTPHandler.hh"

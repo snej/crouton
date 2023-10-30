@@ -18,7 +18,7 @@
 
 #pragma once
 #include "crouton/util/Bytes.hh"
-#include "crouton/Future.hh"
+#include "crouton/CroutonFwd.hh"
 #include "crouton/Generator.hh"
 
 #include <initializer_list>
@@ -70,7 +70,7 @@ namespace crouton::io {
 
         /// Reads `len` bytes, returning them as a string.
         /// Will always read the full number of bytes unless it hits EOF.
-        ASYNC<string> readString(size_t maxLen);
+        ASYNC<string> readString(size_t len);
 
         /// Reads exactly `len` bytes; on EOF, returns/throws an error.
         ASYNC<void> readExactly(MutableBytes);
@@ -81,8 +81,8 @@ namespace crouton::io {
         ASYNC<string> readUntil(string end, size_t maxLen = SIZE_MAX);
 
         /// Reads until EOF.
-        ASYNC<string> readAll() {return readString(SIZE_MAX);}
-
+        ASYNC<string> readAll();
+        
         /// Returns a `Generator` that produces chunks of data read from the stream.
         /// This is a wrapper around `readNoCopy()` that makes `IStream` satisfy the concept
         /// `GeneratorFactory`, which in turn allows it to be used as a Publisher.

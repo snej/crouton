@@ -10,7 +10,7 @@
 
 #pragma once
 #include "crouton/io/blip/Protocol.hh"
-#include "crouton/Future.hh"
+#include "crouton/CroutonFwd.hh"
 #include "crouton/util/Bytes.hh"
 
 namespace crouton::io::blip {

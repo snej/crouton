@@ -11,10 +11,11 @@
 //
 
 #include "crouton/io/blip/Message.hh"
-#include "crouton/io/blip/MessageBuilder.hh"
-#include "MessageOut.hh"
-#include "crouton/io/blip/BLIPIO.hh"
 #include "Codec.hh"
+#include "MessageOut.hh"
+#include "crouton/Future.hh"
+#include "crouton/io/blip/MessageBuilder.hh"
+#include "crouton/io/blip/BLIPIO.hh"
 #include "crouton/util/Varint.hh"
 #include "support/StringUtils.hh"
 #include <iostream>

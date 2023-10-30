@@ -19,6 +19,7 @@
 #pragma once
 #include "crouton/Awaitable.hh"
 #include "crouton/Coroutine.hh"
+#include "crouton/CroutonFwd.hh"
 #include "crouton/Result.hh"
 #include "crouton/Scheduler.hh"
 #include "crouton/Select.hh"
@@ -26,14 +27,6 @@
 #include <atomic>
 #include <exception>
 #include <functional>
-
-/// Macro for declaring a function that returns a Future, e.g. `ASYNC<void> close();`
-/// It's surprisingly easy to forget to await the Future, especially `Future<void>`,
-/// hence the `[[nodiscard]]` annotation.
-#define        ASYNC [[nodiscard]]         crouton::Future
-#define  staticASYNC [[nodiscard]] static  crouton::Future
-#define virtualASYNC [[nodiscard]] virtual crouton::Future
-
 
 namespace crouton {
     template <typename T> class FutureImpl;

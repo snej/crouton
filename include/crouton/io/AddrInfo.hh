@@ -17,7 +17,7 @@
 //
 
 #pragma once
-#include "crouton/Future.hh"
+#include "crouton/CroutonFwd.hh"
 
 #ifdef ESP_PLATFORM
     struct ip_addr;

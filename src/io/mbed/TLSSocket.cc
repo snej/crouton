@@ -18,6 +18,7 @@
 
 #include "crouton/io/mbed/TLSSocket.hh"
 #include "crouton/io/ISocket.hh"
+#include "crouton/Future.hh"
 #include "Internal.hh"
 #include "TLSContext.hh"
 #include <optional>

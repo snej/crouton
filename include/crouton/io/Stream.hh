@@ -22,9 +22,7 @@
 #include <vector>
 
 struct uv_stream_s;
-namespace crouton {
-    struct Buffer;
-}
+
 namespace crouton::io {
 
     /** An asynchronous bidirectional stream. Abstract base class of Pipe and TCPSocket. */

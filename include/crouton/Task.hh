@@ -18,6 +18,7 @@
 
 #pragma once
 #include "crouton/CoCondition.hh"
+#include "crouton/Error.hh"
 #include "crouton/Scheduler.hh"
 
 #include <atomic>

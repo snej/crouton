@@ -17,6 +17,7 @@
 //
 
 #include "crouton/io/IStream.hh"
+#include "crouton/Future.hh"
 #include "crouton/util/Bytes.hh"
 #include <cstring> // for memcpy
 
@@ -112,6 +113,9 @@ namespace crouton::io {
         }
         RETURN data;
     }
+
+
+    ASYNC<string> IStream::readAll() {return readString(SIZE_MAX);}
 
 
     Generator<string> IStream::generate() {

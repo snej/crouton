@@ -17,6 +17,7 @@
 //
 
 #include "crouton/io/Process.hh"
+#include "crouton/Future.hh"
 #include "crouton/util/Logging.hh"
 #include "crouton/Task.hh"
 #include <cstdio>

@@ -622,6 +622,7 @@
 		27BCD2F82AE98D10009DFCED /* Varint.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Varint.cc; sourceTree = "<group>"; };
 		27BCD3002AEACE0C009DFCED /* LocalSocket.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LocalSocket.hh; sourceTree = "<group>"; };
 		27BCD3012AEACE0C009DFCED /* LocalSocket.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LocalSocket.cc; sourceTree = "<group>"; };
+		27BCD30B2AF01095009DFCED /* CroutonFwd.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CroutonFwd.hh; sourceTree = "<group>"; };
 		27E98EDE2AC2099E002F3D35 /* test_generator.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_generator.cc; sourceTree = "<group>"; };
 		27E98EE02AC21940002F3D35 /* Awaitable.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Awaitable.hh; sourceTree = "<group>"; };
 		27ED1C702AABF47200ADC971 /* CoroLifecycle.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CoroLifecycle.hh; sourceTree = "<group>"; };
@@ -725,6 +726,7 @@
 				27ED1C702AABF47200ADC971 /* CoroLifecycle.hh */,
 				272728FD2A8D6B43000CCA22 /* Coroutine.hh */,
 				279D5D442A8FE174005C3066 /* Crouton.hh */,
+				27BCD30B2AF01095009DFCED /* CroutonFwd.hh */,
 				277E8A452ABA7A1800E78CB1 /* Error.hh */,
 				279D5D5C2A93BB5C005C3066 /* EventLoop.hh */,
 				272728FF2A8D6B43000CCA22 /* Future.hh */,

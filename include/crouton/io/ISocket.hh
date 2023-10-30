@@ -17,8 +17,7 @@
 //
 
 #pragma once
-#include "crouton/Future.hh"
-#include "crouton/Task.hh"
+#include "crouton/CroutonFwd.hh"
 
 
 namespace crouton::io {
@@ -48,10 +47,7 @@ namespace crouton::io {
         virtualASYNC<void> open() =0;
 
         /// Equivalent to bind + open.
-        virtualASYNC<void> connect(string const& address, uint16_t port) {
-            bind(address, port);
-            return open();
-        }
+        virtualASYNC<void> connect(string const& address, uint16_t port);
 
         /// True if the socket is open/connected.
         virtual bool isOpen() const =0;

@@ -19,6 +19,7 @@
 #ifdef __APPLE__
 
 #include "crouton/io/apple/NWConnection.hh"
+#include "crouton/Future.hh"
 #include "crouton/util/Logging.hh"
 
 #include <Network/Network.h>
@@ -215,6 +216,10 @@ namespace crouton::io::apple {
             return Future(onRead);
         }
     }
+
+
+    ASYNC<void> NWConnection::closeWrite()        {return _writeOrShutdown({}, true);}
+    ASYNC<void> NWConnection::write(ConstBytes b) {return _writeOrShutdown(b, false);}
 
 
     Future<void> NWConnection::_writeOrShutdown(ConstBytes src, bool shutdown) {

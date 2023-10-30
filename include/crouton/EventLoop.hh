@@ -17,15 +17,12 @@
 //
 
 #pragma once
-#include "crouton/Future.hh"
+#include "crouton/CroutonFwd.hh"
 
 #include <functional>
 #include <optional>
 
 namespace crouton {
-    template <typename T> class Future;
-    class Timer;
-
 
     /** Abstract event loop class, owned by a Scheduler.
         Like a Scheduler, an EventLoop is associated with a single thread.

@@ -33,9 +33,9 @@ namespace crouton::io {
         /// Opens the socket to the bound address. Resolves once opened.
         ASYNC<void> open() override;
 
-        bool isOpen() const override                {return Stream::isOpen();}
         std::shared_ptr<IStream> stream() override;
-        ASYNC<void> close() override                {return Stream::close();}
+        bool isOpen() const override;
+        ASYNC<void> close() override;
 
         TCPSocket();
     protected:

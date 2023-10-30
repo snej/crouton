@@ -18,9 +18,10 @@
 
 #include "crouton/io/uv/UVBase.hh"
 #include "crouton/EventLoop.hh"
-#include "crouton/util/Logging.hh"
+#include "crouton/Future.hh"
 #include "crouton/Misc.hh"
 #include "crouton/Task.hh"
+#include "crouton/util/Logging.hh"
 #include "UVInternal.hh"
 #include <charconv>
 #include <cmath>

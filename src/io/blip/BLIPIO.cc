@@ -11,10 +11,12 @@
 //
 
 #include "crouton/io/blip/BLIPIO.hh"
-#include "crouton/Error.hh"
 #include "Codec.hh"
 #include "Internal.hh"
 #include "MessageOut.hh"
+#include "crouton/Error.hh"
+#include "crouton/Future.hh"
+#include "crouton/Generator.hh"
 #include "crouton/util/Logging.hh"
 #include "crouton/util/Varint.hh"
 #include "support/StringUtils.hh"

@@ -17,6 +17,7 @@
 //
 
 #include "crouton/io/Stream.hh"
+#include "crouton/Future.hh"
 #include "UVInternal.hh"
 
 namespace crouton::io {

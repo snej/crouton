@@ -17,8 +17,8 @@
 //
 
 #pragma once
-#include "crouton/util/Bytes.hh"
-#include "crouton/Future.hh"
+#include "crouton/CroutonFwd.hh"
+#include "crouton/Error.hh"
 #include "crouton/io/URL.hh"
 
 #include <optional>
@@ -39,6 +39,7 @@ namespace crouton::io::http {
         OK = 200,
         MovedPermanently = 301,
         BadRequest = 400,
+        Forbidden = 403,
         NotFound = 404,
         MethodNotAllowed = 405,
         ServerError = 500,

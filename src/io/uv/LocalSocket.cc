@@ -17,6 +17,7 @@
 //
 
 #include "crouton/io/LocalSocket.hh"
+#include "crouton/Future.hh"
 #include "UVInternal.hh"
 
 namespace crouton::io {
