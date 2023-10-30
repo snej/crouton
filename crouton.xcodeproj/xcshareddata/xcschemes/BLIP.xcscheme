@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "272728DA2A8D6604000CCA22"
-               BuildableName = "libcrouton.a"
-               BlueprintName = "crouton"
+               BlueprintIdentifier = "275EB3ED2ACDCC5D0022ED53"
+               BuildableName = "libBLIP.a"
+               BlueprintName = "BLIP"
                ReferencedContainer = "container:crouton.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -49,9 +49,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "272728DA2A8D6604000CCA22"
-            BuildableName = "libcrouton.a"
-            BlueprintName = "crouton"
+            BlueprintIdentifier = "275EB3ED2ACDCC5D0022ED53"
+            BuildableName = "libBLIP.a"
+            BlueprintName = "BLIP"
             ReferencedContainer = "container:crouton.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

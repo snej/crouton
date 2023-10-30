@@ -6,6 +6,25 @@
 	objectVersion = 56;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		27BCD30C2AF01939009DFCED /* All */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 27BCD30D2AF01939009DFCED /* Build configuration list for PBXAggregateTarget "All" */;
+			buildPhases = (
+			);
+			dependencies = (
+				27BCD3112AF01946009DFCED /* PBXTargetDependency */,
+				27BCD31B2AF019C1009DFCED /* PBXTargetDependency */,
+				27BCD3132AF01948009DFCED /* PBXTargetDependency */,
+				27BCD3152AF01949009DFCED /* PBXTargetDependency */,
+				27BCD3172AF0194C009DFCED /* PBXTargetDependency */,
+				27BCD3192AF0194E009DFCED /* PBXTargetDependency */,
+			);
+			name = All;
+			productName = All;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		2711C1842A99656E00361566 /* libcrouton.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 272728DB2A8D6604000CCA22 /* libcrouton.a */; };
 		272728C72A8D6505000CCA22 /* tests.cc in Sources */ = {isa = PBXBuildFile; fileRef = 272728C62A8D6505000CCA22 /* tests.cc */; };
@@ -132,6 +151,51 @@
 		27F603092A9FA366006FA1D0 /* NWConnection.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27F603072A9FA366006FA1D0 /* NWConnection.cc */; };
 		27F6030D2A9FBA73006FA1D0 /* Network.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27F6030B2A9FBA5E006FA1D0 /* Network.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		27BCD3102AF01946009DFCED /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 272728BB2A8D6505000CCA22 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 272728DA2A8D6604000CCA22;
+			remoteInfo = crouton;
+		};
+		27BCD3122AF01948009DFCED /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 272728BB2A8D6505000CCA22 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 272728C22A8D6505000CCA22;
+			remoteInfo = Tests;
+		};
+		27BCD3142AF01949009DFCED /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 272728BB2A8D6505000CCA22 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 279D5D4C2A9031EF005C3066;
+			remoteInfo = demo_server;
+		};
+		27BCD3162AF0194C009DFCED /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 272728BB2A8D6505000CCA22 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2711C17F2A99656E00361566;
+			remoteInfo = demo_client;
+		};
+		27BCD3182AF0194E009DFCED /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 272728BB2A8D6505000CCA22 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 27B330752AB911250066C8DA;
+			remoteInfo = demo_blipclient;
+		};
+		27BCD31A2AF019C1009DFCED /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 272728BB2A8D6505000CCA22 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 275EB3ED2ACDCC5D0022ED53;
+			remoteInfo = BLIP;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		2711C1862A99656E00361566 /* CopyFiles */ = {
@@ -1753,6 +1817,9 @@
 					279D5E2F2A954627005C3066 = {
 						CreatedOnToolsVersion = 15.0;
 					};
+					27BCD30C2AF01939009DFCED = {
+						CreatedOnToolsVersion = 15.0;
+					};
 				};
 			};
 			buildConfigurationList = 272728BE2A8D6505000CCA22 /* Build configuration list for PBXProject "crouton" */;
@@ -1775,6 +1842,7 @@
 				279D5D4C2A9031EF005C3066 /* demo_server */,
 				2711C17F2A99656E00361566 /* demo_client */,
 				27B330752AB911250066C8DA /* demo_blipclient */,
+				27BCD30C2AF01939009DFCED /* All */,
 			);
 		};
 /* End PBXProject section */
@@ -1916,6 +1984,39 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		27BCD3112AF01946009DFCED /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 272728DA2A8D6604000CCA22 /* crouton */;
+			targetProxy = 27BCD3102AF01946009DFCED /* PBXContainerItemProxy */;
+		};
+		27BCD3132AF01948009DFCED /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 272728C22A8D6505000CCA22 /* Tests */;
+			targetProxy = 27BCD3122AF01948009DFCED /* PBXContainerItemProxy */;
+		};
+		27BCD3152AF01949009DFCED /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 279D5D4C2A9031EF005C3066 /* demo_server */;
+			targetProxy = 27BCD3142AF01949009DFCED /* PBXContainerItemProxy */;
+		};
+		27BCD3172AF0194C009DFCED /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2711C17F2A99656E00361566 /* demo_client */;
+			targetProxy = 27BCD3162AF0194C009DFCED /* PBXContainerItemProxy */;
+		};
+		27BCD3192AF0194E009DFCED /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 27B330752AB911250066C8DA /* demo_blipclient */;
+			targetProxy = 27BCD3182AF0194E009DFCED /* PBXContainerItemProxy */;
+		};
+		27BCD31B2AF019C1009DFCED /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 275EB3ED2ACDCC5D0022ED53 /* BLIP */;
+			targetProxy = 27BCD31A2AF019C1009DFCED /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
 		2711C1882A99656E00361566 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -2033,6 +2134,24 @@
 			};
 			name = Release;
 		};
+		27BCD30E2AF01939009DFCED /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Z62S7RW88Y;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		27BCD30F2AF01939009DFCED /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Z62S7RW88Y;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -2104,6 +2223,15 @@
 			buildConfigurations = (
 				27B3307F2AB911250066C8DA /* Debug */,
 				27B330802AB911250066C8DA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		27BCD30D2AF01939009DFCED /* Build configuration list for PBXAggregateTarget "All" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				27BCD30E2AF01939009DFCED /* Debug */,
+				27BCD30F2AF01939009DFCED /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
