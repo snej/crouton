@@ -143,6 +143,7 @@ namespace crouton {
             {errorcode_t(Timeout), "operation timed out"},
             {errorcode_t(EndOfData), "unexpected end of data"},
             {errorcode_t(Unimplemented), "unimplemented operation"},
+            {errorcode_t(Disconnected), "unexpectedly disconnected"},
         };
         return NameEntry::lookup(code, names);
     }

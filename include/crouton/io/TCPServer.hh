@@ -27,20 +27,31 @@ namespace crouton::io {
 
     class TCPServer {
     public:
-        TCPServer(uint16_t port);
+        /// Constructs a TCPServer that will listen on the given port,
+        /// or if port is 0, on any available port.
+        explicit TCPServer(uint16_t port, const char* interfaceAddr =nullptr);
         ~TCPServer();
 
         using Acceptor = std::function<void(std::shared_ptr<TCPSocket>)>;
 
+        /// Starts the server. Incoming connections will trigger calls to the acceptor function.
+        /// @throws  If it's not possible to listen on the specified port.
         void listen(Acceptor);
 
+        /// The port on which the server is listening.
+        uint16_t port();
+
+        /// Stops the server.
         void close();
+
+        bool isOpen() const                 {return _isOpen;}
 
     private:
         void accept(int status);
         
         uv_tcp_s*       _tcpHandle;         // Handle for TCP operations
         Acceptor        _acceptor;
+        bool            _isOpen = false;
     };
 
 }

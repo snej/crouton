@@ -45,8 +45,10 @@ namespace crouton {
         virtual void stop(bool threadSafe =true) =0;
 
         /// Schedules a function to run on the next event loop iteration.
+        /// @param fn  The function to call
+        /// @param synchronous  If true, will not return until the function has completed.
         /// @note  This method is thread-safe.
-        virtual void perform(std::function<void()>) =0;
+        virtual void perform(std::function<void()> fn, bool synchronous = false) =0;
 
     protected:
         virtual ~EventLoop();
@@ -73,7 +75,7 @@ namespace crouton {
         /// Calls the function repeatedly after a delay.
         void start(double delaySecs, double intervalSecs)   {_start(delaySecs, intervalSecs);}
 
-        /// Stops any future calls. The timer's destruction also stops calls.
+        /// Stops any future calls. (The timer's destruction also stops calls.)
         void stop();
 
         /// Static method that calls the given function after the given delay.

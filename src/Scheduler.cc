@@ -164,8 +164,8 @@ namespace crouton {
 
 
     EventLoop& Scheduler::eventLoop() {
-        precondition(isCurrent());
         if (!_eventLoop) {
+            precondition(isCurrent());
             _eventLoop = newEventLoop();
             _ownsEventLoop = true;
         }
@@ -219,7 +219,12 @@ namespace crouton {
     }
 
     void Scheduler::onEventLoop(std::function<void()> fn) {
-        eventLoop().perform(std::move(fn));
+        eventLoop().perform(std::move(fn), false);
+    }
+
+    void Scheduler::onEventLoopSync(std::function<void()> fn) {
+        precondition(!isCurrent());
+        eventLoop().perform(std::move(fn), true);
     }
 
     EventLoop::~EventLoop() = default;
@@ -233,6 +238,10 @@ namespace crouton {
         assert(!isWaiting(h));
         if (!isReady(h))
             _ready.push_back(h);
+    }
+
+    void Scheduler::adopt(coro_handle h) {
+        onEventLoop([this, h] { schedule(h); });
     }
 
     /// Allows a running coroutine `h` to give another ready coroutine some time.

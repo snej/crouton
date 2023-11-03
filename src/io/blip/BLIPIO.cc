@@ -17,6 +17,7 @@
 #include "crouton/Error.hh"
 #include "crouton/Future.hh"
 #include "crouton/Generator.hh"
+#include "crouton/io/HTTPParser.hh"
 #include "crouton/util/Logging.hh"
 #include "crouton/util/Varint.hh"
 #include "support/StringUtils.hh"
@@ -35,6 +36,17 @@ namespace crouton {
             {int(BadChecksum),          "invalid checksum in message"},
         };
         return NameEntry::lookup(code, names);
+    }
+
+    string ErrorDomainInfo<io::blip::AppError>::description(errorcode_t code) {
+        using enum io::blip::AppError;
+        static constexpr NameEntry names[] = {
+            {int(NotFound),     "peer didn't recognize the message"},
+        };
+        string desc = NameEntry::lookup(code, names);
+        if (desc.empty())
+            desc = ErrorDomainInfo<io::http::Status>::description(code);
+        return desc;
     }
 }
 

@@ -25,6 +25,7 @@
 #include "UVInternal.hh"
 #include <charconv>
 #include <cmath>
+#include <mutex>
 
 namespace crouton {
     using namespace crouton::io::uv;
@@ -59,7 +60,7 @@ namespace crouton::io::uv {
         void run() override;
         bool runOnce(bool waitForIO =true) override;
         void stop(bool threadSafe) override;
-        void perform(std::function<void()>) override;
+        void perform(std::function<void()>, bool synchronous = false) override;
 
         void ensureWaits();
         uv_loop_s* uvLoop() {return _loop.get();}
@@ -121,14 +122,16 @@ namespace crouton::io::uv {
             uv_stop(_loop.get());
     }
 
-    void UVEventLoop::perform(std::function<void()> fn) {
+    void UVEventLoop::perform(std::function<void()> fn, bool synchronous) {
         struct uvAsyncFn : public uv_async_t {
-            uvAsyncFn(std::function<void()> &&fn) :_fn(std::move(fn)) { }
             std::function<void()> _fn;
+            bool _synchronous;
+            std::mutex _mutex;
+            std::condition_variable _cond;
         };
 
         LLoop->info("Scheduler::onEventLoop()");
-        auto async = new uvAsyncFn(std::move(fn));
+        auto async = new uvAsyncFn{{}, std::move(fn), synchronous};
         check(uv_async_init(_loop.get(), async, [](uv_async_t *async) noexcept {
             auto self = static_cast<uvAsyncFn*>(async);
             try {
@@ -136,9 +139,17 @@ namespace crouton::io::uv {
             } catch (...) {
                 LLoop->error("*** Caught unexpected exception in onEventLoop callback ***");
             }
+            if (self->_synchronous) {
+                std::unique_lock lock(self->_mutex);
+                self->_cond.notify_one();
+            }
             closeHandle(self);
         }), "making an async call");
+
+        std::unique_lock lock(async->_mutex);
         check(uv_async_send(async), "making an async call");
+        if (async->_synchronous)
+            async->_cond.wait(lock);
     }
 
 

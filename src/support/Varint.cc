@@ -22,6 +22,8 @@
 namespace crouton::uvarint {
 
     bool readPartial(ConstBytes& bytes, uint64_t* outN) {
+        if (bytes.empty())
+            return false;
         uint64_t n = 0;
         int shift = 0;
         auto end = std::min(bytes.begin() + kMaxSize, bytes.end());

@@ -26,41 +26,8 @@ namespace crouton::io::blip {
     using namespace std;
 
 
-    Dispatcher::Dispatcher(initializer_list<RequestHandlerItem> handlers)
-    :_handlers(handlers)
-    { }
-
-    void Dispatcher::setRequestHandler(string profile, RequestHandler handler) {
-        _handlers[profile] = std::move(handler);
-    }
-
-    void Dispatcher::dispatchRequest(MessageInRef msg) {
-        string profile(msg->property("Profile"));
-        auto i = _handlers.find(profile);
-        if (i == _handlers.end())
-            i = _handlers.find("*");
-        if (i == _handlers.end()) {
-            msg->notHandled();
-            return;
-        }
-
-        string exceptionMessage;
-        try {
-            i->second(std::move(msg));
-            return;
-        } catch (std::exception const& x) {
-            exceptionMessage = x.what();
-        } catch(...) {
-        }
-        LBLIP->error(fmt::format("Unexpected exception `{}` handling BLIP request {}",
-                                 exceptionMessage, *msg));
-        msg->respondWithError({"BLIP", 500, "Internal error handling message"});
-    }
-
-
-
     Connection::Connection(std::unique_ptr<ws::WebSocket> ws,
-                                   std::initializer_list<RequestHandlerItem> handlers)
+                           std::initializer_list<RequestHandlerItem> handlers)
     :Dispatcher(handlers)
     ,_socket(std::move(ws))
     { }

@@ -18,6 +18,7 @@
 
 #include "crouton/util/Logging.hh"
 #include "crouton/io/Process.hh"
+#include "support/StringUtils.hh"
 
 #if CROUTON_USE_SPDLOG
 #include <spdlog/cfg/env.h>
@@ -85,15 +86,31 @@ namespace crouton {
 
 #ifndef ESP_PLATFORM
     static mutex        sLogMutex;      // makes logging thread-safe and prevents overlapping msgs
-    static std::time_t  sTime;          // Time in seconds that's formatted in sTimeBuf
+    static vector<Logger*>* sLoggers;
+    static time_t       sTime;          // Time in seconds that's formatted in sTimeBuf
     static char         sTimeBuf[30];   // Formatted timestamp, to second accuracy
 
-    static constexpr const char* kLevelName[] = {
+    static constexpr string_view kLevelName[] = {
+        "trace", "debug", "info", "warn", "error", "critical", "off"
+    };
+    static constexpr const char* kLevelDisplayName[] = {
         "trace", "debug", "info ", "WARN ", "ERR  ", "CRITICAL", ""
     };
 
+
+    Logger::Logger(string name, LogLevelType level)
+    :_name(std::move(name))
+    ,_level(level) {
+        unique_lock lock(sLogMutex);
+        if (!sLoggers)
+            sLoggers = new vector<Logger*>;
+        sLoggers->push_back(this);
+    }
+
+
     void Logger::_writeHeader(LogLevelType lvl) {
         // sLogMutex must be locked
+        io::TTY const& tty = io::TTY::err();
         timespec now;
         timespec_get(&now, TIME_UTC);
         if (now.tv_sec != sTime) {
@@ -105,20 +122,20 @@ namespace crouton {
             localtime_r(&sTime, &nowStruct);
 #endif
             strcpy(sTimeBuf, "▣ ");
-            strcat(sTimeBuf, io::TTY::err.dim);
+            strcat(sTimeBuf, tty.dim);
             size_t len = strlen(sTimeBuf);
             strftime(sTimeBuf + len, sizeof(sTimeBuf) - len, "%H:%M:%S.", &nowStruct);
         }
 
         const char* color = "";
         if (lvl >= LogLevel::err)
-            color = io::TTY::err.red;
+            color = tty.red;
         else if (lvl == LogLevel::warn)
-            color = io::TTY::err.yellow;
+            color = tty.yellow;
 
         fprintf(stderr, "%s%06ld%s %s%s| <%s> ",
-                sTimeBuf, now.tv_nsec / 1000, io::TTY::err.reset,
-                color, kLevelName[int(lvl)], _name.c_str());
+                sTimeBuf, now.tv_nsec / 1000, tty.reset,
+                color, kLevelDisplayName[int(lvl)], _name.c_str());
     }
 
 
@@ -126,7 +143,7 @@ namespace crouton {
         if (should_log(lvl)) {
             unique_lock<mutex> lock(sLogMutex);
             _writeHeader(lvl);
-            cerr << msg << io::TTY::err.reset << std::endl;
+            cerr << msg << io::TTY::err().reset << std::endl;
         }
     }
 
@@ -139,7 +156,44 @@ namespace crouton {
         va_start(args, types);
         minifmt::vformat_types(cerr, fmt, types, args);
         va_end(args);
-        cerr << io::TTY::err.reset << endl;
+        cerr << io::TTY::err().reset << endl;
+    }
+
+
+    static LogLevelType levelNamed(string_view name) {
+        int level = 0;
+        for (string_view levelStr : kLevelName) {
+            if (name == levelStr)
+                return LogLevelType(level);
+            ++level;
+        }
+        return LogLevel::info; // default if unrecognized name
+    }
+
+
+    void Logger::load_env_levels() {
+        const char* env = getenv("CROUTON_LOG_LEVEL");
+        if (!env)
+            return;
+        unique_lock lock(sLogMutex);
+        string_view envStr(env);
+        while (!envStr.empty()) {
+            string_view item;
+            tie(item,envStr) = split(envStr, ',');
+            auto [k, v] = split(item, '=');
+            if (v.empty()) {
+                auto level = levelNamed(k);
+                for (auto logger : *sLoggers)
+                    logger->set_level(level);
+            } else {
+                for (auto logger : *sLoggers) {
+                    if (logger->_name == k) {
+                        logger->set_level(levelNamed(v));
+                        break;
+                    }
+                }
+            }
+        }
     }
 
 #else
@@ -220,6 +274,8 @@ namespace crouton {
 #if CROUTON_USE_SPDLOG
             // Set log levels from `SPDLOG_LEVEL` env var:
             spdlog::cfg::load_env_levels();
+#else
+            Logger::load_env_levels();
 #endif
             assert_failed_hook = [](const char* message) {
                 Log->critical(message);

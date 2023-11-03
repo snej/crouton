@@ -70,9 +70,16 @@ namespace crouton {
         /// @note  This method is thread-safe.
         void onEventLoop(std::function<void()>);
 
+        /// Schedules the function to be run at the next iteration of the event loop,
+        /// and blocks until the function completes.
+        /// @note  This method is thread-safe.
+        /// @warning MUST NOT be called on the Scheduler's thread or it will deadlock.
+        ///          Use `asapSync` instead if this is a possibility.
+        void onEventLoopSync(std::function<void()>);
+
         /// Runs the lambda/function as soon as possible: either immediately if this Scheduler is
         /// current, else on its next event loop iteration.
-        template <std::invocable FN> 
+        template <std::invocable FN>
         void asap(FN fn) {
             if (isCurrent()) {
                 fn();
@@ -81,28 +88,36 @@ namespace crouton {
             }
         }
 
-        //---- Awaitable: `co_await`ing a Scheduler moves the current coroutine to its thread.
-#if 0   //TODO: This doesn't work yet
+        template <std::invocable FN>
+        void asapSync(FN fn) {
+            if (isCurrent()) {
+                fn();
+            } else {
+                onEventLoopSync(fn);
+            }
+        }
+
+
+        //==== Awaitable:
+
         class SchedAwaiter  {
         public:
-            SchedAwaiter(Scheduler* sched)  :_sched(sched) { }
-
-            bool await_ready() noexcept {return _sched->isCurrent();}
-
-            coro_handle await_suspend(coro_handle h) noexcept   {
-                _sched->suspend(h);
-                return lifecycle::suspendingTo(h, CRTN_TYPEID(*_sched), _sched,
-                                               Scheduler::current().next());
+            explicit SchedAwaiter(Scheduler* sched)     :_sched(sched) { }
+            bool await_ready() noexcept                 {return _sched->isCurrent();}
+            coro_handle await_suspend(coro_handle h) noexcept {
+                auto next = lifecycle::suspendingTo(h, CRTN_TYPEID(*_sched), _sched, nullptr);
+                _sched->adopt(h);
+                return next;
             }
-
-            void await_resume() noexcept {
-                precondition(_sched->isCurrent());
-            }
+            void await_resume() noexcept                {precondition(_sched->isCurrent());}
         private:
             Scheduler* _sched;
         };
-        SchedAwaiter operator co_await() {return SchedAwaiter(this);}
-#endif
+
+        /// `co_await`ing a Scheduler moves the current coroutine to its thread.
+        /// @warning  The coroutine's type must be thread-safe. `Future` is.
+        SchedAwaiter operator co_await()                {return SchedAwaiter(this);}
+
 
         /// Called from "normal" code.
         /// Resumes the next ready coroutine and returns true.
@@ -159,6 +174,7 @@ namespace crouton {
         void wakeUp();
         bool hasWakers() const;
         void scheduleWakers();
+        void adopt(coro_handle);
 
         using SuspensionMap = std::unordered_map<const void*,SuspensionImpl>;
 

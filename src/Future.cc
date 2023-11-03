@@ -86,6 +86,7 @@ namespace crouton {
         assert(!_chainedFuture);
         _chainedFuture = std::move(future);
         _chainedCallback = std::move(fn);
+        _chainedScheduler = &Scheduler::current();
         if (ready || !changeState(Chained))
             resolveChain();
     }
@@ -141,11 +142,14 @@ namespace crouton {
         if (auto x = getError()) {
             chainedFuture->setError(x);
         } else {
-            try {
-                chainedCallback(chainedFuture, *this);
-            } catch(...) {
-                chainedFuture->setError(Error(std::current_exception()));
-            }
+            std::shared_ptr<FutureStateBase> srcState = shared_from_this();
+            _chainedScheduler->asap([=] {
+                try {
+                    chainedCallback(chainedFuture, srcState);
+                } catch(...) {
+                    chainedFuture->setError(Error(std::current_exception()));
+                }
+            });
         }
     }
 

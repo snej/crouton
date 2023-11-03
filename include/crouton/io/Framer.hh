@@ -42,6 +42,8 @@ namespace crouton::io {
 
     private:
         IStream& _stream;
+        byte     _buf[10];
+        bool     _busy = false;
     };
 
 }

@@ -18,39 +18,15 @@
 
 #pragma once
 #include "crouton/io/blip/BLIPIO.hh"
-#include "crouton/io/blip/Message.hh"
+#include "crouton/io/blip/Dispatcher.hh"
 #include "crouton/CoCondition.hh"
 #include "crouton/Task.hh"
 #include "crouton/io/WebSocket.hh"
 
-#include <functional>
 #include <optional>
-#include <unordered_map>  
 
 namespace crouton::io::blip {
     class MessageBuilder;
-
-
-    /** A map from message Profile strings to handler functions. */
-    class Dispatcher {
-    public:
-        using RequestHandler = std::function<void(MessageInRef)>;
-        using RequestHandlerItem = std::pair<const string,RequestHandler>;
-
-        explicit Dispatcher(std::initializer_list<RequestHandlerItem> = {});
-
-        /// Registers a handler for incoming requests with a specific `Profile` property value.
-        /// The profile string `"*"` is a wild-card that matches any message.
-        void setRequestHandler(string profile, RequestHandler);
-
-        /// Calls the handler for a message. 
-        /// If there is none, responds with a {BLIP,404} error.
-        /// If the handler fails, responds with a {BLIP, 500} error.
-        void dispatchRequest(MessageInRef);
-
-    private:
-        std::unordered_map<string,RequestHandler> _handlers;
-    };
 
 
     /** A BLIP WebSocket connection. Glues a `BLIPIO` to a `WebSocket`.

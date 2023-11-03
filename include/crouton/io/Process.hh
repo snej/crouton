@@ -68,8 +68,8 @@ namespace crouton::io {
 
     /** Information about an output device; currently just color support. */
     struct TTY {
-        static const TTY out;   ///< TTY instance for stdout
-        static const TTY err;   ///< TTY instance for stderr
+        static TTY const& out();   ///< TTY instance for stdout
+        static TTY const& err();   ///< TTY instance for stderr
 
         explicit TTY(int fd);
 

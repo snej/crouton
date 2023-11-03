@@ -196,10 +196,14 @@ namespace crouton::io {
             // Fulfil the Future from the latest read() call:
             if (err == 0)
                 _readFuture->setResult(std::move(_readingBuf));
-            else if (err == UV_EOF || err == UV_EINVAL)
+            else if (err == UV_EOF || err == UV_EINVAL) {
+                LNet->debug("Stream read EOF");
                 _readFuture->setResult(nullptr);
-            else
-                _readFuture->setError(Error(uv::UVError{err}, "reading from the network"));
+            } else {
+                Error error(uv::UVError{err}, "reading from the network");
+                LNet->error("Stream read error: {}", minifmt::write{error});
+                _readFuture->setError(error);
+            }
             _readFuture = nullptr;
         } else {
             // If this is an unrequested read, queue it up for later:

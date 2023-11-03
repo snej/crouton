@@ -118,9 +118,6 @@ namespace crouton::io::blip {
 #pragma mark - MESSAGE IN:
 
 
-    MessageIn::~MessageIn() = default;
-
-
     MessageIn::MessageIn(BLIPIO* connection, FrameFlags flags, MessageNo n,
                          MessageSize outgoingSize,
                          FutureProvider<std::shared_ptr<MessageIn>> onResponse)
@@ -129,6 +126,12 @@ namespace crouton::io::blip {
     ,_outgoingSize(outgoingSize)
     ,_onResponse(std::move(onResponse))
     { }
+
+
+    MessageIn::~MessageIn() {
+        if (!_responded && !isResponse() && !noReply())
+            LBLIP->warn("Incoming message {} was not responded to!", minifmt::write(*this));
+    }
 
 
     MessageIn::ReceiveState MessageIn::receivedFrame(Codec& codec,

@@ -5,8 +5,6 @@
 //  Created by Jens Alfke on 8/25/23.
 //
 
-OTHER_LDFLAGS = $(OTHER_LDFLAGS) -lmbedcrypto -lmbedtls -lmbedx509 -luv
-
 LD_GENERATE_MAP_FILE    = YES
 LD_MAP_FILE_PATH        = $(CONFIGURATION_BUILD_DIR)/$(PRODUCT_NAME)-LinkMap-$(CURRENT_ARCH).txt
 

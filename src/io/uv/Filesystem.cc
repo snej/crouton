@@ -17,8 +17,8 @@
 //
 
 #include "crouton/io/Filesystem.hh"
+#include "crouton/util/Defer.hh"
 #include "UVInternal.hh"
-#include "support/Defer.hh"
 
 #include <cstring>
 

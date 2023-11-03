@@ -26,18 +26,32 @@ namespace crouton::io {
     using namespace crouton::io::uv;
 
 
-    TCPServer::TCPServer(uint16_t port)
+    TCPServer::TCPServer(uint16_t port, const char* interfaceAddr)
     :_tcpHandle(new uv_tcp_s)
     {
+        if (!interfaceAddr)
+            interfaceAddr = "0.0.0.0";
+        sockaddr_in addr = {};
+        check(uv_ip4_addr(interfaceAddr, port, &addr), "parsing server interface");
         uv_tcp_init(curLoop(), _tcpHandle);
         _tcpHandle->data = this;
-        sockaddr_in addr = {};
-        uv_ip4_addr("0.0.0.0", port, &addr);
         check(uv_tcp_bind(_tcpHandle, (sockaddr*)&addr, 0), "initializing server");
     }
 
+
     TCPServer::~TCPServer() {
         close();
+    }
+
+
+    uint16_t TCPServer::port() {
+        sockaddr_storage addr;
+        int addrLen = sizeof(addr);
+        check(uv_tcp_getsockname(_tcpHandle, (sockaddr*)&addr, &addrLen), "getting server port");
+        if (addr.ss_family == AF_INET)
+            return ((sockaddr_in&)addr).sin_port;
+        else
+            return ((sockaddr_in6&)addr).sin6_port;
     }
 
 
@@ -50,10 +64,12 @@ namespace crouton::io {
                 LNet->error("Caught unexpected exception in TCPServer::accept");
             }
         }), "starting server");
+        _isOpen = true;
     }
 
 
     void TCPServer::close() {
+        _isOpen = false;
         closeHandle(_tcpHandle);
     }
 

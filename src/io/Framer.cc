@@ -18,6 +18,7 @@
 
 #include "crouton/io/Framer.hh"
 #include "crouton/util/Varint.hh"
+#include "Internal.hh"
 
 namespace crouton::io {
     using namespace std;
@@ -44,8 +45,8 @@ namespace crouton::io {
 
     
     ASYNC<void> Framer::sendMessage(ConstBytes msg) {
-        byte buf[10];
-        ConstBytes frame{buf, uvarint::put(msg.size_bytes(), buf)};
+        NotReentrant nr(_busy);
+        ConstBytes frame{_buf, uvarint::put(msg.size_bytes(), _buf)};
         return _stream.write({frame, msg});
     }
 

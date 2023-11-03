@@ -225,7 +225,14 @@ namespace crouton::io {
     { }
 
 
-    TTY const TTY::out(1);
-    TTY const TTY::err(2);
+    TTY const& TTY::out() {
+        static TTY _out(1);
+        return _out;
+    }
+
+    TTY const& TTY::err() {
+        static TTY _err(2);
+        return _err;
+    }
 
 }

@@ -27,6 +27,7 @@
 #include <atomic>
 #include <exception>
 #include <functional>
+#include <mutex>
 
 namespace crouton {
     template <typename T> class FutureImpl;
@@ -87,6 +88,9 @@ namespace crouton {
         /// Returns the result, or throws the exception. Don't call this if hasResult is false.
         std::add_rvalue_reference_t<T> result() const   {return _state->resultValue();}
 
+        /// Returns the error, if any, else noerror. Don't call this if hasResult is false.
+        Error error() const                             {return _state->getError();}
+
         /// Registers a callback that will be called when the result is available, and which can
         /// return a new value (or void) which becomes the result of the returned Future.
         /// @param fn A callback that will be called when the value is available.
@@ -96,6 +100,9 @@ namespace crouton {
         ///        before `then` returns, and thus the returned Future will also have a result.
         /// @note  If this Future fails with an exception, the callback will not be called.
         ///        Instead the returned Future's result will be the same exception.
+        /// @note  The callback will run on the same thread that is calling `then`. If the Future
+        ///        is assigned a result on a different thread, the callback is scheduled via
+        ///        Scheduler::asap, so the original thread's event loop needs to be active.
         template <typename FN, typename U = std::invoke_result_t<FN,T>> requires(!std::is_void_v<T>)
         [[nodiscard]] Future<U> then(FN fn);
 
@@ -121,6 +128,26 @@ namespace crouton {
 
         void await_resume() requires (std::is_void_v<T>) {
             _state->resultValue();
+        }
+
+        //---- Synchronous/blocking accessors. Only for non-coroutine callers.
+
+        /// Blocks (by running the event loop) until the Future completes,
+        /// then returns its result or error as a `Result<T>`.
+        [[nodiscard]] Result<T> wait() {
+            Scheduler& sched = Scheduler::current();
+            (void)sched.eventLoop(); // create it in advance
+            (void) this->onReady([&]() {
+                sched.asap([&] { });
+            });
+            sched.runUntil([&] {return hasResult();});
+            return _state->result();
+        }
+
+        /// Blocks (by running the event loop) until the Future completes,
+        /// then either returns its result or throws its error as an exception.
+        T waitForResult() {
+            return wait().value();
         }
 
     private:
@@ -152,7 +179,8 @@ namespace crouton {
         virtual void setError(Error) = 0;
         virtual Error getError() = 0;
 
-        using ChainCallback = std::function<void(std::shared_ptr<FutureStateBase>,FutureStateBase&)>;
+        using ChainCallback = std::function<void(std::shared_ptr<FutureStateBase> dstState,
+                                                 std::shared_ptr<FutureStateBase> srcState)>;
 
         template <typename U>
         Future<U> chain(ChainCallback fn) {
@@ -179,6 +207,7 @@ namespace crouton {
         Suspension                       _suspension;           // coro that's awaiting result
         std::shared_ptr<FutureStateBase> _chainedFuture;        // Future of a 'then' callback
         ChainCallback                    _chainedCallback;      // 'then' callback
+        Scheduler*                       _chainedScheduler = nullptr; // Sched to run 'then' on
         ISelectable::OnReadyFn           _onReady;              // `onReady` callback
         std::atomic<bool>                _hasOnReady = false;
         std::atomic<State>               _state = Empty;        // Current state, for thread-safety
@@ -339,14 +368,15 @@ namespace crouton {
     template <typename FN, typename U>  requires(!std::is_void_v<T>)
     Future<U> Future<T>::then(FN fn) {
         return _state->template chain<U>([fn](std::shared_ptr<FutureStateBase> baseState,
-                                              FutureStateBase& myBaseState) mutable {
+                                              std::shared_ptr<FutureStateBase> myBaseState) mutable {
             auto& state = static_cast<FutureState<U>&>(*baseState);
-            T&& result = static_cast<FutureState<T>&>(myBaseState).resultValue();
+            T&& result = static_cast<FutureState<T>&>(*myBaseState).resultValue();
+            myBaseState = nullptr;
             if constexpr (std::is_void_v<U>) {
-                fn(std::move(result));
+                fn(std::move(result));                      // <-- call fn
                 state.setResult();
             } else {
-                state.setResult(fn(std::move(result)));
+                state.setResult(fn(std::move(result)));     // <-- call fn
             }
         });
     }
@@ -356,13 +386,14 @@ namespace crouton {
     template <typename FN, typename U>  requires(std::is_void_v<T>)
     Future<U> Future<T>::then(FN fn) {
         return _state->template chain<U>([fn](std::shared_ptr<FutureStateBase> baseState,
-                                              FutureStateBase&) mutable {
+                                              std::shared_ptr<FutureStateBase> myBaseState) mutable {
+            myBaseState = nullptr; // unused
             auto& state = dynamic_cast<FutureState<U>&>(*baseState);
             if constexpr (std::is_void_v<U>) {
-                fn();
+                fn();                                       // <-- call fn
                 state.setResult();
             } else {
-                state.setResult(fn());
+                state.setResult(fn());                      // <-- call fn
             }
         });
     }

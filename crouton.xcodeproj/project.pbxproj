@@ -125,7 +125,6 @@
 		27B330632AB373430066C8DA /* MessageOut.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330612AB373430066C8DA /* MessageOut.hh */; };
 		27B330682AB384880066C8DA /* Codec.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330662AB384880066C8DA /* Codec.hh */; };
 		27B3306E2AB4BD0B0066C8DA /* test_blip.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B3306D2AB4BD0B0066C8DA /* test_blip.cc */; };
-		27B330702AB4BE590066C8DA /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B3306F2AB4BE590066C8DA /* libz.tbd */; };
 		27B330732AB8FF790066C8DA /* Connection.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330712AB8FF790066C8DA /* Connection.hh */; };
 		27B330792AB911250066C8DA /* libcrouton.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 272728DB2A8D6604000CCA22 /* libcrouton.a */; };
 		27B3307A2AB911250066C8DA /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278F7E312AA015B0005B12F2 /* CoreFoundation.framework */; };
@@ -137,6 +136,13 @@
 		27BCD2F92AE98D10009DFCED /* Varint.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27BCD2F82AE98D10009DFCED /* Varint.cc */; };
 		27BCD3022AEACE0C009DFCED /* LocalSocket.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27BCD3002AEACE0C009DFCED /* LocalSocket.hh */; };
 		27BCD3032AEACE0C009DFCED /* LocalSocket.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27BCD3012AEACE0C009DFCED /* LocalSocket.cc */; };
+		27BCD31F2AF19BA5009DFCED /* Dispatcher.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27BCD31D2AF19BA5009DFCED /* Dispatcher.hh */; };
+		27BCD3202AF19BA5009DFCED /* Dispatcher.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27BCD31E2AF19BA5009DFCED /* Dispatcher.cc */; };
+		27BCD32C2AF3078E009DFCED /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B3306F2AB4BE590066C8DA /* libz.tbd */; };
+		27BCD3322AF309F9009DFCED /* libuv.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27BCD3312AF309F9009DFCED /* libuv.a */; };
+		27BCD3362AF30A20009DFCED /* libmbedtls.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27BCD3332AF30A20009DFCED /* libmbedtls.a */; };
+		27BCD3372AF30A20009DFCED /* libmbedx509.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27BCD3342AF30A20009DFCED /* libmbedx509.a */; };
+		27BCD3382AF30A20009DFCED /* libmbedcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27BCD3352AF30A20009DFCED /* libmbedcrypto.a */; };
 		27E98EDF2AC2099E002F3D35 /* test_generator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E98EDE2AC2099E002F3D35 /* test_generator.cc */; };
 		27ED1C722AABF47200ADC971 /* CoroLifecycle.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27ED1C702AABF47200ADC971 /* CoroLifecycle.hh */; };
 		27ED1C732AABF47200ADC971 /* CoroLifecycle.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27ED1C712AABF47200ADC971 /* CoroLifecycle.cc */; };
@@ -687,6 +693,12 @@
 		27BCD3002AEACE0C009DFCED /* LocalSocket.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = LocalSocket.hh; sourceTree = "<group>"; };
 		27BCD3012AEACE0C009DFCED /* LocalSocket.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LocalSocket.cc; sourceTree = "<group>"; };
 		27BCD30B2AF01095009DFCED /* CroutonFwd.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CroutonFwd.hh; sourceTree = "<group>"; };
+		27BCD31D2AF19BA5009DFCED /* Dispatcher.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Dispatcher.hh; sourceTree = "<group>"; };
+		27BCD31E2AF19BA5009DFCED /* Dispatcher.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Dispatcher.cc; sourceTree = "<group>"; };
+		27BCD3312AF309F9009DFCED /* libuv.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libuv.a; path = build_cmake/debug/vendor/libuv/libuv.a; sourceTree = "<group>"; };
+		27BCD3332AF30A20009DFCED /* libmbedtls.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedtls.a; path = build_cmake/debug/xcodedeps/libmbedtls.a; sourceTree = "<group>"; };
+		27BCD3342AF30A20009DFCED /* libmbedx509.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedx509.a; path = build_cmake/debug/xcodedeps/libmbedx509.a; sourceTree = "<group>"; };
+		27BCD3352AF30A20009DFCED /* libmbedcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedcrypto.a; path = build_cmake/debug/xcodedeps/libmbedcrypto.a; sourceTree = "<group>"; };
 		27E98EDE2AC2099E002F3D35 /* test_generator.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_generator.cc; sourceTree = "<group>"; };
 		27E98EE02AC21940002F3D35 /* Awaitable.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Awaitable.hh; sourceTree = "<group>"; };
 		27ED1C702AABF47200ADC971 /* CoroLifecycle.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CoroLifecycle.hh; sourceTree = "<group>"; };
@@ -725,7 +737,7 @@
 			files = (
 				272728E72A8D6619000CCA22 /* libcrouton.a in Frameworks */,
 				275EB4412ACDCD760022ED53 /* libBLIP.a in Frameworks */,
-				27B330702AB4BE590066C8DA /* libz.tbd in Frameworks */,
+				27BCD32C2AF3078E009DFCED /* libz.tbd in Frameworks */,
 				278F7E322AA015B1005B12F2 /* CoreFoundation.framework in Frameworks */,
 				27F6030D2A9FBA73006FA1D0 /* Network.framework in Frameworks */,
 				278F7E342AA015C0005B12F2 /* Security.framework in Frameworks */,
@@ -736,6 +748,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27BCD3362AF30A20009DFCED /* libmbedtls.a in Frameworks */,
+				27BCD3372AF30A20009DFCED /* libmbedx509.a in Frameworks */,
+				27BCD3382AF30A20009DFCED /* libmbedcrypto.a in Frameworks */,
+				27BCD3322AF309F9009DFCED /* libuv.a in Frameworks */,
 				278F7E432AA26876005B12F2 /* libllhttp.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -904,6 +920,10 @@
 		272728E62A8D6619000CCA22 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				27BCD3352AF30A20009DFCED /* libmbedcrypto.a */,
+				27BCD3332AF30A20009DFCED /* libmbedtls.a */,
+				27BCD3342AF30A20009DFCED /* libmbedx509.a */,
+				27BCD3312AF309F9009DFCED /* libuv.a */,
 				27B3306F2AB4BE590066C8DA /* libz.tbd */,
 				278F7E332AA015C0005B12F2 /* Security.framework */,
 				278F7E312AA015B0005B12F2 /* CoreFoundation.framework */,
@@ -1129,6 +1149,7 @@
 				278F7E5D2AAA69B5005B12F2 /* Base.hh */,
 				277B652A2AD8B5CA006F053D /* betterassert.hh */,
 				27B3306A2AB391F30066C8DA /* Bytes.hh */,
+				2727304B2A8E811B000CCA22 /* Defer.hh */,
 				277E8A432ABA50FB00E78CB1 /* LinkedList.hh */,
 				278F7F222AAA98FE005B12F2 /* Logging.hh */,
 				277B6C272AE06CDA006F053D /* MiniFormat.hh */,
@@ -1566,7 +1587,6 @@
 				277B652F2AD9FD47006F053D /* Backtrace+Windows.cc */,
 				27F49CD42A9E4E8E00BFB24C /* Backtrace.hh */,
 				277B652B2AD8B5D8006F053D /* betterassert.cc */,
-				2727304B2A8E811B000CCA22 /* Defer.hh */,
 				27B330692AB388960066C8DA /* Endian.hh */,
 				278F7F232AAA98FE005B12F2 /* Logging.cc */,
 				275A5F132AAFB3B1009791E8 /* Memoized.hh */,
@@ -1585,6 +1605,7 @@
 				275EB3EA2ACDC7450022ED53 /* README.md */,
 				27B330722AB8FF790066C8DA /* Connection.cc */,
 				27B330502AB2763B0066C8DA /* BLIPIO.cc */,
+				27BCD31E2AF19BA5009DFCED /* Dispatcher.cc */,
 				27B3304F2AB2763B0066C8DA /* Message.cc */,
 				27B3305A2AB36F1D0066C8DA /* MessageBuilder.cc */,
 				27B330612AB373430066C8DA /* MessageOut.hh */,
@@ -1601,6 +1622,7 @@
 				27B330842AB912D30066C8DA /* BLIP.hh */,
 				27B330512AB2763B0066C8DA /* Protocol.hh */,
 				27B330712AB8FF790066C8DA /* Connection.hh */,
+				27BCD31D2AF19BA5009DFCED /* Dispatcher.hh */,
 				27B3304E2AB2763B0066C8DA /* BLIPIO.hh */,
 				27B3304D2AB2763B0066C8DA /* Message.hh */,
 				27B3305B2AB36F1D0066C8DA /* MessageBuilder.hh */,
@@ -1658,6 +1680,7 @@
 			files = (
 				275EB3FE2ACDCC5D0022ED53 /* Connection.hh in Headers */,
 				275EB4012ACDCC5D0022ED53 /* BLIPIO.hh in Headers */,
+				27BCD31F2AF19BA5009DFCED /* Dispatcher.hh in Headers */,
 				275EB40C2ACDCC5D0022ED53 /* Protocol.hh in Headers */,
 				275EB3F32ACDCC5D0022ED53 /* Message.hh in Headers */,
 				275EB3F42ACDCC5D0022ED53 /* MessageBuilder.hh in Headers */,
@@ -1953,6 +1976,7 @@
 				275EB4262ACDCC5D0022ED53 /* Message.cc in Sources */,
 				275EB4152ACDCC5D0022ED53 /* MessageBuilder.cc in Sources */,
 				275EB41B2ACDCC5D0022ED53 /* MessageOut.cc in Sources */,
+				27BCD3202AF19BA5009DFCED /* Dispatcher.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -138,8 +138,14 @@ namespace crouton::io {
 
 
     Future<void> IStream::write(const ConstBytes buffers[], size_t nBuffers) {
-        for (size_t i = 0; i < nBuffers; ++i) {
-            AWAIT write(buffers[i]);
+        if (nBuffers == 1) {
+            AWAIT write(buffers[0]);
+        } else if (nBuffers > 1) {
+            // After the first AWAIT the caller's stack frame will be gone,
+            // and also the buffers[] C array. So copy it into a vector:
+            vector<ConstBytes> buffersCopy(&buffers[0], &buffers[nBuffers]);
+            for (auto& buffer : buffersCopy)
+                AWAIT write(buffer);
         }
         RETURN noerror;
     }

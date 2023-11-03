@@ -47,7 +47,8 @@ namespace crouton {
 
     class Logger {
     public:
-        Logger(string name, LogLevelType level)         :_name(std::move(name)), _level(level) { }
+        Logger(string name, LogLevelType level);
+        ~Logger() = delete;
 
         LogLevelType level() const Pure                 {return _level;}
         void set_level(LogLevelType level)              {_level = level;}
@@ -86,6 +87,8 @@ namespace crouton {
             log(LogLevel::critical, fmt, std::forward<Args>(args)...);
         }
 
+        static void load_env_levels();
+        
     private:
         void _log(LogLevelType, string_view fmt, minifmt::FmtIDList, ...);
         void _writeHeader(LogLevelType);
@@ -112,9 +115,13 @@ namespace crouton {
      */
 
 
-    /// Initializes spdlog logging, sets log levels and creates well-known loggers.
+    /// Initializes logging, sets log levels and creates well-known loggers.
     /// Called automatically by `MakeLogger` and `AddSink`.
     /// Calling this multiple times has no effect.
+    /// @note You can set the environment variable `CROUTON_LOG_LEVEL` (or `SPDLOG_LEVEL`, if using
+    ///     spdlog) to configure log levels. The value is a series of comma-separated items.
+    ///     An item that's just a log level name (as in level_enum) sets all loggers to that level.
+    ///     An item of the form "name=level" sets only the named logger to that level.
     void InitLogging();
 
 

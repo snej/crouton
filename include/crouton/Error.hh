@@ -205,6 +205,7 @@ namespace crouton {
         Timeout,                    // Operation failed because it took too long
         EndOfData,                  // Read past end of data in a stream
         Unimplemented,              // Unimplemented functionality or abstract-by-convention method
+        Disconnected,               // A stream/socket was unexpectedly disconnected
     };
 
     template <> struct ErrorDomainInfo<CroutonError> {
