@@ -63,23 +63,15 @@
             argument = "--break"
             isEnabled = "YES">
          </CommandLineArgument>
-         <CommandLineArgument
-            argument = "&quot;MiniFormat&quot;"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "&quot;Producer Consumer&quot;"
-            isEnabled = "NO">
-         </CommandLineArgument>
       </CommandLineArguments>
       <EnvironmentVariables>
          <EnvironmentVariable
-            key = "SPDLOG_LEVEL"
+            key = "CROUTON_LOG_LEVEL"
             value = "info"
             isEnabled = "NO">
          </EnvironmentVariable>
          <EnvironmentVariable
-            key = "SPDLOG_LEVEL"
+            key = "CROUTON_LOG_LEVEL"
             value = "info,Coro=trace,Sched=debug"
             isEnabled = "NO">
          </EnvironmentVariable>

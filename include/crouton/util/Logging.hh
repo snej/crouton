@@ -50,6 +50,7 @@ namespace crouton {
         Logger(string name, LogLevelType level);
         ~Logger() = delete;
 
+        string const& name() const Pure                 {return _name;}
         LogLevelType level() const Pure                 {return _level;}
         void set_level(LogLevelType level)              {_level = level;}
         bool should_log(LogLevelType level) const Pure  {return level >= _level;}
@@ -88,7 +89,9 @@ namespace crouton {
         }
 
         static void load_env_levels();
-        
+
+        static void apply_all(std::function<void(Logger&)>);
+
     private:
         void _log(LogLevelType, string_view fmt, minifmt::FmtIDList, ...);
         void _writeHeader(LogLevelType);
@@ -140,5 +143,10 @@ namespace crouton {
 #if CROUTON_USE_SPDLOG
     /// Creates a log destination.
     void AddSink(spdlog::sink_ptr);
+#else
+    using LogSink = void (*)(Logger const&, LogLevelType, string_view) noexcept;
+
+    /// Redirects log output from stderr to the given callback.
+    void SetLogOutput(LogSink);
 #endif
 }

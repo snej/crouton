@@ -35,6 +35,7 @@
 #include <ctime>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <mutex>
 
 namespace crouton {
@@ -87,6 +88,7 @@ namespace crouton {
 #ifndef ESP_PLATFORM
     static mutex        sLogMutex;      // makes logging thread-safe and prevents overlapping msgs
     static vector<Logger*>* sLoggers;
+    static LogSink      sLogSink = nullptr;
     static time_t       sTime;          // Time in seconds that's formatted in sTimeBuf
     static char         sTimeBuf[30];   // Formatted timestamp, to second accuracy
 
@@ -141,22 +143,35 @@ namespace crouton {
 
     void Logger::log(LogLevelType lvl, string_view msg) {
         if (should_log(lvl)) {
-            unique_lock<mutex> lock(sLogMutex);
-            _writeHeader(lvl);
-            cerr << msg << io::TTY::err().reset << std::endl;
+            if (auto sink = sLogSink) {
+                sink(*this, lvl, msg);
+            } else {
+                unique_lock<mutex> lock(sLogMutex);
+                _writeHeader(lvl);
+                cerr << msg << io::TTY::err().reset << std::endl;
+            }
         }
     }
 
 
     void Logger::_log(LogLevelType lvl, string_view fmt, minifmt::FmtIDList types, ...) {
-        unique_lock<mutex> lock(sLogMutex);
+        if (auto sink = sLogSink) {
+            stringstream out;
+            va_list args;
+            va_start(args, types);
+            minifmt::vformat_types(out, fmt, types, args);
+            va_end(args);
+            sink(*this, lvl, out.str());
+        } else {
+            unique_lock<mutex> lock(sLogMutex);
 
-        _writeHeader(lvl);
-        va_list args;
-        va_start(args, types);
-        minifmt::vformat_types(cerr, fmt, types, args);
-        va_end(args);
-        cerr << io::TTY::err().reset << endl;
+            _writeHeader(lvl);
+            va_list args;
+            va_start(args, types);
+            minifmt::vformat_types(cerr, fmt, types, args);
+            va_end(args);
+            cerr << io::TTY::err().reset << endl;
+        }
     }
 
 
@@ -194,6 +209,21 @@ namespace crouton {
                 }
             }
         }
+    }
+
+
+    void Logger::apply_all(std::function<void(Logger&)> fn) {
+        unique_lock lock(sLogMutex);
+        if (sLoggers) {
+            for (auto logger : *sLoggers)
+                fn(*logger);
+        }
+    }
+
+
+    void SetLogOutput(LogSink sink) {
+        unique_lock lock(sLogMutex);
+        sLogSink = sink;
     }
 
 #else
