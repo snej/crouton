@@ -78,7 +78,7 @@ namespace crouton {
         Log->error("*** Throwing crouton::Exception({}, {}): {} ({}) -- from {} [{}:{}]",
                       domain(), _code, description(), logMessage,
                       loc.function_name(), loc.file_name(), loc.line());
-        fleece::Backtrace(1).writeTo(std::cerr);
+       // fleece::Backtrace(1).writeTo(std::cerr);
         precondition(*this); // it's illegal to throw `noerror`
         throw Exception(*this);
     }
@@ -144,6 +144,7 @@ namespace crouton {
             {errorcode_t(EndOfData), "unexpected end of data"},
             {errorcode_t(Unimplemented), "unimplemented operation"},
             {errorcode_t(Disconnected), "unexpectedly disconnected"},
+            {errorcode_t(NotFound), "not found"},
         };
         return NameEntry::lookup(code, names);
     }

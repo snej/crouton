@@ -47,7 +47,7 @@ namespace crouton::io {
     Future<void> IStream::readExactly(MutableBytes buf) {
         return read(buf).then([buf](size_t bytesRead) {
             if (bytesRead < buf.size())
-                Error(CroutonError::ParseError).raise();
+                Error(CroutonError::EndOfData).raise();
         });
     }
 

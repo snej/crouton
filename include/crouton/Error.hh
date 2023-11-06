@@ -206,6 +206,7 @@ namespace crouton {
         EndOfData,                  // Read past end of data in a stream
         Unimplemented,              // Unimplemented functionality or abstract-by-convention method
         Disconnected,               // A stream/socket was unexpectedly disconnected
+        NotFound,                   // Something requested was not found
     };
 
     template <> struct ErrorDomainInfo<CroutonError> {
