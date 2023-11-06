@@ -161,7 +161,7 @@ namespace crouton::io::blip {
         LBLIP->info("BLIPIO stopping");
         _receiveOpen = _sendOpen = false;
         if (size_t n = _outbox.size() + _icebox.size() + _wayOutBox.size(); n > 0) {
-            LBLIP->debug("  ...Notifying {} outgoing messages they're canceled", n);
+            LBLIP->info("  ...Notifying {} outgoing messages they're canceled", n);
             for (auto &msg : _outbox)
                 msg->disconnected();
             for (auto &msg : _icebox)
@@ -404,7 +404,7 @@ namespace crouton::io::blip {
     /** Returns the MessageIn object for the incoming response with the given MessageNo. */
     MessageInRef BLIPIO::pendingResponse(MessageNo msgNo, FrameFlags flags) {
         MessageInRef msg;
-        auto                i = _pendingResponses.find(msgNo);
+        auto i = _pendingResponses.find(msgNo);
         if (i != _pendingResponses.end()) {
             msg = i->second;
             if (!(flags & kMoreComing)) {

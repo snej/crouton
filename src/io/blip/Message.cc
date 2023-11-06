@@ -172,6 +172,10 @@ namespace crouton::io::blip {
             _properties.append(string_view(dst.read(_propertiesSize)));
             _body.append(string_view(dst));
             _gotProperties = true;
+
+            // If frame has type Error, change my flags accordingly:
+            if (isResponse() && (frameFlags & kTypeMask) == kErrorType)
+                _flags = FrameFlags((_flags & ~kTypeMask) | kErrorType);
         }
         if (size_t curSize = _properties.size(); curSize < _propertiesSize) {
             // Read from the frame into _properties:
