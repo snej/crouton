@@ -55,107 +55,99 @@ namespace crouton::io::uv {
     
     /** Implementation of EventLoop for libuv.*/
     class UVEventLoop final : public EventLoop {
-    public:
-        UVEventLoop();
-        void run() override;
-        bool runOnce(bool waitForIO =true) override;
-        void stop(bool threadSafe) override;
-        void perform(std::function<void()>, bool synchronous = false) override;
-
-        void ensureWaits();
-        uv_loop_s* uvLoop() {return _loop.get();}
-    private:
-        bool _run(int mode);
-
-        std::unique_ptr<uv_loop_s> _loop;
+        std::unique_ptr<uv_loop_s>  _loop;
         std::unique_ptr<uv_async_s> _async;
         std::unique_ptr<uv_timer_s> _distantFutureTimer;
+    public:
+
+        UVEventLoop()
+        :_loop(make_unique<uv_loop_t>())
+        ,_async(make_unique<uv_async_t>())
+        {
+            check(uv_loop_init(_loop.get()), "initializing the event loop");
+            _loop->data = this;
+
+            uv_async_cb stopCallback = [](uv_async_t *async) {
+                uv_stop((uv_loop_t*)async->data);
+            };
+            check(uv_async_init(_loop.get(), _async.get(), stopCallback), "initializing the event loop");
+            _async->data = _loop.get();
+        }
+
+        uv_loop_s* uvLoop() {
+            return _loop.get();
+        }
+
+        void ensureWaits() {
+            // Create a timer with an extremely long period,
+            // so the event loop always has something to wait on.
+            _distantFutureTimer = make_unique<uv_timer_t>();
+            uv_timer_init(uvLoop(), _distantFutureTimer.get());
+            auto callback = [](uv_timer_t *handle){ };
+            uv_timer_start(_distantFutureTimer.get(), callback, 1'000'000'000, 1'000'000'000);
+        }
+
+        void run()  {
+            _run(UV_RUN_DEFAULT);
+        }
+
+        bool runOnce(bool waitForIO)  {
+            return _run(waitForIO ? UV_RUN_ONCE : UV_RUN_NOWAIT);
+        }
+
+        void stop(bool threadSafe) {
+            if (threadSafe)
+                uv_async_send(_async.get());
+            else
+                uv_stop(_loop.get());
+        }
+
+        void perform(std::function<void()> fn, bool synchronous) {
+            struct uvAsyncFn : public uv_async_t {
+                std::function<void()> _fn;
+                bool _synchronous;
+                std::mutex _mutex;
+                std::condition_variable _cond;
+            };
+
+            LLoop->info("Scheduler::onEventLoop()");
+            auto async = new uvAsyncFn{{}, std::move(fn), synchronous};
+            check(uv_async_init(_loop.get(), async, [](uv_async_t *async) noexcept {
+                auto self = static_cast<uvAsyncFn*>(async);
+                try {
+                    self->_fn();
+                } catch (...) {
+                    LLoop->error("*** Caught unexpected exception in onEventLoop callback ***");
+                }
+                if (self->_synchronous) {
+                    std::unique_lock lock(self->_mutex);
+                    self->_cond.notify_one();
+                }
+                closeHandle(self);
+            }), "making an async call");
+
+            std::unique_lock lock(async->_mutex);
+            check(uv_async_send(async), "making an async call");
+            if (async->_synchronous)
+                async->_cond.wait(lock);
+        }
+
+    private:
+        bool _run(int mode)  {
+            NotReentrant nr(_running);
+            LLoop->debug("Running as {}blocking (alive={})",
+                         (mode==UV_RUN_NOWAIT ? "non" : ""), (bool)uv_loop_alive(_loop.get()));
+            auto ns = uv_hrtime();
+            int status = uv_run(_loop.get(), uv_run_mode(mode));
+            ns = uv_hrtime() - ns;
+            LLoop->debug("...stopped after {}ms, status={}", (ns / 1000000), status);
+            return status != 0;
+        }
     };
 
 
-    UVEventLoop::UVEventLoop()
-    :_loop(make_unique<uv_loop_t>())
-    ,_async(make_unique<uv_async_t>())
-    {
-        check(uv_loop_init(_loop.get()), "initializing the event loop");
-        _loop->data = this;
-
-        uv_async_cb stopCallback = [](uv_async_t *async) {
-            uv_stop((uv_loop_t*)async->data);
-        };
-        check(uv_async_init(_loop.get(), _async.get(), stopCallback), "initializing the event loop");
-        _async->data = _loop.get();
-    }
-
-    void UVEventLoop::ensureWaits() {
-        // Create a timer with an extremely long period,
-        // so the event loop always has something to wait on.
-        _distantFutureTimer = make_unique<uv_timer_t>();
-        uv_timer_init(uvLoop(), _distantFutureTimer.get());
-        auto callback = [](uv_timer_t *handle){ };
-        uv_timer_start(_distantFutureTimer.get(), callback, 1'000'000'000, 1'000'000'000);
-    }
-
-    bool UVEventLoop::_run(int mode)  {
-        NotReentrant nr(_running);
-        LLoop->debug("Running as {}blocking (alive={})",
-                    (mode==UV_RUN_NOWAIT ? "non" : ""), (bool)uv_loop_alive(_loop.get()));
-        auto ns = uv_hrtime();
-        int status = uv_run(_loop.get(), uv_run_mode(mode));
-        ns = uv_hrtime() - ns;
-        LLoop->debug("...stopped after {}ms, status={}", (ns / 1000000), status);
-        return status != 0;
-    }
-
-    void UVEventLoop::run()  {
-        _run(UV_RUN_DEFAULT);
-    }
-
-    bool UVEventLoop::runOnce(bool waitForIO)  {
-        return _run(waitForIO ? UV_RUN_ONCE : UV_RUN_NOWAIT);
-    }
-
-    void UVEventLoop::stop(bool threadSafe) {
-        if (threadSafe)
-            uv_async_send(_async.get());
-        else
-            uv_stop(_loop.get());
-    }
-
-    void UVEventLoop::perform(std::function<void()> fn, bool synchronous) {
-        struct uvAsyncFn : public uv_async_t {
-            std::function<void()> _fn;
-            bool _synchronous;
-            std::mutex _mutex;
-            std::condition_variable _cond;
-        };
-
-        LLoop->info("Scheduler::onEventLoop()");
-        auto async = new uvAsyncFn{{}, std::move(fn), synchronous};
-        check(uv_async_init(_loop.get(), async, [](uv_async_t *async) noexcept {
-            auto self = static_cast<uvAsyncFn*>(async);
-            try {
-                self->_fn();
-            } catch (...) {
-                LLoop->error("*** Caught unexpected exception in onEventLoop callback ***");
-            }
-            if (self->_synchronous) {
-                std::unique_lock lock(self->_mutex);
-                self->_cond.notify_one();
-            }
-            closeHandle(self);
-        }), "making an async call");
-
-        std::unique_lock lock(async->_mutex);
-        check(uv_async_send(async), "making an async call");
-        if (async->_synchronous)
-            async->_cond.wait(lock);
-    }
-
-
-
     uv_loop_s* curLoop() {
-        return ((UVEventLoop&)Scheduler::current().eventLoop()).uvLoop();
+        return static_cast<UVEventLoop&>(Scheduler::current().eventLoop()).uvLoop();
     }
 
 }

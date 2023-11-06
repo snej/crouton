@@ -113,13 +113,7 @@ namespace crouton {
     
     /// True if there are no tasks waiting to run.
     bool Scheduler::isIdle() const {
-        if (hasWakers())
-            return false;
-        else if (_ready.empty())
-            return true;
-        else if (_ready.size() == 1 && _ready[0] == _eventLoopTask)
-            return true;
-        return false;
+        return !hasWakers() && _ready.empty();
     }
 
     bool Scheduler::isEmpty() const {
@@ -153,9 +147,7 @@ namespace crouton {
 
         LSched->error("** On this Scheduler:");
         for (auto &r : _ready)
-            if (r != _eventLoopTask) {
-                LSched->info("ready: {}", minifmt::write(logCoro{r}));
-            }
+            LSched->info("ready: {}", minifmt::write(logCoro{r}));
         for (auto &s : *_suspended) {
             LSched->info("\tsuspended: {}" , minifmt::write(logCoro{s.second._handle}));
         }
@@ -179,30 +171,16 @@ namespace crouton {
         _ownsEventLoop = false;
     }
 
-    /// Returns a coroutine that runs the event loop, yielding on every iteration.
-    Task Scheduler::eventLoopTask() {
-        NotReentrant nr(_inEventLoopTask);
-        while(true) {
-            eventLoop().runOnce(isIdle());    // only block on I/O if no tasks are ready
-            if (bool ok = YIELD true; !ok)
-                break;
-        }
-    }
-
     void Scheduler::run() {
         runUntil([]{return false;});
     }
 
     void Scheduler::runUntil(std::function<bool()> fn) {
-        if (!fn()) {
-            if (!_eventLoopTask) {
-                _eventLoopTask = eventLoopTask().handle();
-                lifecycle::ignoreInCount(_eventLoopTask);
-            }
-            while (!fn() && !_eventLoopTask.done())
-                lifecycle::resume(_eventLoopTask);
-            if (_eventLoopTask.done())
-                _eventLoopTask = nullptr;
+        while (!fn()) {
+            bool idle = !resume();
+            if (!idle && fn())
+                break;
+            eventLoop().runOnce(idle);
         }
     }
 

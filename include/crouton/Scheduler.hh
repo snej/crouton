@@ -167,7 +167,6 @@ namespace crouton {
         static Scheduler& _create();
         EventLoop* newEventLoop();
         coro_handle eventLoopHandle();
-        Task eventLoopTask();
         bool isReady(coro_handle h) const;
         bool isWaiting(coro_handle h) const;
         void _wakeUp();
@@ -183,10 +182,8 @@ namespace crouton {
         std::deque<coro_handle> _ready;                     // Coroutines that are ready to run
         std::unique_ptr<SuspensionMap> _suspended;          // Suspended/sleeping coroutines
         EventLoop*              _eventLoop = nullptr;       // My event loop
-        coro_handle             _eventLoopTask = nullptr;   // EventLoop's coroutine handle
         std::atomic<bool>       _woke = false;              // True if a suspended is waking
         bool                    _ownsEventLoop = false;     // True if I created _eventLoop
-        bool                    _inEventLoopTask = false;   // True while in eventLoopTask()
     };
 
 
