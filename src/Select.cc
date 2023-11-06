@@ -17,6 +17,7 @@
 //
 
 #include "crouton/Select.hh"
+#include "crouton/Logging.hh"
 #include "crouton/Scheduler.hh"
 
 namespace crouton {
@@ -33,15 +34,17 @@ namespace crouton {
     ///        before it can be selected again.
     /// @note  If no sources are enabled, `co_await` will immediately return -1.
     void Select::enable(unsigned index) {
+        precondition(_sources[index]);
         if (!_enabled[index]) {
             _enabled.set(index, true);
             _sources[index]->onReady([this,index]{this->notify(index);});
         }
     }
 
-    void Select::enable() {
-        for (unsigned i = 0; i < _sources.size(); ++i)
+    Select& Select::enable() {
+        for (unsigned i = 0; i < _sources.size() && _sources[i]; ++i)
             enable(i);
+        return *this;
     }
 
 
@@ -57,6 +60,7 @@ namespace crouton {
                 return i;
             }
         }
+        Log->warn("Awaiting a non-enabled Select: will immediately return -1");
         return -1; // means "nothing was enabled"
     }
 

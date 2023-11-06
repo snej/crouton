@@ -33,13 +33,13 @@ namespace crouton {
         Example:
         ```
             Select sel { &gen0, &gen1 };
-            sel.enable(0);
-            sel.enable(1);
+            sel.enable();
             switch (AWAIT sel) {
                 case 0: {auto val = AWAIT gen0; ... break;}
                 case 1: {auto val = AWAIT gen1; ... break;}
             }
-        ``` */
+        ``` 
+        @warning  You **must** enable at least one source. */
     class Select {
     public:
         /// Constructs a Select that will watch the given list of ISelectable objects.
@@ -53,7 +53,7 @@ namespace crouton {
         void enable(unsigned index);
 
         /// Begins watching each source.
-        void enable();
+        Select& enable();
 
         //---- Awaitable methods. `co_await` returns the index of a ready source.
         bool await_ready() noexcept     {return _ready.any() || _enabled.none();}
@@ -65,7 +65,7 @@ namespace crouton {
 
         void notify(unsigned index);
 
-        std::array<ISelectable*,kMaxSources>    _sources;
+        std::array<ISelectable*,kMaxSources>    _sources {};
         std::bitset<kMaxSources>                _enabled, _ready;
         Suspension                              _suspension;
     };
