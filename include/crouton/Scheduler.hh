@@ -138,15 +138,8 @@ namespace crouton {
         /// To be called from an `await_resume` method.  //TODO: Is this method still needed?
         void resumed(coro_handle h);
 
-        /// Returns the coroutine that should be resumed. If none is ready, exits coroutine-land.
-        coro_handle next();
-
         /// Returns the coroutine that should be resumed, or else `dflt`.
         coro_handle nextOr(coro_handle dflt);
-
-        /// Returns the coroutine that should be resumed,
-        /// or else the no-op coroutine that returns to the outer caller.
-        coro_handle finished(coro_handle h);
 
         /// Adds a coroutine handle to the suspension set.
         /// To make it runnable again, call the returned Suspension's `wakeUp` method
@@ -156,6 +149,13 @@ namespace crouton {
         /// Tells the Scheduler a coroutine is about to be destroyed, so it can manage it
         /// correctly if it's in the suspended set.
         void destroying(coro_handle h);
+
+        /// Tells the Scheduler a coroutine is gone.
+#ifdef NDEBUG
+        void finished(coro_handle h) { }
+#else
+        void finished(coro_handle h);
+#endif
 
     private:
         struct SuspensionImpl;
@@ -246,16 +246,6 @@ namespace crouton {
         }
     private:
         coro_handle _handle;
-    };
-
-    
-
-    /** General purpose Awaitable to return from `final_suspend`.
-        It lets the Scheduler decide which coroutine should run next. */
-    struct Finisher : public CORO_NS::suspend_always {
-        coro_handle await_suspend(coro_handle h) noexcept {
-            return lifecycle::finalSuspend(h, Scheduler::current().finished(h));
-        }
     };
 
 }

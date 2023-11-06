@@ -185,13 +185,13 @@ namespace crouton {
     }
 
     void Scheduler::_wakeUp() {
-        assert(_eventLoop);
         if (isCurrent()) {
             LSched->debug("wake up!");
-            if (_eventLoop->isRunning())
+            if (_eventLoop && _eventLoop->isRunning())
                 _eventLoop->stop(false);    // efficient stop
         } else {
             LSched->debug("wake up! (from another thread)");
+            assert(_eventLoop);
             _eventLoop->stop(true);         // thread-safe stop
         }
     }
@@ -208,29 +208,26 @@ namespace crouton {
     EventLoop::~EventLoop() = default;
 
 
-    /// Adds a coroutine handle to the end of the ready queue, where at some point it will
-    /// be returned from next().
     void Scheduler::schedule(coro_handle h) {
-        LSched->debug("schedule {}", minifmt::write(logCoro{h}));
         precondition(isCurrent());
         assert(!isWaiting(h));
-        if (!isReady(h))
+        if (!isReady(h)) {
+            LSched->debug("reschedule {} (behind {} others)",
+                          minifmt::write(logCoro{h}), _ready.size());
             _ready.push_back(h);
+        }
     }
 
     void Scheduler::adopt(coro_handle h) {
         onEventLoop([this, h] { schedule(h); });
     }
 
-    /// Allows a running coroutine `h` to give another ready coroutine some time.
-    /// Returns the coroutine that should run next, possibly `h` if no others are ready.
     coro_handle Scheduler::yield(coro_handle h) {
-        if (coro_handle nxt = nextOr(nullptr)) {
-            schedule(h);
-            return nxt;
-        } else {
-            LSched->debug("yield {} -- continue running", minifmt::write(logCoro{h}));
+        if (isIdle()) {
             return h;
+        } else {
+            schedule(h);
+            return nullptr;
         }
     }
 
@@ -240,12 +237,6 @@ namespace crouton {
             _ready.erase(i);
     }
 
-    /// Returns the coroutine that should be resumed. If none is ready, exits coroutine-land.
-    coro_handle Scheduler::next() {
-        return nextOr(CORO_NS::noop_coroutine());
-    }
-
-    /// Returns the coroutine that should be resumed, or else `dflt`.
     coro_handle Scheduler::nextOr(coro_handle dflt) {
         precondition(isCurrent());
         scheduleWakers();
@@ -259,21 +250,6 @@ namespace crouton {
         }
     }
 
-    /// Returns the coroutine that should be resumed,
-    /// or else the no-op coroutine that returns to the outer caller.
-    coro_handle Scheduler::finished(coro_handle h) {
-        LSched->debug("finished {}", minifmt::write(logCoro{h}));
-        precondition(isCurrent());
-        assert(h.done());
-        assert(!isReady(h));
-        assert(!isWaiting(h));
-        // Always continue on to the caller of `h`, otherwise things get confused.
-        return CORO_NS::noop_coroutine();
-    }
-
-    /// Adds a coroutine handle to the suspension set.
-    /// To make it runnable again, call the returned Suspension's `wakeUp` method
-    /// from any thread.
     Suspension Scheduler::suspend(coro_handle h) {
         LSched->debug("suspend {}", minifmt::write(logCoro{h}));
         precondition(isCurrent());
@@ -298,6 +274,14 @@ namespace crouton {
         }
         if (auto i = ranges::find(_ready, h); i != _ready.end())
             _ready.erase(i);
+    }
+
+    void Scheduler::finished(coro_handle h) {
+        LSched->debug("finished {}", minifmt::write(logCoro{h}));
+        precondition(isCurrent());
+        assert(h.done());
+        assert(!isReady(h));
+        assert(!isWaiting(h));
     }
 
     /// Called from "normal" code.

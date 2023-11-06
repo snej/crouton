@@ -57,7 +57,8 @@ namespace crouton {
 
 
 
-    /** To be returned from a CoroutineImpl's `initial_suspend` method. */
+    /** To be returned from a CoroutineImpl's `initial_suspend` method.
+        if `SUS` is true, the coroutine will suspend, otherwise it continues. */
     template <bool SUS>
     struct SuspendInitial : public CORO_NS::suspend_always {
         constexpr bool await_ready() const noexcept { return !SUS; }
@@ -65,7 +66,7 @@ namespace crouton {
     };
 
     /** To be returned from a CoroutineImpl's `final_suspend` method.
-        Destroys the `coro_handle` after the suspension. */
+        If `Destroy` is true, destroys the `coro_handle` after the suspension. */
     template <bool Destroy = true>
     struct SuspendFinal : public CORO_NS::suspend_always {
     public:

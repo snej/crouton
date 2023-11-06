@@ -59,7 +59,7 @@ namespace crouton {
                 // Oops, provider set a value while I was suspending; wake immediately:
                 _suspension.wakeUp();
             }
-            return sched.next();
+            return CORO_NS::noop_coroutine();
         } else {
             // There's a value now, so continue:
             return coro;
