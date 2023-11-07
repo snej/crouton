@@ -127,6 +127,7 @@ namespace crouton::io::apple {
     Future<void> NWConnection::close() {
         if (_conn) {
             if (!_canceled) {
+                LNet->info("NWConnection::close");
                 _canceled = true;
                 nw_connection_cancel(_conn);
             }
@@ -139,6 +140,7 @@ namespace crouton::io::apple {
     void NWConnection::_close() {
         if (_conn) {
             if (!_canceled) {
+                LNet->warn("NWConnection was not closed -- destructor is forcing cancel");
                 nw_connection_set_state_changed_handler(_conn, nullptr);
                 nw_connection_force_cancel(_conn);
             }
@@ -218,8 +220,14 @@ namespace crouton::io::apple {
     }
 
 
-    ASYNC<void> NWConnection::closeWrite()        {return _writeOrShutdown({}, true);}
-    ASYNC<void> NWConnection::write(ConstBytes b) {return _writeOrShutdown(b, false);}
+    ASYNC<void> NWConnection::closeWrite() {
+        LNet->info("NWConnection::closeWrite");
+        return _writeOrShutdown({}, true);
+    }
+
+    ASYNC<void> NWConnection::write(ConstBytes b) {
+        return _writeOrShutdown(b, false);
+    }
 
 
     Future<void> NWConnection::_writeOrShutdown(ConstBytes src, bool shutdown) {

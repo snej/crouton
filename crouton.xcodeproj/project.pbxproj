@@ -144,6 +144,7 @@
 		27BCD3372AF30A20009DFCED /* libmbedx509.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27BCD3342AF30A20009DFCED /* libmbedx509.a */; };
 		27BCD3382AF30A20009DFCED /* libmbedcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27BCD3352AF30A20009DFCED /* libmbedcrypto.a */; };
 		27E98EDF2AC2099E002F3D35 /* test_generator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E98EDE2AC2099E002F3D35 /* test_generator.cc */; };
+		27E9A0C72AFAB8FE00EF3726 /* Task.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E9A0C62AFAB8FE00EF3726 /* Task.cc */; };
 		27ED1C722AABF47200ADC971 /* CoroLifecycle.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27ED1C702AABF47200ADC971 /* CoroLifecycle.hh */; };
 		27ED1C732AABF47200ADC971 /* CoroLifecycle.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27ED1C712AABF47200ADC971 /* CoroLifecycle.cc */; };
 		27F49CCF2A9D011B00BFB24C /* test_io.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27F49CCE2A9D011B00BFB24C /* test_io.cc */; };
@@ -701,6 +702,7 @@
 		27BCD3352AF30A20009DFCED /* libmbedcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedcrypto.a; path = build_cmake/debug/xcodedeps/libmbedcrypto.a; sourceTree = "<group>"; };
 		27E98EDE2AC2099E002F3D35 /* test_generator.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_generator.cc; sourceTree = "<group>"; };
 		27E98EE02AC21940002F3D35 /* Awaitable.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Awaitable.hh; sourceTree = "<group>"; };
+		27E9A0C62AFAB8FE00EF3726 /* Task.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Task.cc; sourceTree = "<group>"; };
 		27ED1C702AABF47200ADC971 /* CoroLifecycle.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CoroLifecycle.hh; sourceTree = "<group>"; };
 		27ED1C712AABF47200ADC971 /* CoroLifecycle.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CoroLifecycle.cc; sourceTree = "<group>"; };
 		27F49CCD2A9D007D00BFB24C /* Actor.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Actor.hh; sourceTree = "<group>"; };
@@ -888,6 +890,7 @@
 				278F7F282AAB9171005B12F2 /* Internal.hh */,
 				272730472A8D8A73000CCA22 /* Scheduler.cc */,
 				2788E3532AC38B5E00254A88 /* Select.cc */,
+				27E9A0C62AFAB8FE00EF3726 /* Task.cc */,
 				2788E3572AC4E34100254A88 /* io */,
 				279D5D572A9146DA005C3066 /* support */,
 			);
@@ -1921,6 +1924,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27E9A0C72AFAB8FE00EF3726 /* Task.cc in Sources */,
 				278F7E502AA2ADFD005B12F2 /* Filesystem.cc in Sources */,
 				278F7E3B2AA1489B005B12F2 /* HTTPParser.cc in Sources */,
 				27BCD3032AEACE0C009DFCED /* LocalSocket.cc in Sources */,

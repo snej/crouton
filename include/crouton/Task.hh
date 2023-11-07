@@ -63,12 +63,7 @@ namespace crouton {
 
     class TaskImpl : public CoroutineImpl<TaskImpl, false> {
     public:
-        ~TaskImpl() { }
-
-        Task get_return_object() {
-            _shared = std::make_shared<shared>();
-            return Task(typedHandle(), _shared);
-        }
+        Task get_return_object();
 
         auto initial_suspend() {
             struct sus : public CORO_NS::suspend_always {
@@ -93,22 +88,9 @@ namespace crouton {
             return yielder(_shared);
         }
 
-        void unhandled_exception() {
-            lifecycle::threw(_handle);
-            _shared->alive = false;
-            _shared->done.notify(Error(std::current_exception()));
-        }
-
-
-        void return_void() {
-            lifecycle::returning(handle());
-            _shared->alive = false;
-            _shared->done.notify(noerror);
-        }
-
-        SuspendFinal<true> final_suspend() noexcept {
-            return {};
-        }
+        void unhandled_exception();
+        void return_void();
+        SuspendFinal<true> final_suspend() noexcept {return {};}
 
     private:
         using shared = Task::shared;

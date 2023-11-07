@@ -41,7 +41,8 @@ namespace crouton::io {
         /// The port on which the server is listening.
         uint16_t port();
 
-        /// Stops the server.
+        /// Stops the server from accepting new connections.
+        /// Has no effect on currently open connections; those need to be closed individually.
         void close();
 
         bool isOpen() const                 {return _isOpen;}

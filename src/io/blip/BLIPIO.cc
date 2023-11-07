@@ -255,7 +255,7 @@ namespace crouton::io::blip {
 
             YIELD string(string_view(frame));
         }
-        LBLIP->debug("Frame Generator stopping");
+        LBLIP->debug("Frame Generator stopped");
     }
 
 

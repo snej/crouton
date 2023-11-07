@@ -44,6 +44,7 @@ namespace crouton::io {
     Future<void> Stream::closeWrite() {
         precondition(isOpen());
 
+        LNet->info("Stream::closeWrite");
         AwaitableRequest<uv_shutdown_t> req("closing connection");
         check( uv_shutdown(&req, _stream, req.callback), "closing connection");
         AWAIT req;
@@ -54,6 +55,7 @@ namespace crouton::io {
     void Stream::_close() {
         precondition(!_readBusy);
         _inputBuf.reset();
+        LNet->info("Stream::close");
         closeHandle(_stream);
     }
 

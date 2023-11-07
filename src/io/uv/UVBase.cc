@@ -110,7 +110,7 @@ namespace crouton::io::uv {
                 std::condition_variable _cond;
             };
 
-            LLoop->info("Scheduler::onEventLoop()");
+            LLoop->debug("Scheduler::onEventLoop()");
             auto async = new uvAsyncFn{{}, std::move(fn), synchronous};
             check(uv_async_init(_loop.get(), async, [](uv_async_t *async) noexcept {
                 auto self = static_cast<uvAsyncFn*>(async);

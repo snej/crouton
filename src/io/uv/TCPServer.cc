@@ -69,6 +69,7 @@ namespace crouton::io {
 
 
     void TCPServer::close() {
+        LNet->info("TCPServer closing listener socket");
         _isOpen = false;
         closeHandle(_tcpHandle);
     }
