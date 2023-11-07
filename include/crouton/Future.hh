@@ -344,14 +344,21 @@ namespace crouton {
             lifecycle::returning(this->handle());
             _provider->setResult(err);
         }
+
         void return_value(ErrorDomain auto errVal) {
             return_value(Error(errVal));
+        }
+
+        void return_value(Result<T> result) {
+            lifecycle::returning(this->handle());
+            _provider->setResult(std::move(result));
         }
 
         void return_value(nonvoidT&& value)  requires (!std::is_void_v<T>) {
             lifecycle::returning(this->handle());
             _provider->setResult(std::move(value));
         }
+
         void return_value(nonvoidT const& value)  requires (!std::is_void_v<T>) {
             lifecycle::returning(this->handle());
             _provider->setResult(value);

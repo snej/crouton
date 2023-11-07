@@ -52,7 +52,7 @@ namespace crouton {
     coro_handle FutureStateBase::suspend(coro_handle coro) {
         if (checkEmpty()) {
             // No value yet, so suspend this coroutine:
-            assert(!_suspension);
+            precondition(!_suspension);
             Scheduler& sched = Scheduler::current();
             _suspension = sched.suspend(coro);
             if (!changeState(Waiting)) {
