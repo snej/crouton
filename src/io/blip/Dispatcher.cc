@@ -16,7 +16,7 @@
 // limitations under the License.
 //
 
-#include "Dispatcher.hh"
+#include "crouton/io/blip/Dispatcher.hh"
 #include <spdlog/fmt/fmt.h>
 #include <spdlog/fmt/ostr.h>    // Makes custom types loggable via `operator <<` overloads
 

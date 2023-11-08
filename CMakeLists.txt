@@ -113,6 +113,7 @@ add_library( LibCrouton STATIC
     src/Future.cc
     src/Scheduler.cc
     src/Select.cc
+    src/Task.cc
 
     src/io/Framer.cc
     src/io/HTTPConnection.cc
@@ -129,6 +130,7 @@ add_library( LibCrouton STATIC
     src/io/uv/AddrInfo.cc
     src/io/uv/FileStream.cc
     src/io/uv/Filesystem.cc
+    src/io/uv/LocalSocket.cc
     src/io/uv/Pipe.cc
     src/io/uv/Stream.cc
     src/io/uv/TCPServer.cc
@@ -187,12 +189,13 @@ endif()
 
 if (CROUTON_BUILD_BLIP)
     add_library( BLIP STATIC
-        src/io/blip/Connection.cc
         src/io/blip/BLIPIO.cc
+        src/io/blip/Codec.cc
+        src/io/blip/Connection.cc
+        src/io/blip/Dispatcher.cc
         src/io/blip/Message.cc
         src/io/blip/MessageBuilder.cc
         src/io/blip/MessageOut.cc
-        src/io/blip/Codec.cc
     )
 
     target_include_directories( LibCrouton PUBLIC

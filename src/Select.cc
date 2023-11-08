@@ -17,8 +17,8 @@
 //
 
 #include "crouton/Select.hh"
-#include "crouton/Logging.hh"
 #include "crouton/Scheduler.hh"
+#include "crouton/util/Logging.hh"
 
 namespace crouton {
 

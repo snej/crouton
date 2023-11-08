@@ -276,6 +276,8 @@ namespace crouton {
             _ready.erase(i);
     }
 
+    
+#ifndef NDEBUG
     void Scheduler::finished(coro_handle h) {
         LSched->debug("finished {}", minifmt::write(logCoro{h}));
         precondition(isCurrent());
@@ -283,6 +285,8 @@ namespace crouton {
         assert(!isReady(h));
         assert(!isWaiting(h));
     }
+#endif
+
 
     /// Called from "normal" code.
     /// Resumes the next ready coroutine and returns true.

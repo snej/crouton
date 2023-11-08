@@ -16,8 +16,8 @@
 // limitations under the License.
 //
 
-#include "Task.hh"
-#include "Logging.hh"
+#include "crouton/Task.hh"
+#include "crouton/util/Logging.hh"
 
 namespace crouton {
 
