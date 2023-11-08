@@ -400,8 +400,9 @@ namespace crouton::lifecycle {
             assert(other.second.caller != &info);
 
         if (info.state < coroState::ending)
-            LCoro->warn("{} destructed before returning or throwing", minifmt::write(verbose{info}));
-        LCoro->debug("{} destructed. ({} left)", minifmt::write(info), _count() - 1);
+            LCoro->debug("{} destructed before returning or throwing", minifmt::write(verbose{info}));
+        else
+            LCoro->debug("{} destructed. ({} left)", minifmt::write(info), _count() - 1);
 
         if (kRememberDestroyedCoros) {
             i->second.handle = nullptr; // mark as tombstone
