@@ -18,10 +18,11 @@
 
 // <https://www.nongnu.org/lwip/2_0_x/raw_api.html>
 
-#include "crouton/ESPTCPSocket.hh"
-#include "crouton/CoCondition.hh"
-#include "crouton/ESPBase.hh"
+#include "ESPTCPSocket.hh"
+#include "ESPBase.hh"
 #include "Internal.hh"
+#include "crouton/CoCondition.hh"
+#include "crouton/Future.hh"
 #include "crouton/util/Logging.hh"
 #include "crouton/io/AddrInfo.hh"
 
@@ -102,6 +103,11 @@ namespace crouton::io::esp {
     Future<void> TCPSocket::closeWrite() {
         // TODO: Implement
         return CroutonError::Unimplemented;
+    }
+
+
+    shared_ptr<IStream> TCPSocket::stream() {
+        return shared_ptr<IStream>(shared_from_this(), static_cast<IStream*>(this));
     }
 
 

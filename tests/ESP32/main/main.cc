@@ -70,10 +70,10 @@ Task mainTask() {
         AWAIT socket->connect("example.com", 443);
 
         Log->info("-- Connected! Test Writing...");
-        AWAIT socket->stream().write(string_view("GET / HTTP/1.1\r\nHost: example.com\r\nConnection: close\r\n\r\n"));
+        AWAIT socket->stream()->write(string_view("GET / HTTP/1.1\r\nHost: example.com\r\nConnection: close\r\n\r\n"));
 
         Log->info("-- Test Reading...");
-        string result = AWAIT socket->stream().readAll();
+        string result = AWAIT socket->stream()->readAll();
 
         Log->info("Got HTTP response");
         printf("%s\n", result.c_str());

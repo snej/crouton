@@ -85,12 +85,9 @@ namespace crouton {
 
 #else // CROUTON_USE_SPDLOG
 
-#ifndef ESP_PLATFORM
     static mutex        sLogMutex;      // makes logging thread-safe and prevents overlapping msgs
     static vector<Logger*>* sLoggers;
     static LogSink      sLogSink = nullptr;
-    static time_t       sTime;          // Time in seconds that's formatted in sTimeBuf
-    static char         sTimeBuf[30];   // Formatted timestamp, to second accuracy
 
     static constexpr string_view kLevelName[] = {
         "trace", "debug", "info", "warn", "error", "critical", "off"
@@ -108,6 +105,25 @@ namespace crouton {
             sLoggers = new vector<Logger*>;
         sLoggers->push_back(this);
     }
+
+    void Logger::apply_all(std::function<void(Logger&)> fn) {
+        unique_lock lock(sLogMutex);
+        if (sLoggers) {
+            for (auto logger : *sLoggers)
+                fn(*logger);
+        }
+    }
+
+
+    void SetLogOutput(LogSink sink) {
+        unique_lock lock(sLogMutex);
+        sLogSink = sink;
+    }
+
+
+#ifndef ESP_PLATFORM
+    static time_t       sTime;          // Time in seconds that's formatted in sTimeBuf
+    static char         sTimeBuf[30];   // Formatted timestamp, to second accuracy
 
 
     void Logger::_writeHeader(LogLevelType lvl) {
@@ -211,37 +227,25 @@ namespace crouton {
         }
     }
 
-
-    void Logger::apply_all(std::function<void(Logger&)> fn) {
-        unique_lock lock(sLogMutex);
-        if (sLoggers) {
-            for (auto logger : *sLoggers)
-                fn(*logger);
-        }
-    }
-
-
-    void SetLogOutput(LogSink sink) {
-        unique_lock lock(sLogMutex);
-        sLogSink = sink;
-    }
-
-#else
+#else // ESP_PLATFORM
     static constexpr esp_log_level_t kESPLevel[] = {
         ESP_LOG_VERBOSE, ESP_LOG_DEBUG, ESP_LOG_INFO, ESP_LOG_WARN, ESP_LOG_ERROR, ESP_LOG_NONE
     };
     static const char* kESPLevelChar = "TDIWE-";
 
 
+    void Logger::load_env_levels() { }
+
     void Logger::log(LogLevelType lvl, string_view msg) {
         if (should_log(lvl) && kESPLevel[lvl] <= esp_log_level_get("Crouton")) {
+            io::TTY const& tty = io::TTY::err();
             const char* color;
             switch (lvl) {
                 case LogLevel::critical:
-                case LogLevel::err:     color = io::TTY::err.red; break;
-                case LogLevel::warn:    color = io::TTY::err.yellow; break;
+                case LogLevel::err:     color = tty.red; break;
+                case LogLevel::warn:    color = tty.yellow; break;
                 case LogLevel::debug:
-                case LogLevel::trace:   color = io::TTY::err.dim; break;
+                case LogLevel::trace:   color = tty.dim; break;
                 default:                color = ""; break;
             }
 #if CONFIG_LOG_TIMESTAMP_SOURCE_RTOS
@@ -251,7 +255,7 @@ namespace crouton {
                           esp_log_timestamp(),
                           _name.c_str(),
                           int(msg.size()), msg.data(),
-                          io::TTY::err.reset);
+                          tty.reset);
 #else
             esp_log_write(kESPLevel[lvl], "Crouton", "%s%c (%s) <%s> %.*s%s\n",
                           color,
@@ -259,7 +263,7 @@ namespace crouton {
                           esp_log_system_timestamp(),
                           _name.c_str(),
                           int(msg.size()), msg.data(),
-                          io::TTY::err.reset);
+                          tty.reset);
 #endif
         }
     }
@@ -272,6 +276,7 @@ namespace crouton {
         log(lvl, message);
     }
 #endif // ESP_PLATFORM
+
 
     static LoggerRef makeLogger(string_view name, LogLevelType level = LogLevel::info) {
         return new Logger(string(name), level);
@@ -301,8 +306,8 @@ namespace crouton {
             LLoop     = makeLogger("Loop");
             LNet      = makeLogger("Net");
 
+            // Set log levels from `SPDLOG_LEVEL` or `CROUTON_LOG_LEVEL` env var:
 #if CROUTON_USE_SPDLOG
-            // Set log levels from `SPDLOG_LEVEL` env var:
             spdlog::cfg::load_env_levels();
 #else
             Logger::load_env_levels();

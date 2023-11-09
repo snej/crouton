@@ -108,7 +108,8 @@ namespace crouton {
             post(Event{.type = Event::Interrupt, .data = {}});
         }
 
-        void perform(std::function<void()> fn) override {
+        void perform(std::function<void()> fn, bool synchronous = false) override {
+            precondition(!synchronous); // UNIMPLEMENTED
             LLoop->trace("posting perform");
             post(Event{
                 .type = Event::Async,

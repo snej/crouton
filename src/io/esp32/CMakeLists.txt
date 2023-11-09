@@ -12,6 +12,7 @@ idf_component_register(
         "${src}/Internal.hh"
         "${src}/Scheduler.cc"
         "${src}/Select.cc"
+        "${src}/Task.cc"
         "${src}/io/HTTPHandler.cc"
         "${src}/io/HTTPParser.cc"
         "${src}/io/ISocket.cc"

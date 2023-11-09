@@ -17,8 +17,9 @@
 //
 
 #include "crouton/io/AddrInfo.hh"
-#include "crouton/ESPBase.hh"
+#include "ESPBase.hh"
 #include "crouton/CoCondition.hh"
+#include "crouton/Future.hh"
 #include "crouton/util/Logging.hh"
 #include <lwip/dns.h>
 

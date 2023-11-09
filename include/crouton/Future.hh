@@ -395,7 +395,7 @@ namespace crouton {
         return _state->template chain<U>([fn](std::shared_ptr<FutureStateBase> baseState,
                                               std::shared_ptr<FutureStateBase> myBaseState) mutable {
             myBaseState = nullptr; // unused
-            auto& state = dynamic_cast<FutureState<U>&>(*baseState);
+            auto& state = static_cast<FutureState<U>&>(*baseState);
             if constexpr (std::is_void_v<U>) {
                 fn();                                       // <-- call fn
                 state.setResult();

@@ -26,7 +26,7 @@
 #endif
 
 #ifdef ESP_PLATFORM
-#include "crouton/ESPTCPSocket.hh"
+#include "io/esp32/ESPTCPSocket.hh"
 #endif
 
 namespace crouton::io {

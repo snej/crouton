@@ -31,7 +31,7 @@ namespace crouton {
 
 namespace crouton::io::esp {
 
-    class TCPSocket : public io::ISocket, public io::IStream {
+    class TCPSocket : public io::ISocket, private io::IStream {
     public:
         TCPSocket();
         ~TCPSocket();
@@ -40,7 +40,7 @@ namespace crouton::io::esp {
         ASYNC<void> open() override;
 
         bool isOpen() const override                {return _isOpen;}
-        IStream& stream() override                  {return *this;}
+        std::shared_ptr<IStream> stream() override;
         ASYNC<void> close() override;
 
         ASYNC<void> closeWrite() override;
