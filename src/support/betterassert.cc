@@ -22,7 +22,7 @@
 #include <string.h>
 
 #ifdef _MSC_VER
-#include "crouton/asprintf.h"
+#include "support/asprintf.h"
 #endif
 
 #ifndef __cold

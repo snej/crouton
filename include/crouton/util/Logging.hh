@@ -19,6 +19,7 @@
 #pragma once
 #include "crouton/util/Base.hh"
 #include "crouton/util/MiniFormat.hh"
+#include <functional>
 
 // By default, Crouton uses its own small logging library.
 // To make it use spdlog instead, pre-define the macro `CROUTON_USE_SPDLOG` to `1`.

@@ -24,6 +24,7 @@
 #include "crouton/util/Logging.hh"
 #include "UVInternal.hh"
 #include <charconv>
+#include <condition_variable>
 #include <cmath>
 #include <mutex>
 

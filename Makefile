@@ -44,3 +44,6 @@ esp:
 
 esptest:
 	cd tests/ESP32 && idf.py build flash monitor
+
+lint:
+	missing_includes.rb --base include/crouton/util/Base.hh  --ignore cassert  include src
