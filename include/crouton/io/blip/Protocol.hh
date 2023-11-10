@@ -68,7 +68,7 @@ namespace crouton::io::blip {
     };
 
 
-    extern LoggerRef LBLIP;
+    extern log::logger* LBLIP;
 
 }
 

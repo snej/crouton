@@ -38,7 +38,7 @@ namespace crouton::io::blip {
     static constexpr int kZlibDeflateMemLevel = 9;
 
 
-    LoggerRef LZip = MakeLogger("Zip");
+    log::logger* LZip = MakeLogger("Zip");
 
     Codec::Codec()
     :_checksum((uint32_t)crc32(0, nullptr, 0))  // the required initial value

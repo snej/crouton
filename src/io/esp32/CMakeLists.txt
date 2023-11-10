@@ -23,6 +23,7 @@ idf_component_register(
         "${src}/io/mbed/TLSSocket.cc"
         "${src}/support/Backtrace.cc"
         "${src}/support/betterassert.cc"
+        "${src}/support/Logger.cc"
         "${src}/support/Logging.cc"
         "${src}/support/Memoized.cc"
         "${src}/support/MiniFormat.cc"

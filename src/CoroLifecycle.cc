@@ -172,7 +172,7 @@ namespace crouton::lifecycle {
 
     /// Logs the coroutines in the current thread's stack.
     static void logStack() {
-        if (LCoro->should_log(LogLevel::trace)) {
+        if (LCoro->should_log(log::level::trace)) {
             stringstream out;
             for (auto c = tCurrent; c; c = c->caller)
                 out << ' ' << *c;

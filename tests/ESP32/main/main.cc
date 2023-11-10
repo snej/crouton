@@ -38,10 +38,10 @@ Task mainTask() {
 
     printf("---------- TESTING CROUTON ----------\n\n");
     esp_log_level_set("Crouton", ESP_LOG_DEBUG);
-//    LCoro->set_level(LogLevel::trace);
-//    LLoop->set_level(LogLevel::trace);
-//    LSched->set_level(LogLevel::trace);
-    LNet->set_level(LogLevel::trace);
+//    LCoro->set_level(log::level::trace);
+//    LLoop->set_level(log::level::trace);
+//    LSched->set_level(log::level::trace);
+    LNet->set_level(log::level::trace);
 
     Log->info("Testing Generator");
     {

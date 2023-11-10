@@ -19,29 +19,19 @@
 #include "crouton/util/Logging.hh"
 #include "crouton/io/Process.hh"
 #include "support/StringUtils.hh"
+#include <mutex>
 
 #if CROUTON_USE_SPDLOG
 #include <spdlog/cfg/env.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <vector>
 #endif
-
-#ifdef ESP_PLATFORM
-#include <esp_log.h>
-#endif
-
-#include <chrono>
-#include <cstring>
-#include <ctime>
-#include <iomanip>
-#include <iostream>
-#include <sstream>
-#include <mutex>
 
 namespace crouton {
     using namespace std;
 
-    LoggerRef Log, LCoro, LSched, LLoop, LNet;
+    log::logger* Log, *LCoro, *LSched, *LLoop, *LNet;
 
 #if CROUTON_USE_SPDLOG
 
@@ -52,7 +42,7 @@ namespace crouton {
     static spdlog::sink_ptr         sStderrSink;
 
 
-    static LoggerRef makeLogger(string_view name, 
+    static log::logger* makeLogger(string_view name, 
                                 spdlog::level::level_enum level = spdlog::level::info)
     {
         string nameStr(name);
@@ -85,202 +75,17 @@ namespace crouton {
 
 #else // CROUTON_USE_SPDLOG
 
-    static mutex        sLogMutex;      // makes logging thread-safe and prevents overlapping msgs
-    static vector<Logger*>* sLoggers;
-    static LogSink      sLogSink = nullptr;
-
-    static constexpr string_view kLevelName[] = {
-        "trace", "debug", "info", "warn", "error", "critical", "off"
-    };
-    static constexpr const char* kLevelDisplayName[] = {
-        "trace", "debug", "info ", "WARN ", "ERR  ", "CRITICAL", ""
-    };
-
-
-    Logger::Logger(string name, LogLevelType level)
-    :_name(std::move(name))
-    ,_level(level) {
-        unique_lock lock(sLogMutex);
-        if (!sLoggers)
-            sLoggers = new vector<Logger*>;
-        sLoggers->push_back(this);
+    static log::logger* makeLogger(string_view name, log::level::level_enum level = log::level::info) {
+        auto logger = log::logger::get(name);
+        if (!logger)
+            logger = new log::logger(string(name), level);
+        return logger;
     }
 
-    void Logger::apply_all(std::function<void(Logger&)> fn) {
-        unique_lock lock(sLogMutex);
-        if (sLoggers) {
-            for (auto logger : *sLoggers)
-                fn(*logger);
-        }
+    void SetLogOutput(log::logger::Sink sink) {
+        log::logger::set_output(sink);
     }
 
-
-    void SetLogOutput(LogSink sink) {
-        unique_lock lock(sLogMutex);
-        sLogSink = sink;
-    }
-
-
-#ifndef ESP_PLATFORM
-    static time_t       sTime;          // Time in seconds that's formatted in sTimeBuf
-    static char         sTimeBuf[30];   // Formatted timestamp, to second accuracy
-
-
-    void Logger::_writeHeader(LogLevelType lvl) {
-        // sLogMutex must be locked
-        io::TTY const& tty = io::TTY::err();
-        timespec now;
-        timespec_get(&now, TIME_UTC);
-        if (now.tv_sec != sTime) {
-            sTime = now.tv_sec;
-            tm nowStruct;
-#ifdef _MSC_VER
-            nowStruct = *localtime(&sTime);
-#else
-            localtime_r(&sTime, &nowStruct);
-#endif
-            strcpy(sTimeBuf, "▣ ");
-            strcat(sTimeBuf, tty.dim);
-            size_t len = strlen(sTimeBuf);
-            strftime(sTimeBuf + len, sizeof(sTimeBuf) - len, "%H:%M:%S.", &nowStruct);
-        }
-
-        const char* color = "";
-        if (lvl >= LogLevel::err)
-            color = tty.red;
-        else if (lvl == LogLevel::warn)
-            color = tty.yellow;
-
-        fprintf(stderr, "%s%06ld%s %s%s| <%s> ",
-                sTimeBuf, now.tv_nsec / 1000, tty.reset,
-                color, kLevelDisplayName[int(lvl)], _name.c_str());
-    }
-
-
-    void Logger::log(LogLevelType lvl, string_view msg) {
-        if (should_log(lvl)) {
-            if (auto sink = sLogSink) {
-                sink(*this, lvl, msg);
-            } else {
-                unique_lock<mutex> lock(sLogMutex);
-                _writeHeader(lvl);
-                cerr << msg << io::TTY::err().reset << std::endl;
-            }
-        }
-    }
-
-
-    void Logger::_log(LogLevelType lvl, string_view fmt, minifmt::FmtIDList types, ...) {
-        if (auto sink = sLogSink) {
-            stringstream out;
-            va_list args;
-            va_start(args, types);
-            minifmt::vformat_types(out, fmt, types, args);
-            va_end(args);
-            sink(*this, lvl, out.str());
-        } else {
-            unique_lock<mutex> lock(sLogMutex);
-
-            _writeHeader(lvl);
-            va_list args;
-            va_start(args, types);
-            minifmt::vformat_types(cerr, fmt, types, args);
-            va_end(args);
-            cerr << io::TTY::err().reset << endl;
-        }
-    }
-
-
-    static LogLevelType levelNamed(string_view name) {
-        int level = 0;
-        for (string_view levelStr : kLevelName) {
-            if (name == levelStr)
-                return LogLevelType(level);
-            ++level;
-        }
-        return LogLevel::info; // default if unrecognized name
-    }
-
-
-    void Logger::load_env_levels() {
-        const char* env = getenv("CROUTON_LOG_LEVEL");
-        if (!env)
-            return;
-        unique_lock lock(sLogMutex);
-        string_view envStr(env);
-        while (!envStr.empty()) {
-            string_view item;
-            tie(item,envStr) = split(envStr, ',');
-            auto [k, v] = split(item, '=');
-            if (v.empty()) {
-                auto level = levelNamed(k);
-                for (auto logger : *sLoggers)
-                    logger->set_level(level);
-            } else {
-                for (auto logger : *sLoggers) {
-                    if (logger->_name == k) {
-                        logger->set_level(levelNamed(v));
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-#else // ESP_PLATFORM
-    static constexpr esp_log_level_t kESPLevel[] = {
-        ESP_LOG_VERBOSE, ESP_LOG_DEBUG, ESP_LOG_INFO, ESP_LOG_WARN, ESP_LOG_ERROR, ESP_LOG_NONE
-    };
-    static const char* kESPLevelChar = "TDIWE-";
-
-
-    void Logger::load_env_levels() { }
-
-    void Logger::log(LogLevelType lvl, string_view msg) {
-        if (should_log(lvl) && kESPLevel[lvl] <= esp_log_level_get("Crouton")) {
-            io::TTY const& tty = io::TTY::err();
-            const char* color;
-            switch (lvl) {
-                case LogLevel::critical:
-                case LogLevel::err:     color = tty.red; break;
-                case LogLevel::warn:    color = tty.yellow; break;
-                case LogLevel::debug:
-                case LogLevel::trace:   color = tty.dim; break;
-                default:                color = ""; break;
-            }
-#if CONFIG_LOG_TIMESTAMP_SOURCE_RTOS
-            esp_log_write(kESPLevel[lvl], "Crouton", "%s%c (%4ld) <%s> %.*s%s\n",
-                          color,
-                          kESPLevelChar[lvl],
-                          esp_log_timestamp(),
-                          _name.c_str(),
-                          int(msg.size()), msg.data(),
-                          tty.reset);
-#else
-            esp_log_write(kESPLevel[lvl], "Crouton", "%s%c (%s) <%s> %.*s%s\n",
-                          color,
-                          kESPLevelChar[lvl],
-                          esp_log_system_timestamp(),
-                          _name.c_str(),
-                          int(msg.size()), msg.data(),
-                          tty.reset);
-#endif
-        }
-    }
-
-    void Logger::_log(LogLevelType lvl, string_view fmt, minifmt::FmtIDList types, ...) {
-        va_list args;
-        va_start(args, types);
-        string message = minifmt::vformat_types(fmt, types, args);
-        va_end(args);
-        log(lvl, message);
-    }
-#endif // ESP_PLATFORM
-
-
-    static LoggerRef makeLogger(string_view name, LogLevelType level = LogLevel::info) {
-        return new Logger(string(name), level);
-    }
 #endif // CROUTON_USE_SPDLOG
 
 
@@ -310,7 +115,7 @@ namespace crouton {
 #if CROUTON_USE_SPDLOG
             spdlog::cfg::load_env_levels();
 #else
-            Logger::load_env_levels();
+            log::logger::load_env_levels();
 #endif
             assert_failed_hook = [](const char* message) {
                 Log->critical(message);
@@ -320,7 +125,7 @@ namespace crouton {
     }
 
 
-    LoggerRef MakeLogger(string_view name, LogLevelType level) {
+    log::logger* MakeLogger(string_view name, log::level::level_enum level) {
         InitLogging();
         return makeLogger(name, level);
     }

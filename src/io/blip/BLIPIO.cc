@@ -66,7 +66,7 @@ namespace crouton::io::blip {
     static constexpr size_t kOutboxCapacity = 10;
 
     /// Logger
-    LoggerRef LBLIP = MakeLogger("BLIP");
+    log::logger* LBLIP = MakeLogger("BLIP");
 
 
 #pragma mark - OUTBOX:
@@ -284,7 +284,7 @@ namespace crouton::io::blip {
         *flagsPos = frameFlags;
         ConstBytes frame(frameBuf, out.data());
 
-        if (LBLIP->should_log(LogLevel::debug)) {
+        if (LBLIP->should_log(log::level::debug)) {
             LBLIP->debug("    Sending frame: {} {} {}{}{}{}, bytes {}--{}",
                          kMessageTypeNames[frameFlags & kTypeMask], minifmt::write(msg->number()),
                          (frameFlags & kMoreComing ? 'M' : '-'),

@@ -145,6 +145,7 @@
 		27BCD3382AF30A20009DFCED /* libmbedcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27BCD3352AF30A20009DFCED /* libmbedcrypto.a */; };
 		27E98EDF2AC2099E002F3D35 /* test_generator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E98EDE2AC2099E002F3D35 /* test_generator.cc */; };
 		27E9A0C72AFAB8FE00EF3726 /* Task.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E9A0C62AFAB8FE00EF3726 /* Task.cc */; };
+		27E9A0D62AFDAA6100EF3726 /* Logger.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E9A0D52AFDAA6100EF3726 /* Logger.cc */; };
 		27ED1C722AABF47200ADC971 /* CoroLifecycle.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27ED1C702AABF47200ADC971 /* CoroLifecycle.hh */; };
 		27ED1C732AABF47200ADC971 /* CoroLifecycle.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27ED1C712AABF47200ADC971 /* CoroLifecycle.cc */; };
 		27F49CCF2A9D011B00BFB24C /* test_io.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27F49CCE2A9D011B00BFB24C /* test_io.cc */; };
@@ -703,6 +704,8 @@
 		27E98EDE2AC2099E002F3D35 /* test_generator.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_generator.cc; sourceTree = "<group>"; };
 		27E98EE02AC21940002F3D35 /* Awaitable.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Awaitable.hh; sourceTree = "<group>"; };
 		27E9A0C62AFAB8FE00EF3726 /* Task.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Task.cc; sourceTree = "<group>"; };
+		27E9A0D42AFDA91200EF3726 /* Logger.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Logger.hh; sourceTree = "<group>"; };
+		27E9A0D52AFDAA6100EF3726 /* Logger.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Logger.cc; sourceTree = "<group>"; };
 		27ED1C702AABF47200ADC971 /* CoroLifecycle.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = CoroLifecycle.hh; sourceTree = "<group>"; };
 		27ED1C712AABF47200ADC971 /* CoroLifecycle.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = CoroLifecycle.cc; sourceTree = "<group>"; };
 		27F49CCD2A9D007D00BFB24C /* Actor.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Actor.hh; sourceTree = "<group>"; };
@@ -1154,6 +1157,7 @@
 				27B3306A2AB391F30066C8DA /* Bytes.hh */,
 				2727304B2A8E811B000CCA22 /* Defer.hh */,
 				277E8A432ABA50FB00E78CB1 /* LinkedList.hh */,
+				27E9A0D42AFDA91200EF3726 /* Logger.hh */,
 				278F7F222AAA98FE005B12F2 /* Logging.hh */,
 				277B6C272AE06CDA006F053D /* MiniFormat.hh */,
 				277B65282AD766EF006F053D /* Relation.hh */,
@@ -1591,6 +1595,7 @@
 				27F49CD42A9E4E8E00BFB24C /* Backtrace.hh */,
 				277B652B2AD8B5D8006F053D /* betterassert.cc */,
 				27B330692AB388960066C8DA /* Endian.hh */,
+				27E9A0D52AFDAA6100EF3726 /* Logger.cc */,
 				278F7F232AAA98FE005B12F2 /* Logging.cc */,
 				275A5F132AAFB3B1009791E8 /* Memoized.hh */,
 				275A5F142AAFB3B1009791E8 /* Memoized.cc */,
@@ -1941,6 +1946,7 @@
 				27F603092A9FA366006FA1D0 /* NWConnection.cc in Sources */,
 				272730482A8D8A73000CCA22 /* Scheduler.cc in Sources */,
 				277B652C2AD8B5D8006F053D /* betterassert.cc in Sources */,
+				27E9A0D62AFDAA6100EF3726 /* Logger.cc in Sources */,
 				272730532A8EC61D000CCA22 /* FileStream.cc in Sources */,
 				272A852B2A97B2090083D947 /* HTTPConnection.cc in Sources */,
 				2727304E2A8E9D99000CCA22 /* UVBase.cc in Sources */,
