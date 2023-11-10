@@ -22,8 +22,11 @@
 
 
 struct uv_tcp_s;
-
 namespace crouton::io {
+    class TCPServer;
+}
+
+namespace crouton::io::uv {
 
     /** A TCP socket. (For TLS connections, use TLSSocket or NWConnection.) */
     class TCPSocket : public ISocket, private Stream {
@@ -39,7 +42,7 @@ namespace crouton::io {
 
         TCPSocket();
     protected:
-        friend class TCPServer;
+        friend class crouton::io::TCPServer;
 
         /// Called by TCPServer to create a TCPSocket for a new client connection.
         virtual void accept(uv_tcp_s* handle)       {opened((uv_stream_s*)handle);}

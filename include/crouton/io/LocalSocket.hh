@@ -21,6 +21,8 @@
 
 namespace crouton::io {
 
+    //TODO: Requires libuv. Not yet implemented for ESP32.
+
     /** LocalSockets are bidirectional streams that come in pairs.
         The data written to either one can be read from the other. */
     class LocalSocket : public Stream {

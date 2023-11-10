@@ -16,14 +16,13 @@
 // limitations under the License.
 //
 
-#include "crouton/io/TCPSocket.hh"
+#include "TCPSocket.hh"
 #include "crouton/Future.hh"
 #include "crouton/io/AddrInfo.hh"
 #include "UVInternal.hh"
 
-namespace crouton::io {
+namespace crouton::io::uv {
     using namespace std;
-    using namespace crouton::io::uv;
 
     using connect_request = AwaitableRequest<uv_connect_s>;
 

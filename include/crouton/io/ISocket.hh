@@ -29,9 +29,12 @@ namespace crouton::io {
     public:
 
         /// Factory method: Creates a new ISocket instance of a default subclass.
+        /// @param useTLS  True for TLS, false for plain TCP.
         static std::shared_ptr<ISocket> newSocket(bool useTLS);
 
-        /// Specifies the address and port to connect to, and whether to use TLS.
+        /// Specifies the address and port to connect to.
+        /// @param address  A DNS hostname or numeric IP address
+        /// @param port  A TCP port number
         virtual void bind(string const& address, uint16_t port) {
             precondition(!_binding);
             _binding.reset(new binding{address, port});

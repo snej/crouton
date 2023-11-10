@@ -17,13 +17,15 @@
 //
 
 #pragma once
-#include "crouton/io/TCPSocket.hh"
+#include "crouton/io/ISocket.hh"
 
 #include <functional>
 
 struct uv_tcp_s;
 
 namespace crouton::io {
+
+    //TODO: Requires libuv. Not yet implemented for ESP32.
 
     class TCPServer {
     public:
@@ -32,7 +34,7 @@ namespace crouton::io {
         explicit TCPServer(uint16_t port, const char* interfaceAddr =nullptr);
         ~TCPServer();
 
-        using Acceptor = std::function<void(std::shared_ptr<TCPSocket>)>;
+        using Acceptor = std::function<void(std::shared_ptr<ISocket>)>;
 
         /// Starts the server. Incoming connections will trigger calls to the acceptor function.
         /// @throws  If it's not possible to listen on the specified port.

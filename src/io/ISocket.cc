@@ -18,8 +18,8 @@
 
 #include "crouton/io/ISocket.hh"
 #include "crouton/Future.hh"
-#include "crouton/io/TCPSocket.hh"
 #include "crouton/io/mbed/TLSSocket.hh"
+#include "io/uv/TCPSocket.hh"
 
 #ifdef __APPLE__
 #include "crouton/io/apple/NWConnection.hh"
@@ -43,7 +43,7 @@ namespace crouton::io {
         if (useTLS)
             return std::make_shared<mbed::TLSSocket>();
         else
-            return std::make_shared<TCPSocket>();
+            return std::make_shared<uv::TCPSocket>();
 #endif
     }
 

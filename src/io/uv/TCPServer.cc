@@ -17,7 +17,7 @@
 //
 
 #include "crouton/io/TCPServer.hh"
-#include "crouton/io/TCPSocket.hh"
+#include "io/uv/TCPSocket.hh"
 #include "UVInternal.hh"
 #include "crouton/util/Logging.hh"
 
@@ -55,7 +55,7 @@ namespace crouton::io {
     }
 
 
-    void TCPServer::listen(std::function<void(std::shared_ptr<TCPSocket>)> acceptor) {
+    void TCPServer::listen(std::function<void(std::shared_ptr<ISocket>)> acceptor) {
         _acceptor = std::move(acceptor);
         check(uv_listen((uv_stream_t*)_tcpHandle, 2, [](uv_stream_t *server, int status) noexcept {
             try {

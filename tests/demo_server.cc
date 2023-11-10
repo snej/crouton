@@ -80,7 +80,7 @@ static vector<http::Handler::Route> sRoutes = {
 };
 
 
-static Task connectionTask(std::shared_ptr<TCPSocket> client) {
+static Task connectionTask(std::shared_ptr<ISocket> client) {
     Log->info("-- Accepted connection");
     http::Handler handler(client->stream(), sRoutes);
     AWAIT handler.run();
@@ -91,7 +91,7 @@ static Task connectionTask(std::shared_ptr<TCPSocket> client) {
 static Task run() {
     static TCPServer server(kPort);
     Log->info("Listening at http://localhost:{}/ and ws://localhost:{}/ws", kPort, kPort);
-    server.listen([](std::shared_ptr<TCPSocket> client) {
+    server.listen([](std::shared_ptr<ISocket> client) {
         connectionTask(std::move(client));
     });
     RETURN;
