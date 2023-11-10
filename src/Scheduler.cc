@@ -97,17 +97,24 @@ namespace crouton {
 
     Scheduler::Scheduler()
     :_suspended(new SuspensionMap)
-    { }
-
-    Scheduler::~Scheduler() = default;
-    
-
-    Scheduler& Scheduler::_create() {
+    { 
         InitLogging();
-        assert(!sCurSched);
-        sCurSched = new Scheduler();
-        LSched->debug("Created Scheduler {}", (void*)sCurSched);
-        return *sCurSched;
+        LSched->debug("Created Scheduler {}", (void*)this);
+    }
+
+
+    Scheduler::~Scheduler() {
+        if (isEmpty())
+            LSched->debug("Destructed Scheduler {}", (void*)this);
+        else
+            LSched->warn("Destructing Scheduler {} with {} ready, {} suspended coroutines",
+                         (void*)this, _ready.size(), _suspended->size());
+    }
+
+
+    Scheduler& Scheduler::current() {
+        static thread_local Scheduler sCurrent;
+        return sCurrent;
     }
 
     

@@ -37,10 +37,10 @@ namespace crouton {
     class Scheduler {
     public:
         /// Returns the Scheduler instance for the current thread. (Thread-safe, obviously.)
-        static Scheduler& current()                     {return sCurSched ? *sCurSched : _create();}
+        static Scheduler& current();
 
         /// True if this is the current thread's Scheduler. (Thread-safe.)
-        bool isCurrent() const                          {return this == sCurSched;}
+        bool isCurrent() const                          {return this == &current();}
 
         /// True if there are no tasks waiting to run.
         bool isIdle() const;
@@ -176,8 +176,6 @@ namespace crouton {
         void adopt(coro_handle);
 
         using SuspensionMap = std::unordered_map<const void*,SuspensionImpl>;
-
-        static inline thread_local Scheduler* sCurSched;    // Current thread's instance
 
         std::deque<coro_handle> _ready;                     // Coroutines that are ready to run
         std::unique_ptr<SuspensionMap> _suspended;          // Suspended/sleeping coroutines
