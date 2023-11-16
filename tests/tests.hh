@@ -27,23 +27,7 @@ using namespace crouton;
 
 
 // Runs a coroutine that returns `Future<void>`, returning once it's completed.
-void RunCoroutine(Future<void> (*test)());
+void RunCoroutine(std::function<Future<void>()>);
 
-
-template <typename T>
-T waitFor(Future<T>&& f) {
-    bool ready = false;
-    (void) f.template then([&](T const&) {ready = true;});
-    Scheduler::current().runUntil([&]{ return ready; });
-    return std::move(f).result();
-}
-
-template <>
-inline void waitFor(Future<void>&& f) {
-    bool ready = false;
-    (void) f.then([&]() {ready = true;});
-    Scheduler::current().runUntil([&]{ return ready; });
-}
-
-
-Future<string> readFile(string const& path);
+// Reads the contents of a file into a string.
+Future<string> ReadFile(string const& path);

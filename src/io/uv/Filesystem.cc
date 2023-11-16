@@ -17,6 +17,7 @@
 //
 
 #include "crouton/io/Filesystem.hh"
+#include "crouton/io/FileStream.hh"
 #include "crouton/util/Defer.hh"
 #include "UVInternal.hh"
 
@@ -62,6 +63,15 @@ namespace crouton::io::fs {
     }
 
 
+    static statBuf copyStatBuf(fs_request const& req) {
+        // memcpy from result.statbuf to a statBuf struct is unnecessary, but avoids
+        // breaking strict aliasing rules.
+        statBuf result;
+        static_assert(sizeof(result) == sizeof(req.statbuf));
+        memcpy(&result, &req.statbuf, sizeof(result));
+        return result;
+    }
+
     statBuf stat(const char* path, bool followSymlink) {
         fs_request req;
         int err;
@@ -70,13 +80,15 @@ namespace crouton::io::fs {
         else
             err = uv_fs_lstat(curLoop(), &req, path, nullptr);
         check(err, "stat");
+        return copyStatBuf(req);
+    }
 
-        // memcpy from result.statbuf to a statBuf struct is unnecessary, but avoids
-        // breaking strict aliasing rules.
-        statBuf result;
-        static_assert(sizeof(result) == sizeof(req.statbuf));
-        memcpy(&result, &req.statbuf, sizeof(result));
-        return result;
+
+    statBuf fstat(FileStream const& file) {
+        fs_request req;
+        int err = uv_fs_fstat(curLoop(), &req, file.fileDescriptor(), nullptr);
+        check(err, "fstat");
+        return copyStatBuf(req);
     }
 
 

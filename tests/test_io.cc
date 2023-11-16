@@ -76,7 +76,7 @@ TEST_CASE("URLs", "[uv]") {
 }
 
 
-Future<string> readFile(string const& path) {
+static Future<string> readFileSlowly(string const& path) {
     string contents;
     FileStream f(path);
     Result<void> r = AWAIT NoThrow(f.open());
@@ -98,9 +98,16 @@ Future<string> readFile(string const& path) {
 }
 
 
+Future<string> ReadFile(string const& path) {
+    io::FileStream fs{string(path)};
+    AWAIT fs.open();
+    RETURN AWAIT fs.readAll();
+}
+
+
 TEST_CASE("Read a file", "[uv]") {
     RunCoroutine([]() -> Future<void> {
-        string contents = AWAIT readFile("README.md");
+        string contents = AWAIT readFileSlowly("README.md");
         //cerr << "File contents: \n--------\n" << contents << "\n--------"<< endl;
         CHECK(contents.size() > 500);
         CHECK(contents.size() < 10000);
@@ -112,7 +119,7 @@ TEST_CASE("Read a file", "[uv]") {
 
 TEST_CASE("Fail to read a file", "[uv][error]") {
     RunCoroutine([]() -> Future<void> {
-        Result<string> contents = AWAIT NoThrow(readFile("nosuchfile"));
+        Result<string> contents = AWAIT NoThrow(readFileSlowly("nosuchfile"));
         cout << "Returned: " << contents.error() << endl;
         CHECK(contents.isError());
         CHECK(contents.error().domain() == "libuv");
@@ -217,7 +224,7 @@ TEST_CASE("WebSocket", "[uv]") {
         AWAIT ws.close();
         RETURN noerror;
     };
-    waitFor(test());
+    test().waitForResult();
     REQUIRE(Scheduler::current().assertEmpty());
 }
 
@@ -253,7 +260,7 @@ staticASYNC<string> readNWSocket(const char* hostname, bool tls) {
 
 TEST_CASE("NWConnection", "[nw]") {
     {
-        string contents = waitFor(readNWSocket("example.com", true));
+        string contents = readNWSocket("example.com", true).waitForResult();
         cerr << "HTTP response:\n" << contents << endl;
         CHECK(contents.starts_with("HTTP/1.1 "));
         CHECK(contents.size() > 1000);
@@ -265,7 +272,7 @@ TEST_CASE("NWConnection", "[nw]") {
 
 TEST_CASE("NWConnection TLS", "[nw]") {
     {
-        string contents = waitFor(readNWSocket("example.com", true));
+        string contents = readNWSocket("example.com", true).waitForResult();
         cerr << "HTTP response:\n" << contents << endl;
         CHECK(contents.starts_with("HTTP/1.1 "));
         CHECK(contents.size() > 1000);

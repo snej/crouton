@@ -37,20 +37,19 @@ namespace crouton {
         CoCondition& operator=(CoCondition&&) noexcept = default;
         ~CoCondition() {precondition(_awaiters.empty());}
 
+        /// Wakes up one waiting coroutine.
         void notifyOne();
 
+        /// Wakes up all waiting coroutines.
         void notifyAll();
 
         struct awaiter : public CORO_NS::suspend_always, private util::Link {
             awaiter(CoCondition* cond) :_cond(cond) { }
-
             coro_handle await_suspend(coro_handle h) noexcept;
-
         private:
             friend class CoCondition;
             friend class util::LinkList;
             void wakeUp();
-
             CoCondition* _cond;
             Suspension   _suspension;
         };
@@ -58,8 +57,6 @@ namespace crouton {
         awaiter operator co_await() {return awaiter(this);}
 
     private:
-        void remove(awaiter* a);
-
         util::LinkedList<awaiter> _awaiters;
     };
 
@@ -70,38 +67,18 @@ namespace crouton {
     // base class of Blocker<T>
     class BlockerBase {
     public:
-        bool await_ready() noexcept     {
-            return _state.load() == Ready;
-        }
+        bool await_ready() noexcept     {return _state.load() == Ready;}
+        coro_handle await_suspend(coro_handle h) noexcept;
+        void await_resume() noexcept    {assert(_state.load() == Ready);}
+        void reset()                    {_state.store(Initial);}
 
-        coro_handle await_suspend(coro_handle h) noexcept {
-            _suspension = Scheduler::current().suspend(h);
-            State curState = Initial;
-            if (!_state.compare_exchange_strong(curState, Waiting)) {
-                assert(curState == Ready);
-                _suspension.wakeUp();
-            }
-            return lifecycle::suspendingTo(h, CRTN_TYPEID(*this), this);
-        }
-
-        void await_resume() noexcept {
-            assert(_state.load() == Ready);
-        }
-
-        void notify() {
-            State prevState = _state.exchange(Ready);
-            if (prevState == Waiting)
-                _suspension.wakeUp();
-            //return prevState != Ready;
-        }
-
-        void reset() {
-            _state.store(Initial);
-        }
-
+        BlockerBase() = default;
+        // these decls exist to enable zero-copy returns. Not implemented:
+        BlockerBase(BlockerBase&&);
+        BlockerBase& operator==(BlockerBase&&);
     protected:
+        void notify();
         enum State { Initial, Waiting, Ready };
-
         Suspension          _suspension;
         std::atomic<State>  _state = Initial;
     };
@@ -140,6 +117,9 @@ namespace crouton {
 
 
     template <>
-    class Blocker<void> : public BlockerBase { };
+    class Blocker<void> : public BlockerBase {
+    public:
+        void notify()   {BlockerBase::notify();}
+    };
 
 }

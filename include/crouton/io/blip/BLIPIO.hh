@@ -20,8 +20,7 @@
 #include <vector>
 
 namespace crouton::io::blip {
-    class Deflater;
-    class Inflater;
+    class Codec;
     class MessageBuilder;
     class MessageOut;
 
@@ -87,7 +86,7 @@ namespace crouton::io::blip {
         void freezeMessage(MessageOutRef);
         void thawMessage(MessageOutRef);
         Generator<string> frameGenerator();
-        ConstBytes createNextFrame(MessageOutRef, uint8_t*, Deflater&);
+        ConstBytes createNextFrame(MessageOutRef, uint8_t*, Codec&);
 
         MessageInRef pendingRequest(MessageNo, FrameFlags);
         MessageInRef pendingResponse(MessageNo, FrameFlags);
@@ -103,7 +102,7 @@ namespace crouton::io::blip {
             bool urgent() const;
         };
 
-        std::unique_ptr<Inflater>   _inputCodec;        // Decompressor for incoming frames
+        std::unique_ptr<Codec>      _inputCodec;        // Decompressor for incoming frames
         Outbox                      _outbox;            // Round-robin queue of msgs being sent
         Outbox                      _wayOutBox;         // Messages waiting to be sent
         std::vector<MessageOutRef>  _icebox;            // Outgoing msgs on hold awaiting ACK

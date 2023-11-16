@@ -49,4 +49,23 @@ namespace crouton {
         _suspension.wakeUp();
     }
 
+
+    coro_handle BlockerBase::await_suspend(coro_handle h) noexcept {
+        _suspension = Scheduler::current().suspend(h);
+        State curState = Initial;
+        if (!_state.compare_exchange_strong(curState, Waiting)) {
+            assert(curState == Ready);
+            _suspension.wakeUp();
+        }
+        return lifecycle::suspendingTo(h, CRTN_TYPEID(*this), this);
+    }
+
+    
+    void BlockerBase::notify() {
+        State prevState = _state.exchange(Ready);
+        if (prevState == Waiting)
+            _suspension.wakeUp();
+        //return prevState != Ready;
+    }
+
 }

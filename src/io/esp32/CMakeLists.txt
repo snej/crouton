@@ -28,7 +28,16 @@ idf_component_register(
         "${src}/support/Memoized.cc"
         "${src}/support/MiniFormat.cc"
         "${src}/support/StringUtils.cc"
-        
+        "${src}/support/Varint.cc"
+
+        "${src}/io/blip/Connection.cc"
+        "${src}/io/blip/BLIPIO.cc"
+        "${src}/io/blip/Dispatcher.cc"
+        "${src}/io/blip/Message.cc"
+        "${src}/io/blip/MessageBuilder.cc"
+        "${src}/io/blip/MessageOut.cc"
+        "${src}/io/blip/Codec.cc"
+
         "Backtrace+ESP32.cc"
         "ESPBase.cc"
         "ESPEventLoop.cc"

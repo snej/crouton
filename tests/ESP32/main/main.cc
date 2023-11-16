@@ -1,5 +1,6 @@
 #include "crouton/Crouton.hh"
-#include "crouton/util/Logging.hh"
+#include "crouton/io/blip/BLIPIO.hh"
+#include "io/blip/Codec.hh"
 
 #include "sdkconfig.h"
 #include <freertos/FreeRTOS.h>
@@ -19,6 +20,56 @@ static void initialize();
 
 using namespace std;
 using namespace crouton;
+
+
+static void testCodec() {
+    using namespace crouton::io::blip;
+    string input = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sed tortor enim. Nullam nec quam sed odio consequat venenatis et id tortor. Phasellus vitae porttitor tortor. Ut eu diam ullamcorper odio egestas pharetra nec quis diam. Nulla quis dolor consectetur sem bibendum posuere. Phasellus commodo ut mauris ac mollis. Aenean volutpat vulputate ultrices. Phasellus varius purus et augue finibus, at ultrices ante volutpat. Mauris luctus massa a tincidunt posuere. Etiam tincidunt, orci in condimentum malesuada, leo sem luctus dolor, sed dapibus ante justo sed libero. Pellentesque id viverra arcu. Duis lorem mi, eleifend eu iaculis at, laoreet at augue. Curabitur condimentum, augue sit amet varius consequat, lorem odio interdum sem, at venenatis nibh ipsum sit amet velit. Proin consectetur ipsum non arcu commodo ultricies.\n\n\
+    Nunc ac ex in felis commodo bibendum nec et lacus. Ut tincidunt imperdiet nibh id venenatis. Cras risus purus, rhoncus a auctor nec, posuere at enim. Sed laoreet nisi quis sapien pulvinar, in efficitur massa venenatis. Proin sollicitudin odio a lacus mattis, sit amet imperdiet magna imperdiet. Donec pulvinar pretium augue, vel fringilla massa scelerisque vitae. Integer tristique lorem quis fringilla vehicula. Pellentesque dignissim pretium velit, sed interdum tellus tristique at. Cras rhoncus ex quam, sit amet accumsan tellus pretium non. In semper tellus dui, rutrum pulvinar leo pellentesque cursus. Fusce sed ex eleifend, semper nulla a, ultrices arcu. Praesent condimentum, elit eu rutrum ornare, quam purus tempus lacus, non porttitor nisi augue sit amet massa.\n\n\
+    Sed sit amet interdum sapien, ac efficitur nulla. Suspendisse dignissim suscipit est, non vehicula metus sagittis id. Ut in consectetur diam, eget commodo lorem. Nulla leo odio, euismod vitae ex in, fringilla ornare nulla. Donec purus massa, maximus sit amet finibus eget, rutrum nec velit. Quisque iaculis ex sit amet libero imperdiet euismod facilisis at diam. Aenean venenatis neque et orci pellentesque mattis.\n\n\
+    Nulla aliquam mauris eu mi vestibulum pellentesque. Aenean non mauris facilisis, tristique ligula ut, auctor libero. Ut vitae tortor quis dui laoreet bibendum. Curabitur lobortis, augue at euismod mattis, odio odio suscipit elit, id vehicula lacus libero sodales magna. In ac nulla nibh. Nullam varius dictum tellus in ultricies. Nunc sit amet massa odio. Donec efficitur risus pulvinar, bibendum quam nec, convallis felis. Vivamus auctor quam nec metus faucibus, vel condimentum diam condimentum. Nam et risus molestie, lacinia lorem vel, volutpat elit.\
+    Donec maximus erat ligula, nec rutrum ante tristique vel. Integer et lacus elementum, molestie ipsum et, consectetur lacus. Quisque dapibus maximus suscipit. Sed egestas ut est ac ultrices. Aliquam mollis gravida est, vel consequat risus congue eget. In ligula est, condimentum hendrerit mattis accumsan, tempor at libero. Nunc ut leo at velit eleifend semper. Sed ut sem sit amet neque feugiat dapibus. Maecenas sagittis ex ut mi molestie, vel dictum nisi fermentum. Fusce a ex id risus dictum fringilla.";
+
+    vector<string> compressed;
+    size_t compressedSize = 0;
+
+    {
+        auto def = Codec::newDeflater();
+        ConstBytes inputBuf(input);
+        while (!inputBuf.empty()) {
+            char buffer[400];
+            MutableBytes outputBuf(buffer, sizeof(buffer));
+            auto mode = Codec::Mode::SyncFlush;// inputBuf.empty() ? Codec::Mode::Finish : Codec::Mode::NoFlush;
+            MutableBytes written = def->write(inputBuf, outputBuf, mode);
+            if (!written.empty()) {
+                // SyncFlush always ends the output with the 4 bytes 00 00 FF FF.
+                // We can remove those, then add them when reading the data back in.
+                assert(written.size() >= 4);
+                assert(memcmp(written.endByte() - 4, "\x00\x00\xFF\xFF", 4) == 0);
+            }
+            def->writeChecksum(outputBuf);
+            compressed.emplace_back((char*)written.data(), written.size() + 4);
+            compressedSize += written.size() + 4;
+        }
+    }
+    Log->info("Compresed {} bytes to {} frames of total size {}",
+              input.size(), compressed.size(), compressedSize);
+    string decompressed;
+    {
+        auto inf = Codec::newInflater();
+        for (string frame : compressed) {
+            ConstBytes inputBuf(frame.data(), frame.size() - 4);
+            char buffer[1000];
+            MutableBytes outputBuf(buffer, sizeof(buffer));
+            MutableBytes written = inf->write(inputBuf, outputBuf, Codec::Mode::SyncFlush);
+            assert(inputBuf.empty());
+            decompressed.append((char*)written.data(), written.size());
+            inputBuf = ConstBytes(frame.data() + frame.size() - 4, 4);
+            inf->readAndVerifyChecksum(inputBuf);
+        }
+    }
+    assert(decompressed == input);
+}
 
 
 static Generator<int64_t> fibonacci(int64_t limit, bool slow = false) {
@@ -55,6 +106,9 @@ Task mainTask() {
         printf("\n");
     }
 
+    Log->info("Testing Codec");
+    testCodec();
+
     Log->info("Testing AddrInfo -- looking up example.com");
     {
         io::AddrInfo addr = AWAIT io::AddrInfo::lookup("example.com");
@@ -81,6 +135,8 @@ Task mainTask() {
         postcondition(result.size() > 1000);
         postcondition(result.size() < 2000);
     }
+
+    io::blip::BLIPIO b;
 
     Log->info("End of tests");
     postcondition(Scheduler::current().assertEmpty());

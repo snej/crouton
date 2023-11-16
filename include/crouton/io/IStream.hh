@@ -81,8 +81,8 @@ namespace crouton::io {
         ASYNC<string> readUntil(string end, size_t maxLen = SIZE_MAX);
 
         /// Reads until EOF.
-        ASYNC<string> readAll();
-        
+        virtualASYNC<string> readAll();
+
         /// Returns a `Generator` that produces chunks of data read from the stream.
         /// This is a wrapper around `readNoCopy()` that makes `IStream` satisfy the concept
         /// `GeneratorFactory`, which in turn allows it to be used as a Publisher.

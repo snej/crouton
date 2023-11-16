@@ -21,7 +21,12 @@
 
 #include <vector>
 
+namespace crouton::io {
+    class FileStream;
+}
 namespace crouton::io::fs {
+
+    //TODO: Requires libuv. Not yet implemented for ESP32.
 
 #pragma mark - DIRECTORIES:
 
@@ -85,6 +90,9 @@ namespace crouton::io::fs {
 
     /// Returns all the metadata for the item at that path.
     statBuf stat(const char* path, bool followSymlink =true);
+
+    /// Returns all the metadata for an open file.
+    statBuf fstat(FileStream const&);
 
 
 #pragma mark - COPY / MOVE / DELETE:

@@ -25,6 +25,8 @@ namespace crouton {
 }
 namespace crouton::io {
     
+    //TODO: Requires libuv. Not yet implemented for ESP32.
+
     /** Asynchronous file I/O. 
 
         @warning  In all the read and write calls, the data pointer passed to the call must
@@ -53,8 +55,12 @@ namespace crouton::io {
         /// Closes the write side, but not the read side. (Like a socket's `shutdown`.)
         ASYNC<void> closeWrite() override;
 
+        /// Returns the size/length of the file in bytes.
+        uint64_t getSize() const;
+
         ASYNC<ConstBytes> readNoCopy(size_t maxLen = 65536) override;
         ASYNC<ConstBytes> peekNoCopy() override;
+        virtualASYNC<string> readAll() override;
 
         ASYNC<void> write(ConstBytes) override;
         ASYNC<void> write(const ConstBytes buffers[], size_t nBuffers) override;
@@ -67,6 +73,8 @@ namespace crouton::io {
         /// Ignores the current stream position and writes to an absolute offset in the file
         /// from one or more buffers.
         ASYNC<void> pwritev(const ConstBytes bufs[], size_t nbufs, int64_t offset);
+
+        int fileDescriptor() const {return _fd;}
 
     private:
         explicit FileStream(int fd);

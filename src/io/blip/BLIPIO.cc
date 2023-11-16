@@ -23,8 +23,6 @@
 #include "support/StringUtils.hh"
 #include "crouton/Task.hh"
 #include <ranges>
-#include <spdlog/fmt/fmt.h>
-#include <spdlog/fmt/ostr.h>    // Makes custom types loggable via `operator <<` overloads
 
 namespace crouton {
     string ErrorDomainInfo<io::blip::ProtocolError>::description(errorcode_t code) {
@@ -32,7 +30,7 @@ namespace crouton {
         static constexpr NameEntry names[] = {
             {int(InvalidFrame),         "invalid BLIP frame"},
             {int(PropertiesTooLarge),   "message properties too large"},
-            {int(CompressionError),     "failed to compress message"},
+            {int(CompressionError),     "failed to decompress message"},
             {int(BadChecksum),          "invalid checksum in message"},
         };
         return NameEntry::lookup(code, names);
@@ -66,7 +64,7 @@ namespace crouton::io::blip {
     static constexpr size_t kOutboxCapacity = 10;
 
     /// Logger
-    log::logger* LBLIP = MakeLogger("BLIP");
+    log::logger* LBLIP;
 
 
 #pragma mark - OUTBOX:
@@ -114,9 +112,12 @@ namespace crouton::io::blip {
 
 
     BLIPIO::BLIPIO()
-    :_inputCodec(make_unique<Inflater>())
+    :_inputCodec(Codec::newInflater())
     ,_frameGenerator(frameGenerator())
-    { }
+    { 
+        static once_flag sOnce;
+        call_once(sOnce, []{LBLIP = MakeLogger("BLIP");} );
+    }
 
 
     BLIPIO::~BLIPIO() {
@@ -236,17 +237,18 @@ namespace crouton::io::blip {
     /** Sends the next frame. */
     Generator<string> BLIPIO::frameGenerator() {
         auto frameBuf = make_unique<uint8_t[]>(kMaxFrameOverhead + kBigFrameSize);
-        Deflater outputCodec;
+        auto outputCodec = Codec::newDeflater();
         Generator<MessageOutRef> generator = _outbox.generate();
 
         LBLIP->debug("Starting frameGenerator loop...");
         while (_sendOpen || hasOutput()) {
             // Await the next message, if any, from the queue:
-            Result<MessageOutRef> msgp = AWAIT generator;
+            Result<MessageOutRef> msgp;
+            msgp = AWAIT generator;
             if (!msgp)
                 break;  // stop when I close
 
-            ConstBytes frame = createNextFrame(*std::move(msgp), frameBuf.get(), outputCodec);
+            ConstBytes frame = createNextFrame(*std::move(msgp), frameBuf.get(), *outputCodec);
 
             // Now yield the frame from the Generator ...
             // returns once my client has read it and called `co_await` again
@@ -259,7 +261,7 @@ namespace crouton::io::blip {
     }
 
 
-    ConstBytes BLIPIO::createNextFrame(MessageOutRef msg, uint8_t* frameBuf, Deflater& outputCodec) {
+    ConstBytes BLIPIO::createNextFrame(MessageOutRef msg, uint8_t* frameBuf, Codec& outputCodec) {
         // Assign the message number for new requests.
         if (msg->_number == MessageNo::None) {
             _lastMessageNo = _lastMessageNo + 1;
@@ -393,7 +395,7 @@ namespace crouton::io::blip {
                 LBLIP->debug("REQ {} has more frames coming", minifmt::write(msgNo));
             }
         } else {
-            string err = fmt::format("Bad incoming REQ {} ({})", minifmt::write(msgNo),
+            string err = minifmt::format("Bad incoming REQ {} ({})", minifmt::write(msgNo),
                                      (msgNo <= _numRequestsReceived ? "already finished" : "too high"));
             Error::raise(ProtocolError::InvalidFrame, err);
         }
@@ -412,7 +414,7 @@ namespace crouton::io::blip {
                 _pendingResponses.erase(i);
             }
         } else {
-            string err = fmt::format("Bad incoming RES {} ({})", minifmt::write(msgNo),
+            string err = minifmt::format("Bad incoming RES {} ({})", minifmt::write(msgNo),
                                      (msgNo <= _lastMessageNo ? "no request waiting" : "too high"));
             Error::raise(ProtocolError::InvalidFrame, err);
         }

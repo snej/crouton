@@ -513,8 +513,8 @@ namespace snej_catch {
     void ConsoleReporter::testCasePartialStarting(Catch::TestCaseInfo const& _testInfo,
                                                   uint64_t _partNumber) {
         StreamingReporterBase::testCasePartialStarting(_testInfo, _partNumber);
-        if (_partNumber > 1)
-            m_stream << m_colour->guardColour(Colour::BrightWhite) << lineOfChars('>') << " (Part " << _partNumber << ")\n";
+        if (_partNumber > 0)
+            m_stream << m_colour->guardColour(Colour::BrightWhite) << lineOfChars('-') << " (Part " << (_partNumber + 1) << ")\n";
     }
 
     void ConsoleReporter::testCaseEnded(TestCaseStats const& _testCaseStats) {

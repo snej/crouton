@@ -23,6 +23,7 @@
 using namespace std;
 using namespace crouton::io::blip;
 
+
 TEST_CASE("BLIP MessageBuilder", "[blip]") {
     MessageBuilder msg{ {"Shoe-Size", "8.5"}, {"Hair", "yes"} };
     msg["Eyes"] = "Brown";
@@ -131,7 +132,7 @@ staticASYNC<void> testSendReceive(initializer_list<MessageBuilder::property> pro
 
 TEST_CASE("BLIP Send And Receive Message", "[blip]") {
     RunCoroutine([]() -> Future<void> {
-        string body = AWAIT readFile("README.md");
+        string body = AWAIT ReadFile("README.md");
         AWAIT testSendReceive({}, body, false);
         AWAIT testSendReceive({}, body, true);
         RETURN noerror;

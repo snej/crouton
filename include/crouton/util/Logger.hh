@@ -97,6 +97,7 @@ namespace crouton::log {
     private:
         void _log(level::level_enum, string_view fmt, minifmt::FmtIDList, ...);
         void _writeHeader(level::level_enum);
+        void load_env_level();
 
         string const        _name;
         level::level_enum   _level;

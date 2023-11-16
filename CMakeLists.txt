@@ -197,6 +197,10 @@ if (CROUTON_BUILD_BLIP)
         src/io/blip/Message.cc
         src/io/blip/MessageBuilder.cc
         src/io/blip/MessageOut.cc
+
+        vendor/miniz/miniz_tdef.c
+        vendor/miniz/miniz_tinfl.c
+        vendor/miniz/miniz.c
     )
 
     target_include_directories( LibCrouton PUBLIC
@@ -207,6 +211,7 @@ if (CROUTON_BUILD_BLIP)
         src/
         src/io/
         src/support/
+        vendor/miniz/
     )
 
     target_link_libraries( BLIP
@@ -271,7 +276,11 @@ if (NOT CROUTON_IOS)
 
     if (CROUTON_BUILD_BLIP)
         target_sources( CroutonTests PRIVATE
+            tests/test_codec.cc
             tests/test_blip.cc
+        )
+        target_include_directories( CroutonTests PRIVATE
+            vendor/miniz/
         )
         target_link_libraries( CroutonTests
             BLIP

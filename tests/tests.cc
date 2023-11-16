@@ -25,7 +25,8 @@
 #include "crouton/io/uv/UVBase.hh"
 
 
-void RunCoroutine(Future<void> (*test)()) {
+void RunCoroutine(std::function<Future<void>()> test) {
+    InitLogging();
     Future<void> f = test();
     Scheduler::current().runUntil([&]{return f.hasResult();});
     f.result(); // check exception

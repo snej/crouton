@@ -148,12 +148,14 @@ namespace crouton::io::blip {
 
         // Get and remove the checksum from the end of the frame:
         ConstBytes frame = entireFrame;
-        auto checksum = entireFrame.last(Codec::kChecksumSize);
+        ConstBytes checksumBytes = entireFrame.last(Codec::kChecksumSize);
+        auto checksumStart = checksumBytes.data();
+        uint32_t checksum = codec.readChecksum(checksumBytes);
         if (mode == Codec::Mode::SyncFlush) {
             // Replace checksum with the untransmitted deflate empty-block trailer,
             // which is conveniently the same size:
             static_assert(Codec::kChecksumSize == 4, "Checksum not same size as deflate trailer");
-            memcpy(const_cast<byte*>(checksum.data()), "\x00\x00\xFF\xFF", 4);
+            memcpy(const_cast<byte*>(checksumStart), "\x00\x00\xFF\xFF", 4);
         } else {
             // In uncompressed message, just trim off the checksum:
             frame = frame.without_last(Codec::kChecksumSize);
@@ -195,13 +197,10 @@ namespace crouton::io::blip {
 
         if (!frame.empty()) {
             // Add remaining data to the body:
-            uint8_t buffer[4096];
-            while (frame.size() > 0) {
-                MutableBytes output(buffer, sizeof(buffer));
-                MutableBytes written = codec.write(frame, output, Codec::Mode(mode));
-                _body.append(string_view(written));
-            }
+            codec.writeAll(frame, _body, mode);
         }
+
+        codec.verifyChecksum(checksum);
 
         if (!(frameFlags & kMoreComing)) {
             // Completed!
@@ -211,7 +210,7 @@ namespace crouton::io::blip {
             state = kEnd;
             LBLIP->info("Finished receiving {}", minifmt::write(*this));
             if (_onResponse) {
-                auto ref = dynamic_pointer_cast<MessageIn>(this->shared_from_this());
+                auto ref = static_pointer_cast<MessageIn>(this->shared_from_this());
                 _onResponse->setResult(ref);
             }
         }

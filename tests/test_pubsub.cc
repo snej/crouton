@@ -196,6 +196,6 @@ TEST_CASE("Stream Publisher", "[pubsub][io]") {
         CHECK(items.size() >= 7);
         RETURN noerror;
     };
-    waitFor(test());
+    test().waitForResult();
     REQUIRE(Scheduler::current().assertEmpty());
 }

@@ -17,6 +17,7 @@
 //
 
 #include "crouton/io/FileStream.hh"
+#include "crouton/io/Filesystem.hh"
 #include "crouton/Future.hh"
 #include "UVInternal.hh"
 
@@ -84,6 +85,11 @@ namespace crouton::io {
     }
 
 
+    uint64_t FileStream::getSize() const {
+        return fs::fstat(*this).size;
+    }
+
+
     // This is FileStream's primitive read operation.
     Future<size_t> FileStream::_preadv(const MutableBytes bufs[], size_t nbufs, int64_t offset) {
         precondition(isOpen());
@@ -140,6 +146,17 @@ namespace crouton::io {
             return _readBuf->bytes();
         else
             return _fillBuffer();
+    }
+
+
+    ASYNC<string> FileStream::readAll() {
+        uint64_t size = getSize();
+        if (size > SIZE_MAX)
+            throw bad_alloc();
+        string contents(size_t(size), 0);
+        size_t sz = AWAIT read(contents);
+        contents.resize(sz);
+        RETURN contents;
     }
 
 

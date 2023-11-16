@@ -49,6 +49,7 @@ namespace crouton::log {
     :_name(std::move(name))
     ,_level(level) {
         unique_lock lock(sLogMutex);
+        load_env_level();
         if (!sLoggers)
             sLoggers = new vector<logger*>;
         sLoggers->push_back(this);
@@ -105,27 +106,32 @@ namespace crouton::log {
     }
 
 
+    static const char* sEnvLevelsStr;
+
     void logger::load_env_levels() {
-        const char* env = getenv("CROUTON_LOG_LEVEL");
-        if (!env)
-            return;
         unique_lock lock(sLogMutex);
-        string_view envStr(env);
-        while (!envStr.empty()) {
+        if (!sEnvLevelsStr) {
+            sEnvLevelsStr = getenv("CROUTON_LOG_LEVEL");
+            sEnvLevelsStr = strdup(sEnvLevelsStr ? sEnvLevelsStr : "");
+        }
+        for (auto logger : *sLoggers)
+            logger->load_env_level();
+    }
+
+
+    void logger::load_env_level() {
+        if (!sEnvLevelsStr)
+            return; // Do nothing if load_env_levels() hasn't been called
+        string_view rest(sEnvLevelsStr);
+        while (!rest.empty()) {
             string_view item;
-            tie(item,envStr) = split(envStr, ',');
+            tie(item,rest) = split(rest, ',');
             auto [k, v] = split(item, '=');
             if (v.empty()) {
-                auto level = levelNamed(k);
-                for (auto logger : *sLoggers)
-                    logger->set_level(level);
-            } else {
-                for (auto logger : *sLoggers) {
-                    if (logger->_name == k) {
-                        logger->set_level(levelNamed(v));
-                        break;
-                    }
-                }
+                set_level(levelNamed(k));
+            } else if (k == _name) {
+                set_level(levelNamed(v));
+                break;
             }
         }
     }
@@ -204,6 +210,7 @@ namespace crouton::log {
 
 
     void logger::load_env_levels() { }
+    void logger::load_env_level() { }
 
 
     void logger::log(level::level_enum lvl, string_view msg) {

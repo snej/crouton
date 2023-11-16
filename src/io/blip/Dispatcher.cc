@@ -17,8 +17,7 @@
 //
 
 #include "crouton/io/blip/Dispatcher.hh"
-#include <spdlog/fmt/fmt.h>
-#include <spdlog/fmt/ostr.h>    // Makes custom types loggable via `operator <<` overloads
+#include "crouton/util/MiniFormat.hh"
 
 namespace crouton::io::blip {
     using namespace std;
@@ -62,8 +61,8 @@ namespace crouton::io::blip {
             err = Error(std::current_exception());
         }
 
-        LBLIP->error(fmt::format("Error {} `{}` handling BLIP request {}",
-                                 err, exceptionMessage, *msg));
+        LBLIP->error(minifmt::format("Error {} `{}` handling BLIP request {}",
+                                 minifmt::write(err), exceptionMessage, minifmt::write(*msg)));
         msg->respondWithError(mapError(err));
     }
 

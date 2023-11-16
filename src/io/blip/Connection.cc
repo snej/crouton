@@ -19,8 +19,6 @@
 #include "crouton/io/blip/Connection.hh"
 #include "crouton/io/WebSocket.hh"
 #include "crouton/Task.hh"
-#include <spdlog/fmt/fmt.h>
-#include <spdlog/fmt/ostr.h>    // Makes custom types loggable via `operator <<` overloads
 
 namespace crouton::io::blip {
     using namespace std;

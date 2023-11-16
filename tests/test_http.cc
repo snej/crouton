@@ -131,7 +131,7 @@ TEST_CASE("HTTP GET", "[uv][http]") {
         CHECK(body.size() >= 200);
         RETURN noerror;
     };
-    waitFor(test());
+    test().waitForResult();
     REQUIRE(Scheduler::current().assertEmpty());
 }
 
@@ -156,7 +156,7 @@ TEST_CASE("HTTPS GET", "[uv][http]") {
         CHECK(body.size() >= 1000);
         RETURN noerror;
     };
-    waitFor(test());
+    test().waitForResult();
     REQUIRE(Scheduler::current().assertEmpty());
 }
 
@@ -183,7 +183,7 @@ TEST_CASE("HTTPs GET Streaming", "[uv][http]") {
         CHECK(len == 4086469);
         RETURN noerror;
     };
-    waitFor(test());
+    test().waitForResult();
     REQUIRE(Scheduler::current().assertEmpty());
 }
 
