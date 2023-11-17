@@ -81,7 +81,7 @@ staticASYNC<void> testBLIP() {
 
     Blocker<void> gotChanges;
 
-    blip::Connection blip(std::move(ws), {
+    blip::Connection blip(std::move(ws), false, {
         {"changes", [&](blip::MessageInRef msg) {
             Log->info("*** demo_blipclient received {}", minifmt::write{*msg});
             if (msg->canRespond()) {

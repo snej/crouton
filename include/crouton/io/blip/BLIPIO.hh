@@ -28,7 +28,7 @@ namespace crouton::io::blip {
         they go. Usually you'll want to use BLIPConnection instead, for BLIP-over-WebSocket. */
     class BLIPIO {
     public:
-        BLIPIO();
+        BLIPIO(bool enableCompression =true);
 
         /// Queues a request to be sent.
         /// The result resolves to the reply message when it arrives.
@@ -111,6 +111,7 @@ namespace crouton::io::blip {
         MessageNo                   _lastMessageNo {0}; // Last msg# generated
         MessageNo                   _numRequestsReceived {0}; // Max msg# received
         Generator<string>           _frameGenerator;    // The Generator side of `output()`.
+        bool                        _enableCompression;
         bool                        _sendOpen = true;   // True until closeSend or stop called
         bool                        _receiveOpen = true;// True until closeReceive or stop called
 

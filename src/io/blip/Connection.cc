@@ -25,8 +25,10 @@ namespace crouton::io::blip {
 
 
     Connection::Connection(std::unique_ptr<ws::WebSocket> ws,
+                           bool enableCompression,
                            std::initializer_list<RequestHandlerItem> handlers)
     :Dispatcher(handlers)
+    ,_io(enableCompression)
     ,_socket(std::move(ws))
     { }
 

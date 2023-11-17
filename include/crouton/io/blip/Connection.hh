@@ -36,7 +36,8 @@ namespace crouton::io::blip {
     public:
         /// Constructs a Connection and registers any given request handlers.
         explicit Connection(std::unique_ptr<ws::WebSocket> ws,
-                                std::initializer_list<RequestHandlerItem> = {});
+                            bool enableCompression = true,
+                            std::initializer_list<RequestHandlerItem> = {});
         ~Connection();
 
         /// Registers a handler for incoming requests with a specific `Profile` property value.

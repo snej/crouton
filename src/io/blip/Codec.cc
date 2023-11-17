@@ -106,6 +106,15 @@ namespace crouton::io::blip {
     }
 
 
+    MutableBytes NullCodec::write(ConstBytes& input, MutableBytes& output, Mode mode) {
+        if (mode == Mode::Raw)
+            return _writeRaw(input, output);
+        else
+            Error(ProtocolError::CompressionError).raise("compression not supported");
+    }
+
+
+
 #pragma mark - ZLIB IMPLEMENTATION:
 
 #ifdef CODEC_USE_ZLIB

@@ -84,4 +84,11 @@ namespace crouton::io::blip {
         uint32_t _checksum{0};
     };
 
+
+    /** Null codec that passes bytes through unaltered. (Still tracks the checksum, though.) */
+    class NullCodec final : public Codec {
+    public:
+        MutableBytes write(ConstBytes& input, MutableBytes& output, Mode = Mode::Default) override;
+    };
+
 }

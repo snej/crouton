@@ -111,10 +111,11 @@ namespace crouton::io::blip {
 #pragma mark - BLIPIO:
 
 
-    BLIPIO::BLIPIO()
+    BLIPIO::BLIPIO(bool enableCompression)
     :_inputCodec(Codec::newInflater())
     ,_frameGenerator(frameGenerator())
-    { 
+    ,_enableCompression(enableCompression)
+    {
         static once_flag sOnce;
         call_once(sOnce, []{LBLIP = MakeLogger("BLIP");} );
     }
@@ -237,7 +238,12 @@ namespace crouton::io::blip {
     /** Sends the next frame. */
     Generator<string> BLIPIO::frameGenerator() {
         auto frameBuf = make_unique<uint8_t[]>(kMaxFrameOverhead + kBigFrameSize);
-        auto outputCodec = Codec::newDeflater();
+        unique_ptr<Codec> outputCodec;
+        if (_enableCompression)
+            outputCodec = Codec::newDeflater();
+        else
+            outputCodec = make_unique<NullCodec>();
+        
         Generator<MessageOutRef> generator = _outbox.generate();
 
         LBLIP->debug("Starting frameGenerator loop...");

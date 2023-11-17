@@ -66,7 +66,7 @@ staticASYNC<int> run() {
 
     Blocker<void> gotChanges;
 
-    blip::Connection blip(std::move(ws), {
+    blip::Connection blip(std::move(ws), true, {
         {"changes", [&](blip::MessageInRef msg) {
             cout << "*** demo_blipclient received ";
             msg->dump(cout, false);
