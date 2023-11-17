@@ -1,5 +1,5 @@
 #include "crouton/Crouton.hh"
-#include "crouton/io/blip/BLIPIO.hh"
+#include "crouton/io/blip/BLIP.hh"
 #include "io/blip/Codec.hh"
 
 #include "sdkconfig.h"
@@ -20,6 +20,7 @@ static void initialize();
 
 using namespace std;
 using namespace crouton;
+using namespace crouton::io;
 
 
 static void testCodec() {
@@ -72,6 +73,40 @@ static void testCodec() {
 }
 
 
+staticASYNC<void> testBLIP() {
+    // Send HTTP request:
+    auto ws = make_unique<ws::ClientWebSocket>("ws://work.local:5984/travel-sample/_blipsync");
+    ws->setHeader("Sec-WebSocket-Protocol", "BLIP_3+CBMobile_2");
+    AWAIT ws->connect();
+
+    Blocker<void> gotChanges;
+
+    blip::Connection blip(std::move(ws), {
+        {"changes", [&](blip::MessageInRef msg) {
+            Log->info("*** demo_blipclient received {}", minifmt::write{*msg});
+            if (msg->canRespond()) {
+                blip::MessageBuilder response;
+                response << "[]";
+                msg->respond(response);
+            }
+            gotChanges.notify();
+        } }
+    });
+    blip.start();
+
+    blip::MessageBuilder msg("subChanges");
+    blip::MessageInRef reply = AWAIT blip.sendRequest(msg);
+
+    Log->info("*** demo_blipclient got reply to its `subChanges`: {}", minifmt::write{*reply});
+
+    AWAIT gotChanges;
+
+    Log->info("Closing...");
+    AWAIT blip.close();
+    RETURN noerror;
+}
+
+
 static Generator<int64_t> fibonacci(int64_t limit, bool slow = false) {
     int64_t a = 1, b = 1;
     YIELD a;
@@ -94,7 +129,7 @@ Task mainTask() {
 //    LSched->set_level(log::level::trace);
     LNet->set_level(log::level::trace);
 
-    Log->info("Testing Generator");
+    Log->info("---------- Testing Generator");
     {
         Generator<int64_t> fib = fibonacci(100, true);
         vector<int64_t> results;
@@ -106,10 +141,7 @@ Task mainTask() {
         printf("\n");
     }
 
-    Log->info("Testing Codec");
-    testCodec();
-
-    Log->info("Testing AddrInfo -- looking up example.com");
+    Log->info("---------- Testing AddrInfo -- looking up example.com");
     {
         io::AddrInfo addr = AWAIT io::AddrInfo::lookup("example.com");
         printf("Addr = %s\n", addr.primaryAddressString().c_str());
@@ -118,7 +150,7 @@ Task mainTask() {
         postcondition(addr.primaryAddressString() == "93.184.216.34");
     }
 
-    Log->info("Testing TCPSocket with TLS");
+    Log->info("---------- Testing TCPSocket with TLS");
     {
         auto socket = io::ISocket::newSocket(true);
         AWAIT socket->connect("example.com", 443);
@@ -136,9 +168,13 @@ Task mainTask() {
         postcondition(result.size() < 2000);
     }
 
-    io::blip::BLIPIO b;
+    Log->info("---------- Testing Codec");
+    testCodec();
 
-    Log->info("End of tests");
+    Log->info("---------- Testing BLIP");
+    testBLIP().waitForResult();
+
+    Log->info("---------- End of tests");
     postcondition(Scheduler::current().assertEmpty());
 
     printf("\n---------- END CROUTON TESTS ----------\n");

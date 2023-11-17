@@ -13,6 +13,7 @@ idf_component_register(
         "${src}/Scheduler.cc"
         "${src}/Select.cc"
         "${src}/Task.cc"
+        "${src}/io/HTTPConnection.cc"
         "${src}/io/HTTPHandler.cc"
         "${src}/io/HTTPParser.cc"
         "${src}/io/ISocket.cc"
@@ -37,6 +38,10 @@ idf_component_register(
         "${src}/io/blip/MessageBuilder.cc"
         "${src}/io/blip/MessageOut.cc"
         "${src}/io/blip/Codec.cc"
+
+        "${root}/vendor/llhttp/src/api.c"
+        "${root}/vendor/llhttp/src/http.c"
+        "${root}/vendor/llhttp/src/llhttp.c"
 
         "Backtrace+ESP32.cc"
         "ESPBase.cc"

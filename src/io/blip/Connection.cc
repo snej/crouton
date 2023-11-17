@@ -76,10 +76,12 @@ namespace crouton::io::blip {
             _io.stop();
         else
             _io.closeSend();
-        AWAIT _outputTask->join();
+        auto& j = _outputTask->join();  // workaround for GCC issue
+        AWAIT j;
         LBLIP->debug("Connection now sending WebSocket CLOSE...");
         AWAIT _socket->send(ws::Message{code, message});
-        AWAIT _inputTask->join();
+        auto& j2 = _inputTask->join();  // workaround for GCC issue
+        AWAIT j2;
         AWAIT _socket->close();
         RETURN noerror;
     }
