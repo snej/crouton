@@ -231,7 +231,6 @@ namespace crouton::io::apple {
 
 
     Future<void> NWConnection::_writeOrShutdown(ConstBytes src, bool shutdown) {
-        clearReadBuf();
         auto onWrite = Future<void>::provider();
         dispatch_sync(_queue, ^{
             __block __unused bool released = false;

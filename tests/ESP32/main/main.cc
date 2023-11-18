@@ -75,7 +75,7 @@ static void testCodec() {
 
 staticASYNC<void> testBLIP() {
     // Send HTTP request:
-    auto ws = make_unique<ws::ClientWebSocket>("ws://work.local:5984/travel-sample/_blipsync");
+    auto ws = make_unique<ws::ClientWebSocket>("ws://work.local:4985/travel-sample/_blipsync");
     ws->setHeader("Sec-WebSocket-Protocol", "BLIP_3+CBMobile_2");
     AWAIT ws->connect();
 
@@ -83,7 +83,8 @@ staticASYNC<void> testBLIP() {
 
     blip::Connection blip(std::move(ws), false, {
         {"changes", [&](blip::MessageInRef msg) {
-            Log->info("*** demo_blipclient received {}", *msg);
+            Log->info("*** testBLIP received {}", *msg);
+            Log->info("*** {}", msg->body());
             if (msg->canRespond()) {
                 blip::MessageBuilder response;
                 response << "[]";
@@ -123,12 +124,10 @@ Task mainTask() {
     initialize();
 
     printf("---------- TESTING CROUTON ----------\n\n");
-    esp_log_level_set("Crouton", ESP_LOG_DEBUG);
-//    LCoro->set_level(log::level::trace);
-//    LLoop->set_level(log::level::trace);
-//    LSched->set_level(log::level::trace);
-    LNet->set_level(log::level::trace);
+    esp_log_level_set("Crouton", ESP_LOG_VERBOSE);
+    log::logger::load_env_levels("Net=debug,BLIP=info,Coro=trace");
 
+#if 0
     Log->info("---------- Testing Generator");
     {
         Generator<int64_t> fib = fibonacci(100, true);
@@ -170,7 +169,7 @@ Task mainTask() {
 
     Log->info("---------- Testing Codec");
     testCodec();
-
+#endif
     Log->info("---------- Testing BLIP");
     testBLIP().waitForResult();
 
@@ -181,12 +180,12 @@ Task mainTask() {
 
     
     printf("Minimum heap space was %ld bytes\n", esp_get_minimum_free_heap_size());
-    printf("Restarting in 100 seconds...");
+    printf("Restarting in a jillion seconds...");
     fflush(stdout);
-    for (int i = 99; i >= 0; i--) {
+    for (int i = 9999999; i >= 0; i--) {
         vTaskDelay(1000 / portTICK_PERIOD_MS);
-        printf(" %d ...", i);
-        fflush(stdout);
+//        printf(" %d ...", i);
+//        fflush(stdout);
     }
     RETURN;
 }
@@ -230,6 +229,9 @@ static void initialize() {
      * Read "Establishing Wi-Fi or Ethernet Connection" section in
      * examples/protocols/README.md for more information about this function.
      */
+    esp_log_level_set("wifi", ESP_LOG_WARN);
+    esp_log_level_set("wifi_init", ESP_LOG_WARN);
+    esp_log_level_set("example_common", ESP_LOG_WARN);
     ESP_ERROR_CHECK(example_connect());
 }
 

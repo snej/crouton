@@ -40,9 +40,20 @@ namespace crouton::log {
     using namespace std;
     using namespace crouton::mini;
 
+    static constexpr string_view kLevelName[] = {
+        "trace", "debug", "info", "warn", "error", "critical", "off"
+    };
+    static constexpr const char* kLevelDisplayName[] = {
+        "trace", "debug", "info ", "WARN ", "ERR  ", "CRITICAL", ""
+    };
+
+
     static mutex            sLogMutex;          // Thread-safety & prevents overlapping msgs
     static vector<logger*>* sLoggers;           // All registered Loggers
     static logger::Sink     sLogSink = nullptr; // Optional function to write messages
+    static const char*      sEnvLevelsStr;
+
+
 
 
     logger::logger(string name, level::level_enum level)
@@ -82,19 +93,6 @@ namespace crouton::log {
     }
 
 
-#ifndef ESP_PLATFORM
-    static constexpr string_view kLevelName[] = {
-        "trace", "debug", "info", "warn", "error", "critical", "off"
-    };
-    static constexpr const char* kLevelDisplayName[] = {
-        "trace", "debug", "info ", "WARN ", "ERR  ", "CRITICAL", ""
-    };
-
-
-    static time_t       sTime;          // Time in seconds that's formatted in sTimeBuf
-    static char         sTimeBuf[30];   // Formatted timestamp, to second accuracy
-
-
     static level::level_enum levelNamed(string_view name) {
         int level = 0;
         for (string_view levelStr : kLevelName) {
@@ -106,14 +104,10 @@ namespace crouton::log {
     }
 
 
-    static const char* sEnvLevelsStr;
-
-    void logger::load_env_levels() {
+    void logger::load_env_levels(const char *envValue) {
         unique_lock lock(sLogMutex);
-        if (!sEnvLevelsStr) {
-            sEnvLevelsStr = getenv("CROUTON_LOG_LEVEL");
-            sEnvLevelsStr = strdup(sEnvLevelsStr ? sEnvLevelsStr : "");
-        }
+        if (!sEnvLevelsStr)
+            sEnvLevelsStr = strdup(envValue ? envValue : "");
         for (auto logger : *sLoggers)
             logger->load_env_level();
     }
@@ -134,6 +128,16 @@ namespace crouton::log {
                 break;
             }
         }
+    }
+
+
+#ifndef ESP_PLATFORM
+    static time_t       sTime;          // Time in seconds that's formatted in sTimeBuf
+    static char         sTimeBuf[30];   // Formatted timestamp, to second accuracy
+
+
+    void logger::load_env_levels() {
+        load_env_levels(getenv("CROUTON_LOG_LEVEL"));
     }
 
 
@@ -210,7 +214,6 @@ namespace crouton::log {
 
 
     void logger::load_env_levels() { }
-    void logger::load_env_level() { }
 
 
     void logger::log(level::level_enum lvl, string_view msg) {

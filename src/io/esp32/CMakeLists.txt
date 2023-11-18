@@ -28,6 +28,7 @@ idf_component_register(
         "${src}/support/Logging.cc"
         "${src}/support/Memoized.cc"
         "${src}/support/MiniFormat.cc"
+        "${src}/support/MiniOStream.cc"
         "${src}/support/StringUtils.cc"
         "${src}/support/Varint.cc"
 

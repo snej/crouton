@@ -86,16 +86,17 @@ namespace crouton::io::esp {
 
 
     Future<void> TCPSocket::close() {
-        LNet->info("Closing TCPSocket");
-        precondition(_isOpen);
-        err_t err = tcp_close(_tcp);
-        _tcp = nullptr;
-        _isOpen = false;
-        if (_readBufs) {
-            pbuf_free(_readBufs);
-            _readBufs = nullptr;
+        if (_isOpen) {
+            LNet->info("Closing TCPSocket");
+            err_t err = tcp_close(_tcp);
+            _tcp = nullptr;
+            _isOpen = false;
+            if (_readBufs) {
+                pbuf_free(_readBufs);
+                _readBufs = nullptr;
+            }
+            postcondition(!err);
         }
-        postcondition(!err);
         return Future<void>{};
     }
 
@@ -171,7 +172,8 @@ namespace crouton::io::esp {
         if (_readBufs) {
             _inputBuf = {_readBufs->payload, _readBufs->len};
             RETURN _inputBuf;
-        } else if (_readErr == CroutonError::EndOfData) {
+        } else if (_readErr == CroutonError::UnexpectedEOF) {
+            LNet->debug("TCPSocket: EOF, no data to read");
             RETURN ConstBytes{};
         } else {
             RETURN _readErr;
@@ -189,8 +191,8 @@ namespace crouton::io::esp {
             else
                 pbuf_cat(_readBufs, pb);
         } else {
-            LNet->debug("read completed, LWIP error {}", err);
             _readErr = err ? Error(LWIPError(err)) : Error(CroutonError::EndOfData);
+            LNet->error("read completed, error {}", minifmt::write{_readErr});
         }
         assert(_readBufs || _readErr);
         _readBlocker.notify();

@@ -35,9 +35,14 @@ namespace crouton::io::blip {
     class Connection : private Dispatcher {
     public:
         /// Constructs a Connection and registers any given request handlers.
+        /// @param ws  The newly-opened WebSocket (client or server side, doesn't matter)
+        /// @param enableCompression  Pass `false` if you promise not to send any compressed
+        ///     messages. (Receiving them is still OK.) Saves about 400KB of RAM.
+        /// @param handlers  Optional list of `{profile, callback}` pairs that register handlers for
+        ///     incoming requests. Or you can call `setRequestHandler` to add them.
         explicit Connection(std::unique_ptr<ws::WebSocket> ws,
                             bool enableCompression = true,
-                            std::initializer_list<RequestHandlerItem> = {});
+                            std::initializer_list<RequestHandlerItem> handlers = {});
         ~Connection();
 
         /// Registers a handler for incoming requests with a specific `Profile` property value.

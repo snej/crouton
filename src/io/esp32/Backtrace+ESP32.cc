@@ -50,4 +50,11 @@ namespace fleece {
         return true;
     }
 
+
+    std::string RawFunctionName(const void *pc) {
+        char buf[20];
+        sprintf(buf, "%p", pc);
+        return buf;
+    }
+
 }

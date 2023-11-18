@@ -142,11 +142,10 @@ namespace crouton::io::blip {
     }
 
 
-    string MessageOut::description() {
-        stringstream s;
-        ConstBytes props = getPropsAndBody().first;
-        writeDescription(props, s);
-        return s.str();
+    void MessageOut::writeDescription(ostream& out) const {
+        auto [props, body] = getPropsAndBody();
+        Message::writeDescription(props, out);
+        out << " + " << body.size() << " bytes";
     }
 
 

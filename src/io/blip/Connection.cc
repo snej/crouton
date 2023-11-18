@@ -43,8 +43,12 @@ namespace crouton::io::blip {
 
 
     Task Connection::outputTask() {
+        auto& gen = _io.output();
         do {
-            Result<string> frame = AWAIT _io.output();
+            Result<string> frame;
+            Log->warn("outputTask about to await");
+            frame = AWAIT (gen);
+            Log->warn("outputTask awaited");
             if (!frame)
                 break; // BLIPIO's send side has closed.
             AWAIT _socket->send(*frame, ws::Message::Binary);
@@ -53,8 +57,10 @@ namespace crouton::io::blip {
 
 
     Task Connection::inputTask() {
+        Generator<ws::Message> receiver = _socket->receive();
         do {
-            Result<ws::Message> frame = AWAIT _socket->receive();
+            Result<ws::Message> frame;
+            frame = AWAIT receiver;
             if (!frame || frame->type == ws::Message::Close) {
                 LBLIP->info("Connection received WebSocket CLOSE");
                 break;
@@ -78,11 +84,11 @@ namespace crouton::io::blip {
             _io.stop();
         else
             _io.closeSend();
-        auto& j = _outputTask->join();  // workaround for GCC issue
+        auto& j = _outputTask->join();
         AWAIT j;
         LBLIP->debug("Connection now sending WebSocket CLOSE...");
         AWAIT _socket->send(ws::Message{code, message});
-        auto& j2 = _inputTask->join();  // workaround for GCC issue
+        auto& j2 = _inputTask->join();
         AWAIT j2;
         AWAIT _socket->close();
         RETURN noerror;

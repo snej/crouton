@@ -130,19 +130,23 @@ namespace crouton {
     /// Returns true if there are no coroutines ready or suspended, except possibly for the one
     /// belonging to the EventLoop. Checked at the end of unit tests.
     bool Scheduler::assertEmpty() {
-        if (auto depth = lifecycle::stackDepth(); depth > 0) {
-            LSched->error("** Coroutine stack is non-empty ({})", depth);
+        auto stackDepth = lifecycle::stackDepth();
+        if (stackDepth > 0) {
+            LSched->info("assertEmpty: Note: Ignoring coroutines in call stack: {}",
+                         lifecycle::dumpStack());
         }
 
         scheduleWakers();
-        if (isEmpty() && lifecycle::count() == 0)
+        auto coroCount = lifecycle::count() - stackDepth;
+        if (isEmpty() && coroCount == 0)
             return true;
-
+        if (coroCount > 0)
+            LSched->info("There are {} coroutines (on all threads)", coroCount);
         LSched->info("Scheduler::assertEmpty: Running event loop until {} ready and {} suspended coroutines finish...",
                      _ready.size(), _suspended->size());
         int attempt = 0;
         const_cast<Scheduler*>(this)->runUntil([&] {
-            return (isEmpty() && lifecycle::count() == 0) || ++attempt >= 10;
+            return (isEmpty() && lifecycle::count() - stackDepth == 0) || ++attempt >= 10;
         });
         if (attempt < 10) {
             LSched->info("...OK, all coroutines finished now.");

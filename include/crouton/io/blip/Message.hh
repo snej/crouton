@@ -47,6 +47,13 @@ namespace crouton::io::blip {
             const string   message;
         };
 
+        string description();
+
+        friend ostream& operator<< (ostream &out, Message const& msg) {
+            msg.writeDescription(out);
+            return out;
+        }
+
       protected:
 
         Message(FrameFlags f, MessageNo n) 
@@ -62,7 +69,8 @@ namespace crouton::io::blip {
 
         void dump(ConstBytes payload, ConstBytes body, bool withBody, ostream&);
         void dumpHeader(ostream&) const;
-        void writeDescription(ConstBytes payload, ostream&) const;
+        virtual void writeDescription(ostream&) const =0;
+        void writeDescription(ConstBytes payload,ostream&) const;
         static const char* findProperty(ConstBytes payload, const char* propertyName);
 
         FrameFlags              _flags;
@@ -119,12 +127,7 @@ namespace crouton::io::blip {
                   FutureProvider<std::shared_ptr<MessageIn>> onResponse = nullptr);
         ~MessageIn() override;
 
-        friend ostream& operator<< (ostream &out, MessageIn const& msg) {
-            msg.writeDescription(ConstBytes(msg._properties), out);
-            return out;
-        }
-
-        string description();
+        void writeDescription(ostream& out) const override;
 
     protected:
         friend class MessageOut;

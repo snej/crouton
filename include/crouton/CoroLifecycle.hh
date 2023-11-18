@@ -61,6 +61,7 @@ namespace crouton {
 
         void logAll();
         void logStacks();
+        string dumpStack();
 #else
         inline void created(coro_handle, bool ready, std::type_info const& implType) { }
         inline void ready(coro_handle) { }
@@ -89,6 +90,7 @@ namespace crouton {
 
         inline void logAll() { }
         inline void logStacks() { }
+        inline string dumpStack() {return "???";}
 #endif
     }
 

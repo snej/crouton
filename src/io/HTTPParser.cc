@@ -110,11 +110,13 @@ namespace crouton::io::http {
         if (!_stream->isOpen())
             AWAIT _stream->open();
 
-        ConstBytes data;
-        do {
-            data = AWAIT _stream->readNoCopy();
-        } while (!parseData(data));
-        RETURN noerror;
+        while (true) {
+            ConstBytes data = AWAIT _stream->readNoCopy();
+            if (parseData(data))
+                RETURN noerror;
+            else if (data.empty())
+                RETURN CroutonError::UnexpectedEOF;
+        }
     }
 
 
@@ -124,6 +126,8 @@ namespace crouton::io::http {
         while (_body.empty() && !complete()) {
             data = AWAIT _stream->readNoCopy();
             parseData(data);
+            if (data.empty() && !complete())
+                RETURN CroutonError::UnexpectedEOF;
         }
         RETURN std::move(_body);
     }

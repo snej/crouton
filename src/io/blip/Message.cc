@@ -68,6 +68,13 @@ namespace crouton::io::blip {
     }
 
 
+    string Message::description() {
+        stringstream s;
+        writeDescription(s);
+        return s.str();
+    }
+
+
     void Message::dump(ConstBytes payload, ConstBytes body, bool withBody, ostream& out) {
         dumpHeader(out);
         if (type() != kAckRequestType && type() != kAckResponseType) {
@@ -195,10 +202,8 @@ namespace crouton::io::blip {
             state = kBeginning;
         }
 
-        if (!frame.empty()) {
-            // Add remaining data to the body:
-            codec.writeAll(frame, _body, mode);
-        }
+        // Add remaining data to the body:
+        codec.writeAll(frame, _body, mode);
 
         codec.verifyChecksum(checksum);
 
@@ -294,10 +299,9 @@ namespace crouton::io::blip {
     }
 
 
-    string MessageIn::description() {
-        stringstream s;
-        writeDescription(ConstBytes(_properties), s);
-        return s.str();
+    void MessageIn::writeDescription(ostream& out) const {
+        Message::writeDescription(ConstBytes(_properties), out);
+        out << " + " << _body.size() << " bytes";
     }
 
 

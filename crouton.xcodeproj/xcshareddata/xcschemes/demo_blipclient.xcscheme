@@ -65,14 +65,14 @@
       </CommandLineArguments>
       <EnvironmentVariables>
          <EnvironmentVariable
-            key = "SPDLOG_LEVEL"
-            value = "info,Sched=debug,Coro=trace,BLIP=debug"
+            key = "CROUTON_LOG_LEVEL"
+            value = "info,Sched=debug,Coro=trace"
             isEnabled = "NO">
          </EnvironmentVariable>
          <EnvironmentVariable
-            key = "SPDLOG_LEVEL"
-            value = "info,BLIP=debug"
-            isEnabled = "NO">
+            key = "CROUTON_LOG_LEVEL"
+            value = "info,BLIP=trace,Net=debug,Zip=trace"
+            isEnabled = "YES">
          </EnvironmentVariable>
       </EnvironmentVariables>
    </LaunchAction>

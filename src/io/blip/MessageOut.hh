@@ -35,11 +35,6 @@ namespace crouton::io::blip {
             _flags = builder.flags();  // finish() may update the flags, so set them after
         }
 
-        friend ostream& operator<< (ostream &out, MessageOut const& msg) {
-            msg.writeDescription(ConstBytes(msg.getPropsAndBody().first), out);
-            return out;
-        }
-
         bool isNew() const      {return _bytesSent == 0;}
 
     protected:
@@ -56,7 +51,7 @@ namespace crouton::io::blip {
         void noResponse();
 
         // for debugging/logging:
-        std::string description();
+        void writeDescription(ostream& out) const override;
         void        dump(ostream& out, bool withBody);
         const char* findProperty(const char* propertyName);
 

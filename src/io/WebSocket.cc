@@ -81,6 +81,7 @@ namespace crouton::io::ws {
     Future<void> WebSocket::send(ConstBytes message, Message::Type type) {
         // Note: This method is not a coroutine, and it passes the message to _stream->write
         // as a `string`, so the caller does not need to keep the data valid.
+        LNet->info("WebSocket sending message: {}, {} bytes", type, message.size());
         if (_closeSent || !_stream)
             return Error(CroutonError::LogicError, "WebSocket is already closing");
         if (type == Message::Close)
@@ -95,17 +96,21 @@ namespace crouton::io::ws {
     Generator<Message> WebSocket::receive() {
         while (_stream && !_closeReceived) {
             while (_incoming.empty()) {
+                LNet->warn("WebSocket reading...");
                 ConstBytes data = AWAIT _stream->readNoCopy(100000);
                 if (data.size() == 0) {
+                    LNet->warn("WebSocket closed unexpectedly");
                     YIELD Message(CloseCode::Abnormal, "WebSocket closed unexpectedly");
                     RETURN;
                 }
+                LNet->warn("WebSocket read {} bytes", data.size());
                 // Pass the data to the 3rd-party WebSocket parser, which will call handleFragment.
                 consume(data);
             }
 
             Message msg = std::move(_incoming.front());
             _incoming.pop_front();
+            LNet->info("WebSocket received message: {}, {} bytes", msg.type, msg.size());
 
             using enum Message::Type;
             switch (msg.type) {

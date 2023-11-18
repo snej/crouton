@@ -45,6 +45,7 @@ namespace crouton {
     class Generator : public Coroutine<GeneratorImpl<T>>, public ISeries<T> {
     public:
         Generator(Generator&&) noexcept = default;
+        Generator& operator=(Generator&&) = default;
 
         ~Generator() {
             if (auto h = this->handle()) {

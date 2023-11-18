@@ -24,22 +24,49 @@ namespace crouton::io::blip {
     class MessageBuilder;
     class MessageOut;
 
-    /** Lower-level transport-agnostic BLIP API. It doesn't care where frames come from or where
-        they go. Usually you'll want to use BLIPConnection instead, for BLIP-over-WebSocket. */
+    /** Lower-level transport-agnostic BLIP API. 
+        It doesn't care where frames come from or how they get to the other side.
+        Usually you'll want to use BLIPConnection instead, for the typical BLIP-over-WebSocket. */
     class BLIPIO {
     public:
+        /// Constructor, duh.
+        /// @param enableCompression  Pass `false` if you promise not to send any compressed
+        ///     messages. (Receiving them is still OK.) Then BLIPIO will refrain from instantiating
+        ///     a gzip compressor, and save about 400KB of RAM. Useful on embedded devices.
         BLIPIO(bool enableCompression =true);
+        ~BLIPIO();
 
         /// Queues a request to be sent.
         /// The result resolves to the reply message when it arrives.
         /// If this message is NoReply, the result resolves to `nullptr` when it's sent.
         ASYNC<MessageInRef> sendRequest(MessageBuilder&);
 
+        /// Call this when you're ready to close and have no more requests nor responses to send.
+        /// The Generator (`output()`) will yield all remaining frames of already-queued messages,
+        /// then end.
+        /// @warning  It is illegal to call `sendRequest` after this.
+        void closeSend();
+
+        /// Call this when the peer indicates it won't send any more frames, like when it sends a
+        /// WebSocket CLOSE frame or closes its output stream or whatever.
+        /// Any partially-complete incoming requests will be discarded.
+        /// Any pending responses (`Future<MessageIn>`) will immediately resolve to Error messages.
+        /// @warning  It is illegal to call `receive` after this.
+        void closeReceive();
+
+        /// Tells BLIPIO that the connection is disconnected and no more messages can be sent or
+        /// received. This is like calling both `closeSend` and `closeReceive`, plus it discards all
+        /// outgoing messages currently in the queue.
+        /// @warning This should only be used if the transport has abruptly failed.
+        void stop();
+
+        //==== FRAME I/O:
+
         /// Passes a received BLIP frame to be parsed, possibly resulting in a finished message.
         /// If the message is a response, it becomes the resolved value of the Future returned from
         /// the `sendRequest` call.
         /// If the message is a request, it's returned from this call.
-        /// @returns  A completed incoming request, or nullptr.
+        /// @returns  A completed incoming request for you to handle, or nullptr.
         MessageInRef receive(ConstBytes frame);
 
         /// A Generator that yields BLIP frames that should be sent to the destination,
@@ -47,32 +74,14 @@ namespace crouton::io::blip {
         Generator<string>& output()     {return  _frameGenerator;}
 
         /// True if there is work for the Generator to do.
-        bool hasOutput() const          {return !_outbox.empty() || !_wayOutBox.empty() || !_icebox.empty();}
+        bool hasOutput() const {
+            return !_outbox.empty() || !_wayOutBox.empty() || !_icebox.empty(); }
 
         /// True if requests/responses can be sent (neither `closeWrite` nor `stop` called.)
         bool isSendOpen() const         {return _sendOpen;}
 
         /// True if messages will still be received (neither `closeRead` nor `stop` called.)
         bool isReceiveOpen() const      {return _receiveOpen;}
-
-        /// Tells BLIPIO that no new requests or responses will be sent (no more calls to `send`.)
-        /// The Generator (`output()`) will yield all remaining frames of already-queued messages,
-        /// then end.
-        void closeSend();
-
-        /// Tells BLIPIO that no more frames will be received, i.e. `receive` won't be called again.
-        /// Any partially-complete incoming requests will be discarded.
-        /// Any pending responses (`Future<MessageIn>`) will immediately resolve to Error messages.
-        void closeReceive();
-
-        /// Tells BLIPIO that the connection is closed and no more messages can be sent or
-        /// received. This is like calling both `closeSend` and `closeReceive`, plus it discards all
-        /// outgoing messages currently in the queue.
-        ///
-        /// This should only be used if the transport has abruptly failed.
-        void stop();
-
-        ~BLIPIO();
 
     protected:
         using MessageOutRef = std::shared_ptr<MessageOut>;

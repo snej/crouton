@@ -141,7 +141,7 @@ namespace crouton {
             {errorcode_t(LogicError), "internal error (logic error)"},
             {errorcode_t(ParseError), "unreadable data"},
             {errorcode_t(Timeout), "operation timed out"},
-            {errorcode_t(EndOfData), "unexpected end of data"},
+            {errorcode_t(UnexpectedEOF), "unexpected end of data"},
             {errorcode_t(Unimplemented), "unimplemented operation"},
             {errorcode_t(Disconnected), "unexpectedly disconnected"},
             {errorcode_t(NotFound), "not found"},

@@ -25,12 +25,8 @@
 #endif
 
 #ifdef CODEC_USE_MINIZ
-#  if CONFIG_IDF_TARGET_ESP32
-#    include "esp32/rom/miniz.h"
-#  elif CONFIG_IDF_TARGET_ESP32S2
-#    include "esp32s2/rom/miniz.h"
-#  elif CONFIG_IDF_TARGET_ESP32S3
-#    include "esp32s3/rom/miniz.h"
+#  ifdef ESP_PLATFORM
+#    include <miniz.h>
 #  else
 #    include "miniz_tdef.h"
 #    include "miniz_tinfl.h"

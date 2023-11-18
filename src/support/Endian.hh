@@ -27,9 +27,9 @@ namespace crouton::endian {
     static constexpr bool IsLittle = std::endian::native == std::endian::little;
     static_assert(IsBig || IsLittle);
 
-#ifdef __cpp_lib_byteswap
+#if __cpp_lib_byteswap >= 202110L
     // C++23 or later:
-    template <typename T> using byteswap = std::byteswap;
+    template <std::integral T> Pure constexpr T byteswap(T t) noexcept {return std::byteswap(t);}
 #else
     #if defined(bswap16) || defined(bswap32) || defined(bswap64)
     #  error "unexpected define!" // freebsd may define these; probably just need to undefine them

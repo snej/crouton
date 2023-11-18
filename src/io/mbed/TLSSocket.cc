@@ -248,11 +248,13 @@ namespace crouton::io::mbed {
             while (_pendingWrite || _pendingRead) {
                 if (_pendingWrite) {
                     //cerr << "processIO writing...\n";
-                    AWAIT *_pendingWrite;
+                    auto &pw = *_pendingWrite;
+                    AWAIT pw;
                     _pendingWrite.reset();
                 } else if (_pendingRead) {
                     //cerr << "processIO reading...\n";
-                    _readBuf = AWAIT *_pendingRead;
+                    auto& pr = *_pendingRead;
+                    _readBuf = AWAIT pr;
                     //cerr << "processIO read " << _readBuf.size() << " bytes\n";
                     if (_readBuf.size() == 0)
                         _readEOF = true;

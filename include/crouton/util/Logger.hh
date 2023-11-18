@@ -85,6 +85,7 @@ namespace crouton::log {
         }
 
         static void load_env_levels();
+        static void load_env_levels(const char *envValue);
 
         static logger* get(string_view name);
 
