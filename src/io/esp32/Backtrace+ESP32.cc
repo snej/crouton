@@ -16,13 +16,13 @@
 // limitations under the License.
 //
 
+#include "crouton/util/MiniOStream.hh"
 #include "support/Backtrace.hh"
 #include "support/StringUtils.hh"
 #include <esp_debug_helpers.h>
-#include "crouton/util/MiniOStream.hh"
 
 namespace fleece {
-    using namespace std;
+    using namespace crouton::mini;
 
     namespace internal {
 

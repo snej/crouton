@@ -68,7 +68,7 @@ namespace crouton::io::esp {
             err = AWAIT block;
         if (err) {
             Error error(LWIPError{err});
-            LNet->error("...TCP connection failed: {}", mini::arg(error));
+            LNet->error("...TCP connection failed: {}", error);
             RETURN error;
         }
 
@@ -221,7 +221,7 @@ namespace crouton::io::esp {
                     LNet->debug("...TCPSocket::write unblocked", chunk.size());
                     break;
                 default:
-                    LNet->error("TCPSocket::write -- error {}", mini::arg(err));
+                    LNet->error("TCPSocket::write -- error {}", err);
                     RETURN LWIPError(err);
             }
         }

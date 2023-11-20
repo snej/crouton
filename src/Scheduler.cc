@@ -43,7 +43,7 @@ namespace crouton {
             assert(_visible);
             if (_wakeMe.test_and_set() == false) {
                 _visible = false;
-                LSched->trace("{} unblocked", mini::arg(logCoro{_handle}));
+                LSched->trace("{} unblocked", logCoro{_handle});
                 auto sched = _scheduler;
                 assert(sched);
                 _scheduler = nullptr;
@@ -54,7 +54,7 @@ namespace crouton {
         /// Removes the associated coroutine from the suspended set.
         /// You must call this if the coroutine is destroyed while a Suspension exists.
         void cancel() {
-            LSched->trace("{} Suspension canceled -- forgetting it", mini::arg(logCoro{_handle}));
+            LSched->trace("{} Suspension canceled -- forgetting it", logCoro{_handle});
             assert(_visible);
             _handle = nullptr;
             if (_wakeMe.test_and_set() == false) {
@@ -154,9 +154,9 @@ namespace crouton {
 
         LSched->error("** On this Scheduler:");
         for (auto &r : _ready)
-            LSched->info("ready: {}", mini::arg(logCoro{r}));
+            LSched->info("ready: {}", logCoro{r});
         for (auto &s : *_suspended) {
-            LSched->info("\tsuspended: {}" , mini::arg(logCoro{s.second._handle}));
+            LSched->info("\tsuspended: {}" , logCoro{s.second._handle});
         }
         return false;
     }
@@ -220,7 +220,7 @@ namespace crouton {
         assert(!isWaiting(h));
         if (!isReady(h)) {
             LSched->debug("reschedule {} (behind {} others)",
-                          mini::arg(logCoro{h}), _ready.size());
+                          logCoro{h}, _ready.size());
             _ready.push_back(h);
         }
     }
@@ -252,13 +252,13 @@ namespace crouton {
         } else {
             coro_handle h = _ready.front();
             _ready.pop_front();
-            LSched->debug("resume {}", mini::arg(logCoro{h}));
+            LSched->debug("resume {}", logCoro{h});
             return h;
         }
     }
 
     Suspension Scheduler::suspend(coro_handle h) {
-        LSched->debug("suspend {}", mini::arg(logCoro{h}));
+        LSched->debug("suspend {}", logCoro{h});
         precondition(isCurrent());
         assert(!isReady(h));
         auto [i, added] = _suspended->try_emplace(h.address(), h, this);
@@ -267,7 +267,7 @@ namespace crouton {
     }
 
     void Scheduler::destroying(coro_handle h) {
-        LSched->debug("destroying {}", mini::arg(logCoro{h}));
+        LSched->debug("destroying {}", logCoro{h});
         precondition(isCurrent());
         if (auto i = _suspended->find(h.address()); i != _suspended->end()) {
             SuspensionImpl& sus = i->second;
@@ -286,7 +286,7 @@ namespace crouton {
     
 #ifndef NDEBUG
     void Scheduler::finished(coro_handle h) {
-        LSched->debug("finished {}", mini::arg(logCoro{h}));
+        LSched->debug("finished {}", logCoro{h});
         precondition(isCurrent());
         assert(h.done());
         assert(!isReady(h));
@@ -342,7 +342,7 @@ namespace crouton {
             for (auto i = _suspended->begin(); i != _suspended->end();) {
                 if (i->second._wakeMe.test()) {
                     if (i->second._handle) {
-                        LSched->debug("scheduleWaker({})", mini::arg(logCoro{i->second._handle}));
+                        LSched->debug("scheduleWaker({})", logCoro{i->second._handle});
                         _ready.push_back(i->second._handle);
                     } else {
                         LSched->debug("cleaned up canceled Suspension {}", (void*)&i->second);

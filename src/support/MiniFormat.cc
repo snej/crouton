@@ -26,26 +26,27 @@ namespace crouton::mini {
     void vformat_types(ostream& out, string_view fmt, FmtIDList types, va_list args) {
         auto itype = types;
         size_t pos;
-        while (string::npos != (pos = fmt.find_first_of("{}"))) {
+        string_view rest = fmt;
+        while (string::npos != (pos = rest.find_first_of("{}"))) {
             if (pos > 0)
-                out << fmt.substr(0, pos);
+                out << rest.substr(0, pos);
 
-            if (fmt[pos] == '}') [[unlikely]] {
+            if (rest[pos] == '}') [[unlikely]] {
                 // (The only reason to pay attention to "}" is that the std::format spec says
                 // "}}" is an escape and should be emitted as "}". Otherwise a "} is a syntax
                 // error, but let's just emit it as-is.
                 out << '}';
-                if (pos < fmt.size() - 1 && fmt[pos + 1] == '}')
+                if (pos < rest.size() - 1 && rest[pos + 1] == '}')
                     ++pos;
-                fmt = fmt.substr(pos + 1);
-            } else if (pos < fmt.size() - 1 && fmt[pos + 1] == '{') {
+                rest = rest.substr(pos + 1);
+            } else if (pos < rest.size() - 1 && rest[pos + 1] == '{') {
                 // "{{" is an escape; emit "{".
                 out << '{';
-                fmt = fmt.substr(pos + 2);
+                rest = rest.substr(pos + 2);
             } else {
-                pos = fmt.find('}', pos + 1);
+                pos = rest.find('}', pos + 1);
                 //TODO: Pay attention to at least some formatting specs
-                fmt = fmt.substr(pos + 1);
+                rest = rest.substr(pos + 1);
                 switch( *(itype++) ) {
                     case FmtID::None:       out << "{{{TOO FEW ARGS}}}"; return;
                     case FmtID::Bool:       out << (va_arg(args, int) ? "true" : "false"); break;
@@ -61,13 +62,13 @@ namespace crouton::mini {
                     case FmtID::Pointer:    out << va_arg(args, const void*); break;
                     case FmtID::String:     out << *va_arg(args, const string*); break;
                     case FmtID::StringView: out << *va_arg(args, const string_view*); break;
-                    case FmtID::Arg:        out << *va_arg(args, const arg*); break;
+                    case FmtID::Arg:        arg(args).writeTo(out); break;
                 }
             }
         }
 
-        if (!fmt.empty())
-            out << fmt;
+        if (!rest.empty())
+            out << rest;
         if (*itype != FmtID::None)
             out << "{{{TOO FEW PLACEHOLDERS}}}";
     }

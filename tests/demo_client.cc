@@ -21,6 +21,7 @@
 
 using namespace std;
 using namespace crouton;
+using namespace crouton::mini;
 using namespace crouton::io;
 
 /* NOTE to newbies: this file uses some simple/optional macros that are used everywhere in Crouton
@@ -51,7 +52,7 @@ staticASYNC<int> run() {
     // Read URL argument:
     auto url = args.popFirst();
     if (!url) {
-        std::cerr << "Missing URL";
+        cerr << "Missing URL";
         RETURN 1;
     }
 

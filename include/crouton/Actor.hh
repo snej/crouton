@@ -51,21 +51,21 @@ namespace crouton {
         bool startNew(coro_handle h) const {
             if (_scheduler.isCurrent()) {
                 if (_activeCoro == nullptr) {
-                    Log->info("Actor {} immediately starting {}", (void*)this, mini::arg(logCoro{h}));
+                    Log->info("Actor {} immediately starting {}", (void*)this, logCoro{h});
                     _activeCoro = h;
                     return true;
                 } else {
-                    Log->info("Actor {} queued {}", (void*)this, mini::arg(logCoro{h}));
+                    Log->info("Actor {} queued {}", (void*)this, logCoro{h});
                     _queue.push_back(h);
                 }
             } else {
                 _scheduler.onEventLoop([this,h]{
                     if (_activeCoro == nullptr) {
                         _activeCoro = h;
-                        Log->info("Actor {} scheduled ", (void*)this, mini::arg(logCoro{h}));
+                        Log->info("Actor {} scheduled on {}", (void*)this, logCoro{h});
                         _scheduler.schedule(h);
                     } else {
-                        Log->info("Actor {} queued ", (void*)this, mini::arg(logCoro{h}));
+                        Log->info("Actor {} queued on {}", (void*)this, logCoro{h});
                         _queue.push_back(h);
                     }
                 });
@@ -82,7 +82,7 @@ namespace crouton {
             } else {
                 _activeCoro = _queue.front();
                 _queue.pop_front();
-                Log->info("Actor {} scheduled ", (void*)this, mini::arg(logCoro{h}));
+                Log->info("Actor {} scheduled ", (void*)this, logCoro{h});
                 _scheduler.schedule(_activeCoro);
             }
         }

@@ -29,7 +29,7 @@ namespace crouton {
 
 
     void TaskImpl::unhandled_exception() {
-        LCoro->info("Task {} exiting with exception", mini::arg{logCoro{handle()}});
+        LCoro->info("Task {} exiting with exception", logCoro{handle()});
         lifecycle::threw(_handle);
         _shared->alive = false;
         _shared->done.notify(Error(std::current_exception()));
@@ -37,7 +37,7 @@ namespace crouton {
 
 
     void TaskImpl::return_void() {
-        LCoro->info("Task {} finished", mini::arg{logCoro{handle(), true}});
+        LCoro->info("Task {} finished", logCoro{handle(), true});
         lifecycle::returning(handle());
         _shared->alive = false;
         _shared->done.notify(noerror);

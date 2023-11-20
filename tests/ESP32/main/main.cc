@@ -83,7 +83,7 @@ staticASYNC<void> testBLIP() {
 
     blip::Connection blip(std::move(ws), false, {
         {"changes", [&](blip::MessageInRef msg) {
-            Log->info("*** demo_blipclient received {}", minifmt::write{*msg});
+            Log->info("*** demo_blipclient received {}", *msg);
             if (msg->canRespond()) {
                 blip::MessageBuilder response;
                 response << "[]";
@@ -97,7 +97,7 @@ staticASYNC<void> testBLIP() {
     blip::MessageBuilder msg("subChanges");
     blip::MessageInRef reply = AWAIT blip.sendRequest(msg);
 
-    Log->info("*** demo_blipclient got reply to its `subChanges`: {}", minifmt::write{*reply});
+    Log->info("*** demo_blipclient got reply to its `subChanges`: {}", *reply);
 
     AWAIT gotChanges;
 

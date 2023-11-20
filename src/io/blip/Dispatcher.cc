@@ -62,7 +62,7 @@ namespace crouton::io::blip {
         }
 
         LBLIP->error(mini::format("Error {} `{}` handling BLIP request {}",
-                                 mini::arg(err), exceptionMessage, mini::arg(*msg)));
+                                 err, exceptionMessage, *msg));
         msg->respondWithError(mapError(err));
     }
 

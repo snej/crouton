@@ -37,15 +37,14 @@ namespace crouton {
     coro_handle CoCondition::awaiter::await_suspend(coro_handle h) noexcept {
         _suspension = Scheduler::current().suspend(h);
         LSched->debug("CoCondition {}: suspending {}",
-                      (void*)this, mini::arg(logCoro{h}));
+                      (void*)this, logCoro{h});
         _cond->_awaiters.push_back(*this);
         return lifecycle::suspendingTo(h, CRTN_TYPEID(*_cond), _cond);
     }
 
 
     void CoCondition::awaiter::wakeUp() {
-        LSched->debug("CoCondition {}: waking {}",
-                      (void*)_cond, mini::arg(logCoro{_suspension.handle()}));
+        LSched->debug("CoCondition {}: waking {}", (void*)_cond, logCoro{_suspension.handle()});
         _suspension.wakeUp();
     }
 

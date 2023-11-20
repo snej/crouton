@@ -55,7 +55,7 @@ staticASYNC<void> serveWebSocket(http::Handler::Request const& req, http::Handle
     Generator<ws::Message> rcvr = socket.receive();
     Result<ws::Message> msg;
     while ((msg = AWAIT rcvr)) {
-        Log->info("\treceived {}", minifmt::write(msg));
+        Log->info("\treceived {}", msg);
         switch (msg->type) {
             case ws::Message::Text:
             case ws::Message::Binary:

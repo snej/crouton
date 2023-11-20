@@ -130,7 +130,7 @@ namespace crouton::io::blip {
 
     MessageIn::~MessageIn() {
         if (!_responded && !isResponse() && !noReply())
-            LBLIP->warn("Incoming message {} was not responded to!", mini::arg(*this));
+            LBLIP->warn("Incoming message {} was not responded to!", *this);
     }
 
 
@@ -208,7 +208,7 @@ namespace crouton::io::blip {
                 crouton::Error::raise(ProtocolError::InvalidFrame, "message ends before end of properties");
             _complete = true;
             state = kEnd;
-            LBLIP->info("Finished receiving {}", mini::arg(*this));
+            LBLIP->info("Finished receiving {}", *this);
             if (_onResponse) {
                 auto ref = static_pointer_cast<MessageIn>(this->shared_from_this());
                 _onResponse->setResult(ref);

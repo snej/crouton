@@ -146,6 +146,7 @@ add_library( LibCrouton STATIC
     src/support/Logger.cc
     src/support/Logging.cc
     src/support/MiniFormat.cc
+    src/support/MiniOStream.cc
     src/support/StringUtils.cc
     src/support/Varint.cc
 )

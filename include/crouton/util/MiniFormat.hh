@@ -32,9 +32,6 @@ namespace crouton::mini {
     using std::string;
     using std::string_view;
 
-    class arg;
-
-
     namespace i {
         // Enumeration identifying all formattable types.
         enum class FmtID : uint8_t {
@@ -55,12 +52,15 @@ namespace crouton::mini {
             Arg,
         };
 
+        class arg;
+
         using enum FmtID;
 
         // This maps types to FmtID values. Every formattable type needs an entry here.
         template <typename T> struct Formatting { };
         template<> struct Formatting<bool>              { static constexpr FmtID id = Bool; };
         template<> struct Formatting<char>              { static constexpr FmtID id = Char; };
+        template<> struct Formatting<signed char>       { static constexpr FmtID id = Char; };
         template<> struct Formatting<unsigned char>     { static constexpr FmtID id = UInt; };
         template<> struct Formatting<short>             { static constexpr FmtID id = Int; };
         template<> struct Formatting<unsigned short>    { static constexpr FmtID id = UInt; };
@@ -74,25 +74,17 @@ namespace crouton::mini {
         template<> struct Formatting<double>            { static constexpr FmtID id = Double; };
         template<> struct Formatting<const char*>       { static constexpr FmtID id = CString; };
         template<> struct Formatting<char*>             { static constexpr FmtID id = CString; };
+        template<> struct Formatting<const void*>       { static constexpr FmtID id = Pointer; };
         template<> struct Formatting<void*>             { static constexpr FmtID id = Pointer; };
         template<> struct Formatting<std::string>       { static constexpr FmtID id = String; };
         template<> struct Formatting<std::string_view>  { static constexpr FmtID id = StringView; };
         template<> struct Formatting<arg>               { static constexpr FmtID id = Arg; };
+        template <ostreamable T> struct Formatting<T>   { static constexpr FmtID id = Arg; };
 
         // Returns the FmtID value corresponding to the type of its argument.
         template <typename T>
         consteval FmtID getFmtID(T&&) { return Formatting<std::decay_t<T>>::id; }
-
-        // Transforms args before they're passed to `format`.
-        // Makes sure non-basic types, like `std::string`, are passed by pointer.
-        template <std::integral T>          auto passArg(T t)         {return t;}
-        template <std::floating_point T>    auto passArg(T t)         {return t;}
-        template <typename T>               auto passArg(T const* t)  {return t;}
-        template <typename T>               auto passArg(T* t)        {return t;}
-        template <typename T>               auto passArg(T const& t)
-                            requires (!std::integral<T> && !std::floating_point<T>) {return &t;}
     }
-
 
     /** The concept `Formattable` defines what types can be passed as args to `format`. */
     template <typename T>
@@ -105,6 +97,53 @@ namespace crouton::mini {
         static constexpr i::FmtID ids[] {i::Formatting<std::decay_t<Args>>::id... , i::FmtID::None};
     };
     using FmtIDList = i::FmtID const*;
+
+
+    namespace i {
+        // Struct that type-erases an `ostreamable` value; passed as arg to formatting fns.
+        class arg {
+        public:
+            template <ostreamable T>
+            explicit arg(T &&value)
+            :_ptr(reinterpret_cast<const void*>(&value))
+            ,_write(&writeFn<std::remove_cvref_t<T>>)
+            { }
+
+            explicit arg(va_list& args)
+            :_ptr(va_arg(args, const void*))
+            ,_write(va_arg(args, writeFn_t))
+            { }
+
+            void writeTo(ostream& out) const                        {_write(out, _ptr);}
+
+            // for compatibility with std::fmt or spdlog, this object can itself be written
+            //friend ostream& operator<< (ostream& out, arg const& f) {f.writeTo(out); return out;}
+        private:
+            using writeFn_t = void (*)(ostream&, const void*);
+
+            template <typename T>
+            static void writeFn(ostream& out, const void* ptr) { out << *(const T*)ptr; }
+
+            const void* _ptr;                       // address of value -- type-erased T*
+            writeFn_t   _write;                     // pointer to writeFn<T>()
+        };
+
+        // Transforms args before they're passed as varargs to `format`.
+        template <std::integral T>       auto passArg(T t)  {return t;}
+        template <std::floating_point T> auto passArg(T t)  {return t;}
+        inline auto passArg(char* t)                        {return t;}
+        inline auto passArg(const char* t)                  {return t;}
+        inline auto passArg(void* t)                        {return t;}
+        inline auto passArg(const void* t)                  {return t;}
+        inline auto passArg(std::string const& t)           {return &t;}
+        inline auto passArg(std::string_view const& t)      {return &t;}
+        inline auto passArg(arg const& t)                   {return t;}
+
+        template <ostreamable T>
+        requires (i::Formatting<T>::id == FmtID::Arg)
+        auto passArg(T const& t)                            {return arg{t};}
+    }
+
 
     // The core formatting functions:
     void format_types(ostream&, string_view fmt, FmtIDList types, ...);
@@ -130,31 +169,4 @@ namespace crouton::mini {
     string format(string_view fmt, Args &&...args) {
         return format_types(fmt, FmtIDs<Args...>::ids, i::passArg(args)...);
     }
-
-
-    /** Struct that can be wrapped around an argument to `format()`.
-        Works with any type that can be written to an ostream with `<<`. 
-        @note This is just a temporary workaround. */
-    class arg {
-    public:
-        template <ostreamable T>
-        explicit arg(T &&value)
-        :_ptr(reinterpret_cast<const void*>(&value))
-        ,_write(&writeFn<std::remove_reference_t<T>>)
-        { }
-
-        // for compatibility with std::fmt or spdlog, this object can itself be written
-        friend ostream& operator<< (ostream& out, arg const& f) {
-            f._write(out, f._ptr);
-            return out;
-        }
-    private:
-        template <typename T>
-        static void writeFn(ostream& out, const void* ptr) { out << *(const T*)ptr; }
-
-        const void* _ptr;                       // address of value -- type-erased T*
-        void (*_write)(ostream&, const void*);  // pointer to writeFn<T>()
-    };
-
-
 }

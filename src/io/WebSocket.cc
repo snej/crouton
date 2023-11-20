@@ -175,7 +175,7 @@ namespace crouton::io::ws {
             return close();
         } else {
             // Peer is initiating a close; echo it:
-            LNet->warn("Peer sent {}; echoing it", mini::arg(msg));
+            LNet->warn("Peer sent {}; echoing it", msg);
             return send(std::move(msg));
         }
     }
