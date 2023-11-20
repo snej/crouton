@@ -71,7 +71,7 @@ namespace crouton {
         //TODO: Make this fully thread-safe
         if (_suspension) {
             LCoro->info("Future dealloced with _suspension of {}",
-                        minifmt::write(logCoro{_suspension.handle()}));
+                        mini::arg(logCoro{_suspension.handle()}));
             State state = Waiting;
             _state.compare_exchange_strong(state, Empty);
             _suspension.cancel();

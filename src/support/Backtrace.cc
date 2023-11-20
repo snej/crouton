@@ -19,9 +19,8 @@
 #include "support/Backtrace.hh"
 #include <csignal>
 #include <exception>
-#include <iostream>
+#include "crouton/util/MiniOStream.hh"
 #include <mutex>
-#include <sstream>
 #include <string.h>
 #include <algorithm>
 #include "crouton/util/betterassert.hh"
@@ -32,6 +31,8 @@
 
 namespace fleece {
     using namespace std;
+    using ostream = crouton::mini::ostream;
+    using stringstream = crouton::mini::stringstream;
 
 
     string Unmangle(const char *name) {
@@ -126,9 +127,9 @@ namespace fleece {
                     writeCrashLog(out);
                     sLogger(out.str());
                 } else {
-                    cerr << "\n\n******************** C++ fatal error ********************\n";
-                    writeCrashLog(cerr);
-                    cerr << "\n******************** Now terminating ********************\n";
+                    crouton::mini::cerr << "\n\n******************** C++ fatal error ********************\n";
+                    writeCrashLog(crouton::mini::cerr);
+                    crouton::mini::cerr << "\n******************** Now terminating ********************\n";
                 }
                 // Chain to old handler:
                 sOldHandler();

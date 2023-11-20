@@ -61,4 +61,8 @@ namespace crouton {
 
     template <typename T> using FutureProvider = std::shared_ptr<FutureState<T>>;
 
+    namespace mini {
+        class ostream;
+        class sstream;
+    }
 }

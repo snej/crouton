@@ -15,7 +15,7 @@
 
 #include <functional>
 #include <initializer_list>
-#include <sstream>
+#include "crouton/util/MiniOStream.hh"
 
 namespace crouton::io::blip {
 
@@ -93,15 +93,15 @@ namespace crouton::io::blip {
         friend class MessageIn;
         friend class MessageOut;
 
-        static void writeTokenizedString(std::ostream& out, string_view str);
+        static void writeTokenizedString(ostream& out, string_view str);
 
         MessageType type{kRequestType};
 
       private:
         void finishProperties();
 
-        std::stringstream   _out;                     // The message
-        std::stringstream   _properties;              // Accumulates encoded properties
+        stringstream   _out;                     // The message
+        stringstream   _properties;              // Accumulates encoded properties
         bool                _wroteProperties{false};  // Have _properties been written to _out yet?
     };
 

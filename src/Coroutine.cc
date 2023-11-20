@@ -22,7 +22,7 @@
 #include "crouton/Scheduler.hh"
 
 #include <charconv>
-#include <iostream>
+#include "crouton/util/MiniOStream.hh"
 
 namespace crouton {
     using namespace std;
@@ -81,7 +81,7 @@ namespace crouton {
     }
 
 
-    std::ostream& operator<< (std::ostream& out, coro_handle h) {
+    ostream& operator<< (ostream& out, coro_handle h) {
         if (!h)
             return out << "¢null";
         else if (isNoop(h))
@@ -90,7 +90,7 @@ namespace crouton {
             return out << "¢" << lifecycle::getSequence(h);
     }
 
-    std::ostream& operator<<(std::ostream& out, logCoro lc) {
+    ostream& operator<<(ostream& out, logCoro lc) {
         if (lc.verbose)
             return out << CoroutineName(lc.h);
         else

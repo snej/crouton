@@ -36,7 +36,7 @@ static Generator<int64_t> fibonacci(int64_t limit, bool slow = false) {
     YIELD a;
     while (b <= limit) {
         YIELD b;
-        tie(a, b) = pair{b, a + b};
+        std::tie(a, b) = std::pair{b, a + b};
         if (slow)
             AWAIT Timer::sleep(0.05);
     }
@@ -57,7 +57,7 @@ static Generator<int64_t> onlyEven(Generator<int64_t> source) {
 // Converts int to string
 static Generator<string> toString(Generator <int64_t> source) {
     while (Result<int64_t> value = AWAIT source) {
-        YIELD to_string(*value) + "i";
+        YIELD std::to_string(*value) + "i";
     }
 }
 
@@ -65,14 +65,14 @@ static Generator<string> toString(Generator <int64_t> source) {
 TEST_CASE("Generator", "[generator]") {
     RunCoroutine([]() -> Future<void> {
         Generator<int64_t> fib = fibonacci(100);
-        vector<int64_t> results;
+        std::vector<int64_t> results;
         Result<int64_t> n;
         while ((n = AWAIT fib)) {
             cerr << n << ' ';
             results.push_back(n.value());
         }
         cerr << endl;
-        CHECK(results == vector<int64_t>{ 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89 });
+        CHECK(results == std::vector<int64_t>{ 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89 });
         RETURN noerror;
     });
     REQUIRE(Scheduler::current().assertEmpty());
@@ -82,13 +82,13 @@ TEST_CASE("Generator", "[generator]") {
 TEST_CASE("Generator without coroutine", "[generator]") {
     {
         Generator<int64_t> fib = fibonacci(100);
-        vector<int64_t> results;
+        std::vector<int64_t> results;
         for (int64_t n : fib) {
             cerr << n << ' ';
             results.push_back(n);
         }
         cerr << endl;
-        CHECK(results == vector<int64_t>{ 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89 });
+        CHECK(results == std::vector<int64_t>{ 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89 });
     }
     REQUIRE(Scheduler::current().assertEmpty());
 }
@@ -101,7 +101,7 @@ TEST_CASE("Generators", "[generator]") {
         
         cerr << "Calling Generator...\n";
         
-        vector<string> results;
+        std::vector<string> results;
         int n = 0;
         for (string const& value : fib) {
             results.push_back(value);
@@ -113,7 +113,7 @@ TEST_CASE("Generators", "[generator]") {
         }
         
         cerr << "Done!\n";
-        CHECK(results == vector<string>{ "2i", "8i", "34i", "144i", "610i", "2584i", "10946i", "46368i" });
+        CHECK(results == std::vector<string>{ "2i", "8i", "34i", "144i", "610i", "2584i", "10946i", "46368i" });
     }
     REQUIRE(Scheduler::current().assertEmpty());
 }

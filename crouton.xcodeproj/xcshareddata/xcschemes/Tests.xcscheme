@@ -63,11 +63,19 @@
             argument = "--break"
             isEnabled = "YES">
          </CommandLineArgument>
+         <CommandLineArgument
+            argument = "[codec]"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "&quot;BLIP MessageBuilder&quot;"
+            isEnabled = "NO">
+         </CommandLineArgument>
       </CommandLineArguments>
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "CROUTON_LOG_LEVEL"
-            value = "info"
+            value = "info,Zip=trace"
             isEnabled = "NO">
          </EnvironmentVariable>
          <EnvironmentVariable

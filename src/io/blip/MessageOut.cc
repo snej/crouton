@@ -18,6 +18,7 @@
 
 namespace crouton::io::blip {
     using namespace std;
+    using namespace crouton::mini;
 
     MessageOut::MessageOut(BLIPIO* connection, FrameFlags flags, string payload,
                            MessageNo number)
@@ -129,7 +130,7 @@ namespace crouton::io::blip {
     }
 
 
-    void MessageOut::dump(std::ostream& out, bool withBody) {
+    void MessageOut::dump(ostream& out, bool withBody) {
         auto [props, body] = getPropsAndBody();
         Message::dump(props, body, withBody, out);
     }

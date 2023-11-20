@@ -60,9 +60,9 @@ namespace crouton::io::blip {
         const char* typeName() const { return kMessageTypeNames[type()]; }
         virtual void disconnected() { }
 
-        void dump(ConstBytes payload, ConstBytes body, bool withBody, std::ostream&);
-        void dumpHeader(std::ostream&) const;
-        void writeDescription(ConstBytes payload, std::ostream&) const;
+        void dump(ConstBytes payload, ConstBytes body, bool withBody, ostream&);
+        void dumpHeader(ostream&) const;
+        void writeDescription(ConstBytes payload, ostream&) const;
         static const char* findProperty(ConstBytes payload, const char* propertyName);
 
         FrameFlags              _flags;
@@ -111,7 +111,7 @@ namespace crouton::io::blip {
             This is a no-op if the message was sent NoReply. */
         void notHandled();
 
-        void dump(std::ostream& out, bool withBody) {
+        void dump(ostream& out, bool withBody) {
             Message::dump(ConstBytes(_properties), ConstBytes(_body), withBody, out);
         }
 
@@ -119,7 +119,7 @@ namespace crouton::io::blip {
                   FutureProvider<std::shared_ptr<MessageIn>> onResponse = nullptr);
         ~MessageIn() override;
 
-        friend std::ostream& operator<< (std::ostream &out, MessageIn const& msg) {
+        friend ostream& operator<< (ostream &out, MessageIn const& msg) {
             msg.writeDescription(ConstBytes(msg._properties), out);
             return out;
         }

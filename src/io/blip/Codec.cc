@@ -134,7 +134,7 @@ namespace crouton::io::blip {
 
     void ZlibCodec::check(int ret) const {
         if (ret < 0 && ret != Z_BUF_ERROR) {
-            string msg = minifmt::format("zlib error {}: {}", ret, (_z.msg ? _z.msg : "???"));
+            string msg = mini::format("zlib error {}: {}", ret, (_z.msg ? _z.msg : "???"));
             Error::raise(ProtocolError::CompressionError, msg);
         }
     }

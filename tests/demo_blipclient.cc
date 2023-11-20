@@ -18,12 +18,13 @@
 
 #include "crouton/Crouton.hh"
 #include "crouton/io/blip/BLIP.hh"
-#include <iostream>
+#include "crouton/util/MiniOStream.hh"
 #include <vector>
 
 using namespace std;
 using namespace crouton;
 using namespace crouton::io;
+using namespace crouton::mini;
 
 /* NOTE to newbies: this file uses some simple/optional macros that are used everywhere in Crouton
    to highlight suspend points and use of asynchronous code:
@@ -54,7 +55,7 @@ staticASYNC<int> run() {
     // Read URL argument:
     auto url = args.popFirst();
     if (!url) {
-        std::cerr << "Missing URL";
+        cerr << "Missing URL";
         RETURN 1;
     }
 

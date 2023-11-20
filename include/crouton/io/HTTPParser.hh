@@ -56,8 +56,8 @@ namespace crouton::io::http {
         OPTIONS,
     };
 
-    std::ostream& operator<< (std::ostream&, Status);
-    std::ostream& operator<< (std::ostream&, Method);
+    ostream& operator<< (ostream&, Status);
+    ostream& operator<< (ostream&, Method);
 
 
     /// A map of HTTP header names->values. Inherits from `unordered_map`.

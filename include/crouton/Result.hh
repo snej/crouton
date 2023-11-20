@@ -125,7 +125,7 @@ namespace crouton {
         TT* operator->()             requires (!std::is_void_v<T>)  {return &value();}
 
         /// Writes either the value or the error to the stream.
-        friend std::ostream& operator<<(std::ostream& out, Result const& r) {
+        friend ostream& operator<<(ostream& out, Result const& r) {
             if (r.ok()) {
                 return out << std::get<T>(r._value);
             } else {

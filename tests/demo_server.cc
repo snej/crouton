@@ -21,7 +21,7 @@
 #include "crouton/util/Logging.hh"
 #include <functional>
 #include <iomanip>
-#include <iostream>
+#include "crouton/util/MiniOStream.hh"
 #include <memory>
 
 using namespace std;
@@ -74,7 +74,7 @@ staticASYNC<void> serveWebSocket(http::Handler::Request const& req, http::Handle
 }
 
 
-static vector<http::Handler::Route> sRoutes = {
+static std::vector<http::Handler::Route> sRoutes = {
     {http::Method::GET, regex("/"),     serveRoot},
     {http::Method::GET, regex("/ws/?"), serveWebSocket},
 };

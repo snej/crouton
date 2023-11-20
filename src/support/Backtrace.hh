@@ -18,12 +18,14 @@
 
 #pragma once
 #include <functional>
-#include <iosfwd>
 #include <memory>
 #include <string>
 #include <typeinfo>
 #include <vector>
 
+namespace crouton::mini {
+    class ostream;
+}
 namespace fleece {
 
     /** Captures a backtrace of the current thread, and can convert it to human-readable form. */
@@ -41,7 +43,7 @@ namespace fleece {
         void skip(unsigned nFrames);
 
         /// Writes the human-readable backtrace to a stream.
-        bool writeTo(std::ostream&) const;
+        bool writeTo(crouton::mini::ostream&) const;
 
         /// Returns the human-readable backtrace.
         std::string toString() const;
@@ -75,7 +77,7 @@ namespace fleece {
     private:
         void _capture(unsigned skipFrames =0, unsigned maxFrames =50);
         char* printFrame(unsigned i) const;
-        static void writeCrashLog(std::ostream&);
+        static void writeCrashLog(crouton::mini::ostream&);
 
         std::vector<void*> _addrs;          // Array of PCs in backtrace, top first
     };

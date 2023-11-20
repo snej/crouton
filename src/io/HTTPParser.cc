@@ -22,7 +22,7 @@
 #include "support/StringUtils.hh"
 #include "llhttp.h"
 
-#include <iostream>
+#include "crouton/util/MiniOStream.hh"
 
 namespace crouton {
     string ErrorDomainInfo<io::http::Status>::description(errorcode_t code) {
@@ -34,11 +34,11 @@ namespace crouton::io::http {
     using namespace std;
 
 
-    std::ostream& operator<< (std::ostream& out, Status status) {
+    ostream& operator<< (ostream& out, Status status) {
         return out << llhttp_status_name(llhttp_status_t(status));
     }
 
-    std::ostream& operator<< (std::ostream& out, Method method) {
+    ostream& operator<< (ostream& out, Method method) {
         return out << llhttp_method_name(llhttp_method_t(method));
     }
 

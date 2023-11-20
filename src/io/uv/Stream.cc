@@ -203,7 +203,7 @@ namespace crouton::io {
                 _readFuture->setResult(nullptr);
             } else {
                 Error error(uv::UVError{err}, "reading from the network");
-                LNet->error("Stream read error: {}", minifmt::write{error});
+                LNet->error("Stream read error: {}", mini::arg{error});
                 _readFuture->setError(error);
             }
             _readFuture = nullptr;

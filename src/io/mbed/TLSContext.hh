@@ -96,7 +96,7 @@
 #elif defined(_WIN32)
     // Windows:
     #include <wincrypt.h>
-    #include <sstream>
+    #include "crouton/util/MiniOStream.hh"
     #pragma comment (lib, "crypt32.lib")
     #pragma comment (lib, "cryptui.lib")
 #else
@@ -105,8 +105,7 @@
     #include <fcntl.h>
     #include <fnmatch.h>
     #include <fstream>
-    #include <iostream>
-    #include <sstream>
+    #include "crouton/util/MiniOStream.hh"
     #include <sys/stat.h>
 #endif
 

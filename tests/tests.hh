@@ -18,12 +18,12 @@
 
 #include "crouton/Crouton.hh"
 #include "crouton/util/Logging.hh"
-#include <iostream>
+#include "crouton/util/MiniOStream.hh"
 
 #include "catch_amalgamated.hpp"
 
-using namespace std;
 using namespace crouton;
+using namespace crouton::mini;
 
 
 // Runs a coroutine that returns `Future<void>`, returning once it's completed.

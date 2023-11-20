@@ -79,9 +79,9 @@ namespace crouton::io::ws {
         string_view closeMessage() const;  ///< If type==Close, this is the status message
     };
 
-    std::ostream& operator<< (std::ostream&, Message::Type);
-    std::ostream& operator<< (std::ostream&, Message const&);
-    std::ostream& operator<< (std::ostream&, CloseCode);
+    ostream& operator<< (ostream&, Message::Type);
+    ostream& operator<< (ostream&, Message const&);
+    ostream& operator<< (ostream&, CloseCode);
 
 
     /** Abstract base class of WebSocket connections. */

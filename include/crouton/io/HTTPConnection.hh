@@ -68,7 +68,7 @@ namespace crouton::io::http {
 
         /// Writes the request line & headers for transmission.
         /// Doesn't include the trailing CRLF after the headers, so more can be appended.
-        friend std::ostream& operator<< (std::ostream&, Request const&);
+        friend ostream& operator<< (ostream&, Request const&);
     };
 
 

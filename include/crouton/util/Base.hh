@@ -17,7 +17,6 @@
 //
 
 #pragma once
-#include <iosfwd>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -85,6 +84,13 @@ namespace crouton {
     using std::string_view;
 
     using coro_handle = CORO_NS::coroutine_handle<>;
+
+    namespace mini {
+        class ostream;
+        class stringstream;
+    }
+    using ostream = crouton::mini::ostream;
+    using stringstream = crouton::mini::stringstream;
 
 
     // `is_type_complete_v<T>` evaluates to true iff T is a complete (fully-defined) type.

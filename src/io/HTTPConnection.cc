@@ -20,14 +20,15 @@
 #include "crouton/io/ISocket.hh"
 #include "Internal.hh"
 #include "llhttp.h"
-#include <sstream>
+#include "crouton/util/MiniOStream.hh"
 
 namespace crouton::io::http {
     using namespace std;
     using namespace crouton::io;
+    using namespace crouton::mini;
 
 
-    std::ostream& operator<< (std::ostream& out, Request const& req) {
+    ostream& operator<< (ostream& out, Request const& req) {
         out << llhttp_method_name(llhttp_method_t(req.method)) << ' ';
         if (!req.uri.starts_with('/'))
             out << '/';

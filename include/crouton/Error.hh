@@ -111,7 +111,7 @@ namespace crouton {
         string brief() const;
 
         /// Writes an error's description to a stream.
-        friend std::ostream& operator<< (std::ostream&, Error const&);
+        friend ostream& operator<< (ostream&, Error const&);
 
         /// True if there is an error, false if none.
         explicit operator bool() const Pure      {return _code != 0;}

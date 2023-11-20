@@ -14,7 +14,7 @@
 #include "crouton/io/blip/Message.hh"
 #include "crouton/io/blip/MessageBuilder.hh"
 #include "crouton/CroutonFwd.hh"
-#include <ostream>
+#include "crouton/util/MiniOStream.hh"
 
 namespace crouton::io::blip {
     class BLIPIO;
@@ -35,7 +35,7 @@ namespace crouton::io::blip {
             _flags = builder.flags();  // finish() may update the flags, so set them after
         }
 
-        friend std::ostream& operator<< (std::ostream &out, MessageOut const& msg) {
+        friend ostream& operator<< (ostream &out, MessageOut const& msg) {
             msg.writeDescription(ConstBytes(msg.getPropsAndBody().first), out);
             return out;
         }
@@ -57,7 +57,7 @@ namespace crouton::io::blip {
 
         // for debugging/logging:
         std::string description();
-        void        dump(std::ostream& out, bool withBody);
+        void        dump(ostream& out, bool withBody);
         const char* findProperty(const char* propertyName);
 
     private:

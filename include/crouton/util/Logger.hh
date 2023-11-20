@@ -46,40 +46,40 @@ namespace crouton::log {
         void set_level(level::level_enum level)              {_level = level;}
         bool should_log(level::level_enum level) const Pure  {return level >= _level;}
 
-        template<minifmt::Formattable... Args>
+        template<mini::Formattable... Args>
         void log(level::level_enum lvl, string_view fmt, Args &&...args) {
             if (should_log(lvl)) [[unlikely]]
-                _log(lvl, fmt, minifmt::FmtIDs<Args...>::ids, minifmt::passArg(args)...);
+                _log(lvl, fmt, mini::FmtIDs<Args...>::ids, mini::i::passArg(args)...);
         }
 
         void log(level::level_enum lvl, string_view msg);
 
-        template<minifmt::Formattable... Args>
+        template<mini::Formattable... Args>
         void trace(string_view fmt, Args &&...args) {
             log(level::trace, fmt, std::forward<Args>(args)...);
         }
 
-        template<minifmt::Formattable... Args>
+        template<mini::Formattable... Args>
         void debug(string_view fmt, Args &&...args) {
             log(level::debug, fmt, std::forward<Args>(args)...);
         }
 
-        template<minifmt::Formattable... Args>
+        template<mini::Formattable... Args>
         void info(string_view fmt, Args &&...args) {
             log(level::info, fmt, std::forward<Args>(args)...);
         }
 
-        template<minifmt::Formattable... Args>
+        template<mini::Formattable... Args>
         void warn(string_view fmt, Args &&...args) {
             log(level::warn, fmt, std::forward<Args>(args)...);
         }
 
-        template<minifmt::Formattable... Args>
+        template<mini::Formattable... Args>
         void error(string_view fmt, Args &&...args) {
             log(level::err, fmt, std::forward<Args>(args)...);
         }
 
-        template<minifmt::Formattable... Args>
+        template<mini::Formattable... Args>
         void critical(string_view fmt, Args &&...args) {
             log(level::critical, fmt, std::forward<Args>(args)...);
         }
@@ -95,7 +95,7 @@ namespace crouton::log {
         static void set_output(Sink);
 
     private:
-        void _log(level::level_enum, string_view fmt, minifmt::FmtIDList, ...);
+        void _log(level::level_enum, string_view fmt, mini::FmtIDList, ...);
         void _writeHeader(level::level_enum);
         void load_env_level();
 

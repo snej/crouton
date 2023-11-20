@@ -19,11 +19,10 @@
 #ifdef _WIN32
 
 #include "support/Backtrace.hh"
+#include "crouton/util/MiniOStream.hh"
 #include <csignal>
 #include <exception>
-#include <iostream>
 #include <mutex>
-#include <sstream>
 #include <string.h>
 #include <algorithm>
 #include "crouton/util/betterassert.hh"
@@ -32,10 +31,11 @@
 #include <Windows.h>
 #include <Dbghelp.h>
 #include "asprintf.h"
-#include <sstream>
-using namespace std;
 
 namespace fleece {
+    using namespace std;
+    using ostream = crouton::mini::ostream;
+    using stringstream = crouton::mini::stringstream;
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
     namespace internal {
@@ -99,7 +99,7 @@ namespace fleece {
         int backtrace(void** buffer, size_t max) {return 0;}
     }
 
-    bool Backtrace::writeTo(std::ostream&) const  {return false;}
+    bool Backtrace::writeTo(mini::ostream&) const  {return false;}
 #endif
 
 

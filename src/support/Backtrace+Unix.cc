@@ -21,7 +21,7 @@
 #include "support/Backtrace.hh"
 #include "support/StringUtils.hh"
 #include "crouton/util/betterassert.hh"
-#include <iostream>
+#include "crouton/util/MiniOStream.hh"
 
 #include <dlfcn.h>          // dladdr()
 
@@ -45,6 +45,8 @@
 
 namespace fleece {
     using namespace std;
+    using ostream = crouton::mini::ostream;
+    using stringstream = crouton::mini::stringstream;
 
 
     namespace internal {

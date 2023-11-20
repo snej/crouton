@@ -14,8 +14,8 @@
 #include "crouton/io/blip/BLIPIO.hh"
 #include "crouton/io/blip/Protocol.hh"
 #include "support/StringUtils.hh"
+#include "crouton/util/MiniOStream.hh"
 #include "crouton/util/Varint.hh"
-#include <ostream>
 
 namespace crouton::io::blip {
     using namespace std;

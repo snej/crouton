@@ -21,19 +21,18 @@
 #include "support/StringUtils.hh"
 #include "crouton/io/FileStream.hh"
 
-using namespace std;
 using namespace crouton;
 using namespace crouton::ps;
 
 
 TEST_CASE("Emitter and Collector", "[pubsub]") {
     RunCoroutine([]() -> Future<void> {
-        auto emit = make_shared<Emitter<string>>(initializer_list<string>{"hello", "world", "...", "goodbye"});
+        auto emit = std::make_shared<Emitter<string>>(std::initializer_list<string>{"hello", "world", "...", "goodbye"});
         Collector<string> collect(emit);
         collect.start();
 
         Scheduler::current().runUntil( [&] {return collect.done(); });
-        CHECK(collect.items() == vector<string>{"hello", "world", "...", "goodbye" });
+        CHECK(collect.items() == std::vector<string>{"hello", "world", "...", "goodbye" });
         RETURN noerror;
     });
     REQUIRE(Scheduler::current().assertEmpty());
@@ -42,9 +41,9 @@ TEST_CASE("Emitter and Collector", "[pubsub]") {
 
 TEST_CASE("Transformer", "[pubsub]") {
     RunCoroutine([]() -> Future<void> {
-        auto emit = make_shared<Emitter<int>>(initializer_list<int>{1, 2, 4, 8, 16, 32});
+        auto emit = std::make_shared<Emitter<int>>(std::initializer_list<int>{1, 2, 4, 8, 16, 32});
 
-        auto xform = make_shared<Transformer<int,string>>([](Result<int> in) -> Result<string> {
+        auto xform = std::make_shared<Transformer<int,string>>([](Result<int> in) -> Result<string> {
             if (in.ok())
                 return std::to_string(in.value());
             else
@@ -56,7 +55,7 @@ TEST_CASE("Transformer", "[pubsub]") {
         collect.start();
 
         Scheduler::current().runUntil( [&] {return collect.done(); });
-        CHECK(collect.items() == vector<string>{"1", "2", "4", "8", "16", "32"});
+        CHECK(collect.items() == std::vector<string>{"1", "2", "4", "8", "16", "32"});
         RETURN noerror;
     });
     REQUIRE(Scheduler::current().assertEmpty());
@@ -65,14 +64,14 @@ TEST_CASE("Transformer", "[pubsub]") {
 
 TEST_CASE("Filter", "[pubsub]") {
     RunCoroutine([]() -> Future<void> {
-        auto collect = Emitter<int>(initializer_list<int>{1, 2, 3, 4, 5, 6})
+        auto collect = Emitter<int>(std::initializer_list<int>{1, 2, 3, 4, 5, 6})
                      | Filter<int>([](int i) {return i % 2 == 0;})
                      | Collector<int>{};
         collect.start();
 
         Scheduler::current().runUntil( [&] {return collect.done(); });
 
-        CHECK(collect.items() == vector<int>{2, 4, 6});
+        CHECK(collect.items() == std::vector<int>{2, 4, 6});
         RETURN noerror;
     });
     REQUIRE(Scheduler::current().assertEmpty());
@@ -82,10 +81,10 @@ TEST_CASE("Filter", "[pubsub]") {
 TEST_CASE("BaseConnector", "[pubsub]") {
     static constexpr size_t kNSubscribers = 3;
     RunCoroutine([]() -> Future<void> {
-        auto emit = make_shared<Emitter<int>>(initializer_list<int>{1, 2, 3, 4, 5, 6});
+        auto emit = std::make_shared<Emitter<int>>(std::initializer_list<int>{1, 2, 3, 4, 5, 6});
         auto connect = make_shared<BaseConnector<int>>(emit);
 
-        vector<Collector<int>> colls(kNSubscribers);
+        std::vector<Collector<int>> colls(kNSubscribers);
         for (auto &coll : colls) {
             coll.subscribeTo(emit);
             coll.start();
@@ -101,7 +100,7 @@ TEST_CASE("BaseConnector", "[pubsub]") {
         int i = 0;
         for (auto &coll : colls) {
             INFO("colls[" << i++ << "]");
-            CHECK(coll.items() == vector<int>{1, 2, 3, 4, 5, 6});
+            CHECK(coll.items() == std::vector<int>{1, 2, 3, 4, 5, 6});
         }
         RETURN noerror;
     });
@@ -188,7 +187,7 @@ TEST_CASE("Stream Publisher", "[pubsub][io]") {
         collect.start();
         Scheduler::current().runUntil( [&] {return collect.done(); });
 
-        vector<string> const& items = collect.items();
+        std::vector<string> const& items = collect.items();
         for (size_t i = 0; i < items.size(); ++i) {
             cout << i << ": " << items[i] << endl;
             CHECK(items[i].find("Crouton") != string::npos);

@@ -86,7 +86,7 @@ TEST_CASE("Error", "[error]") {
 
     Exception x(err);
     CHECK(x.error() == err);
-    CHECK(x.what() == "internal error (logic error)"s);
+    CHECK(x.what() == string_view("internal error (logic error)"));
 }
 
 
@@ -186,10 +186,10 @@ TEST_CASE("ToMany") {
         CHECK(paul._band.other() == &beatles);
         CHECK(george._band.other() == &beatles);
 
-        vector<string> names;
+        std::vector<string> names;
         for (auto& member : beatles._members)
             names.push_back(member._name);
-        CHECK(names == vector<string>{"Ringo", "John", "Paul", "George"});
+        CHECK(names == std::vector<string>{"Ringo", "John", "Paul", "George"});
 
         Band wings("Wings");
         paul._band = &wings._members;
@@ -198,7 +198,7 @@ TEST_CASE("ToMany") {
         names.clear();
         for (auto& member : beatles._members)
             names.push_back(member._name);
-        CHECK(names == vector<string>{"Ringo", "John", "George"});
+        CHECK(names == std::vector<string>{"Ringo", "John", "George"});
 
         beatles._members.erase(john._band);
         CHECK(john._band.other() == nullptr);
@@ -206,7 +206,7 @@ TEST_CASE("ToMany") {
         names.clear();
         for (auto& member : beatles._members)
             names.push_back(member._name);
-        CHECK(names == vector<string>{"Ringo", "George"});
+        CHECK(names == std::vector<string>{"Ringo", "George"});
     }
     CHECK(beatles._members.empty());
 }
@@ -214,9 +214,9 @@ TEST_CASE("ToMany") {
 
 TEST_CASE("Producer Consumer") {
     RunCoroutine([]() -> Future<void> {
-        optional<SeriesProducer<int>> producer;
+        std::optional<SeriesProducer<int>> producer;
         producer.emplace();
-        unique_ptr<SeriesConsumer<int>> consumer = producer->make_consumer();
+        std::unique_ptr<SeriesConsumer<int>> consumer = producer->make_consumer();
 
         auto producerTaskFn = [&]() -> Task {
             for (int i = 1; i <= 10; i++) {
@@ -228,7 +228,7 @@ TEST_CASE("Producer Consumer") {
             bool ok = AWAIT producer->produce(noerror);
             CHECK(!ok);
             cerr << "END producer\n";
-            producer = nullopt;
+            producer = std::nullopt;
         };
 
         Task producerTask = producerTaskFn();
@@ -251,39 +251,39 @@ TEST_CASE("Producer Consumer") {
 
 
 TEST_CASE("MiniFormat") {
-    CHECK(minifmt::format("No placeholders") == "No placeholders");
-    CHECK(minifmt::format("Escaped {{... {}!", 7) == "Escaped {... 7!");
-    CHECK(minifmt::format("Escaped {{{{... {}!", 7) == "Escaped {{... 7!");
-    CHECK(minifmt::format("Escaped {{{}!", 7) == "Escaped {7!");
-    CHECK(minifmt::format("{{Escaped ... {}!", 7) == "{Escaped ... 7!");
-    CHECK(minifmt::format("Escaped ... {}!{{", 7) == "Escaped ... 7!{");
-    CHECK(minifmt::format("Escaped {{... {}! ...}}", 7) == "Escaped {... 7! ...}");
-    CHECK(minifmt::format("Escaped {{... {}! }", 7) == "Escaped {... 7! }");
+    CHECK(mini::format("No placeholders") == "No placeholders");
+    CHECK(mini::format("Escaped {{... {}!", 7) == "Escaped {... 7!");
+    CHECK(mini::format("Escaped {{{{... {}!", 7) == "Escaped {{... 7!");
+    CHECK(mini::format("Escaped {{{}!", 7) == "Escaped {7!");
+    CHECK(mini::format("{{Escaped ... {}!", 7) == "{Escaped ... 7!");
+    CHECK(mini::format("Escaped ... {}!{{", 7) == "Escaped ... 7!{");
+    CHECK(mini::format("Escaped {{... {}! ...}}", 7) == "Escaped {... 7! ...}");
+    CHECK(mini::format("Escaped {{... {}! }", 7) == "Escaped {... 7! }");
 
-    CHECK(minifmt::format("{} {}", false, true) == "false true");
-    CHECK(minifmt::format("char '{}', i16 {}, u16 {}, i32 {}, u32 {}, i {}, u {}",
+    CHECK(mini::format("{} {}", false, true) == "false true");
+    CHECK(mini::format("char '{}', i16 {}, u16 {}, i32 {}, u32 {}, i {}, u {}",
                           'X', int16_t(-1234), uint16_t(65432), int32_t(123456789), uint32_t(987654321),
                           int(-1234567), unsigned(7654321))
           == "char 'X', i16 -1234, u16 65432, i32 123456789, u32 987654321, i -1234567, u 7654321");
-    CHECK(minifmt::format("long {}, ulong {}, i64 {}, u64 {}",
+    CHECK(mini::format("long {}, ulong {}, i64 {}, u64 {}",
                           12345678l, 87654321ul, int64_t(-12345678901234), uint64_t(12345678901234))
           == "long 12345678, ulong 87654321, i64 -12345678901234, u64 12345678901234");
     double d = 3.1415926;
-    CHECK(minifmt::format("float {}, double {}", 12345.125f, d)
+    CHECK(mini::format("float {}, double {}", 12345.125f, d)
           == "float 12345.1, double 3.14159");
 
     const char* cstr = "C string";
     string str = "C++ string";
-    CHECK(minifmt::format("cstr '{}', C++ str '{}', string_view '{}'", cstr, str, string_view(str))
+    CHECK(mini::format("cstr '{}', C++ str '{}', string_view '{}'", cstr, str, string_view(str))
           == "cstr 'C string', C++ str 'C++ string', string_view 'C++ string'");
 
     coro_handle h = std::noop_coroutine();
-    CHECK(minifmt::format("{}", minifmt::write(logCoro{h}))
+    CHECK(mini::format("{}", mini::arg(logCoro{h}))
           == "¢exit");
 
-    CHECK(minifmt::format("One {} two {} three", 1, 2, 3)
+    CHECK(mini::format("One {} two {} three", 1, 2, 3)
           == "One 1 two 2 three{{{TOO FEW PLACEHOLDERS}}}");
-    CHECK(minifmt::format("One {} two {} three {} four {}", 1, 2)
+    CHECK(mini::format("One {} two {} three {} four {}", 1, 2)
           == "One 1 two 2 three {{{TOO FEW ARGS}}}");
 }
 
@@ -346,7 +346,7 @@ static Generator<int64_t> fibonacci(int64_t limit) {
     YIELD a;
     while (b <= limit) {
         YIELD b;
-        tie(a, b) = pair{b, a + b};
+        std::tie(a, b) = std::pair{b, a + b};
     }
 }
 
@@ -354,7 +354,7 @@ static Generator<int64_t> fibonacci(int64_t limit) {
 class TestActor : public Actor {
 public:
     Future<int64_t> fibonacciSum(int n) const {
-        std::cerr << "---begin fibonacciSum(" << n << ")\n";
+        cerr << "---begin fibonacciSum(" << n << ")\n";
         int64_t sum = 0;
         auto fib = fibonacci(INT_MAX);
         for (int i = 0; i < n; i++) {
@@ -365,7 +365,7 @@ public:
             else
                 break;
         }
-        std::cerr << "---end fibonacciSum(" << n << ") returning " << sum << "\n";
+        cerr << "---end fibonacciSum(" << n << ") returning " << sum << "\n";
         RETURN sum;
     }
 };

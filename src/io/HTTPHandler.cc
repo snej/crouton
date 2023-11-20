@@ -20,7 +20,7 @@
 #include "crouton/Future.hh"
 #include "crouton/util/Logging.hh"
 #include <llhttp.h>
-#include <sstream>
+#include "crouton/util/MiniOStream.hh"
 
 namespace crouton::io::http {
     using namespace std;
@@ -38,7 +38,7 @@ namespace crouton::io::http {
 
         auto uri = _parser.requestURI.value();
         string path(uri.path);
-        LNet->info("HTTPHandler: Request is {} {}", minifmt::write(_parser.requestMethod), string(uri));
+        LNet->info("HTTPHandler: Request is {} {}", mini::arg(_parser.requestMethod), string(uri));
 
         Headers responseHeaders;
         responseHeaders.set("User-Agent", "Crouton");
@@ -129,7 +129,7 @@ namespace crouton::io::http {
 
     Future<void> Handler::Response::finishHeaders() {
         if (!_sentHeaders) {
-            LNet->info("HTTPHandler: Sending {} response", minifmt::write(status));
+            LNet->info("HTTPHandler: Sending {} response", mini::arg(status));
             AWAIT _handler->writeHeaders(status, statusMessage, _headers);
         }
         _sentHeaders = true;

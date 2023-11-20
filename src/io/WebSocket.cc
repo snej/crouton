@@ -19,6 +19,7 @@
 #include "crouton/io/WebSocket.hh"
 #include "crouton/util/Logging.hh"
 #include "crouton/Misc.hh"
+#include "crouton/util/MiniOStream.hh"
 #include "support/StringUtils.hh"
 #include "Internal.hh"
 #include "WebSocketProtocol.hh"
@@ -174,7 +175,7 @@ namespace crouton::io::ws {
             return close();
         } else {
             // Peer is initiating a close; echo it:
-            LNet->warn("Peer sent {}; echoing it", minifmt::write(msg));
+            LNet->warn("Peer sent {}; echoing it", mini::arg(msg));
             return send(std::move(msg));
         }
     }
@@ -352,12 +353,12 @@ namespace crouton::io::ws {
     }
 
 
-    std::ostream& operator<< (std::ostream& out, Message const& msg) {
+    ostream& operator<< (ostream& out, Message const& msg) {
         using enum Message::Type;
         out << msg.type << '[';
         switch (msg.type) {
             case Text:
-                out << std::quoted(msg);
+                out << '"' << (string const&)msg << '"';
                 break;
             case Binary:
                 out << msg.size();
@@ -365,7 +366,7 @@ namespace crouton::io::ws {
             case Close:
                 out << msg.closeCode();
                 if (auto closeMsg = msg.closeMessage(); !closeMsg.empty())
-                    out << ", " << std::quoted(closeMsg);
+                    out << ", " << '"' << closeMsg << '"';
                 break;
             default:
                 break;
@@ -374,7 +375,7 @@ namespace crouton::io::ws {
     }
 
 
-    std::ostream& operator<< (std::ostream& out, Message::Type type) {
+    ostream& operator<< (ostream& out, Message::Type type) {
         using enum Message::Type;
         static constexpr const char* kTypeNames[] = {
             nullptr, "Text", "Binary", nullptr, nullptr, nullptr, nullptr, nullptr,
@@ -387,7 +388,7 @@ namespace crouton::io::ws {
     }
 
 
-    std::ostream& operator<< (std::ostream& out, CloseCode code) {
+    ostream& operator<< (ostream& out, CloseCode code) {
         using enum CloseCode;
         static constexpr const char* kCodeNames[] = {
             "Normal",

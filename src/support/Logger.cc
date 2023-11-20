@@ -33,12 +33,12 @@
 #  include <chrono>
 #  include <ctime>
 #  include <iomanip>
-#  include <iostream>
-#  include <sstream>
+#  include "crouton/util/MiniOStream.hh"
 #endif
 
 namespace crouton::log {
     using namespace std;
+    using namespace crouton::mini;
 
     static mutex            sLogMutex;          // Thread-safety & prevents overlapping msgs
     static vector<logger*>* sLoggers;           // All registered Loggers
@@ -175,18 +175,18 @@ namespace crouton::log {
             } else {
                 unique_lock<mutex> lock(sLogMutex);
                 _writeHeader(lvl);
-                cerr << msg << io::TTY::err().reset << std::endl;
+                cerr << msg << io::TTY::err().reset << endl;
             }
         }
     }
 
 
-    void logger::_log(level::level_enum lvl, string_view fmt, minifmt::FmtIDList types, ...) {
+    void logger::_log(level::level_enum lvl, string_view fmt, mini::FmtIDList types, ...) {
         if (auto sink = sLogSink) {
             stringstream out;
             va_list args;
             va_start(args, types);
-            minifmt::vformat_types(out, fmt, types, args);
+            mini::vformat_types(out, fmt, types, args);
             va_end(args);
             sink(*this, lvl, out.str());
         } else {
@@ -195,7 +195,7 @@ namespace crouton::log {
             _writeHeader(lvl);
             va_list args;
             va_start(args, types);
-            minifmt::vformat_types(cerr, fmt, types, args);
+            mini::vformat_types(cerr, fmt, types, args);
             va_end(args);
             cerr << io::TTY::err().reset << endl;
         }
@@ -246,10 +246,10 @@ namespace crouton::log {
     }
 
 
-    void logger::_log(level::level_enum lvl, string_view fmt, minifmt::FmtIDList types, ...) {
+    void logger::_log(level::level_enum lvl, string_view fmt, mini::FmtIDList types, ...) {
         va_list args;
         va_start(args, types);
-        string message = minifmt::vformat_types(fmt, types, args);
+        string message = mini::vformat_types(fmt, types, args);
         va_end(args);
         log(lvl, message);
     }

@@ -18,17 +18,17 @@
 #include "crouton/io/blip/BLIPIO.hh"
 #include "crouton/util/Varint.hh"
 #include "support/StringUtils.hh"
-#include <iostream>
-#include <sstream>
+#include "crouton/util/MiniOStream.hh"
 
 namespace crouton::io::blip {
     using namespace std;
-
+    using namespace crouton::mini;
+    
     const char* const kMessageTypeNames[8] = {
         "REQ", "RES", "ERR", "?3?", "ACKREQ", "AKRES", "?6?", "?7?"};
 
 
-    std::ostream& operator<< (std::ostream& out, MessageNo n) {
+    ostream& operator<< (ostream& out, MessageNo n) {
         return out << '#' << uint64_t(n);
     }
 
@@ -50,7 +50,7 @@ namespace crouton::io::blip {
 #pragma mark - MESSAGE:
 
 
-    void Message::dumpHeader(std::ostream& out) const {
+    void Message::dumpHeader(ostream& out) const {
         out << kMessageTypeNames[type()] << _number << ' ';
         if (_flags & kUrgent) out << 'U';
         if (_flags & kNoReply) out << 'N';
@@ -58,7 +58,7 @@ namespace crouton::io::blip {
     }
 
     
-    void Message::writeDescription(ConstBytes payload, std::ostream& out) const {
+    void Message::writeDescription(ConstBytes payload, ostream& out) const {
         if (type() == kRequestType) {
             const char* profile = findProperty(payload, "Profile");
             if (profile) 
@@ -68,7 +68,7 @@ namespace crouton::io::blip {
     }
 
 
-    void Message::dump(ConstBytes payload, ConstBytes body, bool withBody, std::ostream& out) {
+    void Message::dump(ConstBytes payload, ConstBytes body, bool withBody, ostream& out) {
         dumpHeader(out);
         if (type() != kAckRequestType && type() != kAckResponseType) {
             out << " {";
@@ -130,7 +130,7 @@ namespace crouton::io::blip {
 
     MessageIn::~MessageIn() {
         if (!_responded && !isResponse() && !noReply())
-            LBLIP->warn("Incoming message {} was not responded to!", minifmt::write(*this));
+            LBLIP->warn("Incoming message {} was not responded to!", mini::arg(*this));
     }
 
 
@@ -208,7 +208,7 @@ namespace crouton::io::blip {
                 crouton::Error::raise(ProtocolError::InvalidFrame, "message ends before end of properties");
             _complete = true;
             state = kEnd;
-            LBLIP->info("Finished receiving {}", minifmt::write(*this));
+            LBLIP->info("Finished receiving {}", mini::arg(*this));
             if (_onResponse) {
                 auto ref = static_pointer_cast<MessageIn>(this->shared_from_this());
                 _onResponse->setResult(ref);

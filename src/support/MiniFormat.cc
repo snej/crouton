@@ -1,7 +1,7 @@
 //
 // MiniFormat.cc
 //
-// 
+// Copyright 2023-Present Couchbase, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,10 +17,9 @@
 //
 
 #include "crouton/util/MiniFormat.hh"
-#include <iostream>
-#include <sstream>
+#include "crouton/util/MiniOStream.hh"
 
-namespace crouton::minifmt {
+namespace crouton::mini {
     using namespace std;
     using namespace i;
 
@@ -62,7 +61,7 @@ namespace crouton::minifmt {
                     case FmtID::Pointer:    out << va_arg(args, const void*); break;
                     case FmtID::String:     out << *va_arg(args, const string*); break;
                     case FmtID::StringView: out << *va_arg(args, const string_view*); break;
-                    case FmtID::Write:      out << *va_arg(args, const write*); break;
+                    case FmtID::Arg:        out << *va_arg(args, const arg*); break;
                 }
             }
         }

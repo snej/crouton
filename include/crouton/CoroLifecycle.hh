@@ -101,7 +101,7 @@ namespace crouton {
     string CoroutineName(coro_handle);
 
     /** Writes `CoroutineName(h)` to `out` */
-    std::ostream& operator<< (std::ostream& out, coro_handle h);
+    ostream& operator<< (ostream& out, coro_handle h);
 
     /** spdlog won't use `operator<<` to format types in the `std` namespace, and that includes
         `std::coroutine_handle<>`. Work around this by wrapping it in a trivial custom struct. */
@@ -109,7 +109,7 @@ namespace crouton {
         coro_handle h;
         bool verbose = false;
 
-        friend std::ostream& operator<<(std::ostream& out, logCoro lc);
+        friend ostream& operator<<(ostream& out, logCoro lc);
     };
 
 }

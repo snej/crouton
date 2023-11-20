@@ -19,7 +19,7 @@
 #include "support/Backtrace.hh"
 #include "support/StringUtils.hh"
 #include <esp_debug_helpers.h>
-#include <iostream>
+#include "crouton/util/MiniOStream.hh"
 
 namespace fleece {
     using namespace std;

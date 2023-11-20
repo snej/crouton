@@ -38,7 +38,7 @@ namespace crouton::io::blip {
     enum class MessageNo : uint64_t { None = 0 };
 
     inline MessageNo operator+ (MessageNo m, int i) {return MessageNo{uint64_t(m) + i};}
-    std::ostream& operator<< (std::ostream&, MessageNo);
+    ostream& operator<< (ostream&, MessageNo);
 
     using MessageSize = uint64_t;
 

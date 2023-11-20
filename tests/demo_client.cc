@@ -17,7 +17,7 @@
 //
 
 #include "crouton/Crouton.hh"
-#include <iostream>
+#include "crouton/util/MiniOStream.hh"
 
 using namespace std;
 using namespace crouton;

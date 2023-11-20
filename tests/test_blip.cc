@@ -20,7 +20,6 @@
 #include "crouton/io/blip/BLIP.hh"
 #include "support/StringUtils.hh"
 
-using namespace std;
 using namespace crouton::io::blip;
 
 
@@ -32,9 +31,8 @@ TEST_CASE("BLIP MessageBuilder", "[blip]") {
     msg.urgent = true;
 
     string data = std::move(msg).finish();
-//    cout << data << endl;
-//    cout << hexString(data) << endl;
-    CHECK(data == "\x22Shoe-Size\08.5\0Hair\0yes\0Eyes\0Brown\0Hi! This is the body."s);
+    static constexpr char expectedData[] = "\x22Shoe-Size\08.5\0Hair\0yes\0Eyes\0Brown\0Hi! This is the body.";
+    CHECK(data == string_view(expectedData, sizeof(expectedData) - 1));
     CHECK(msg.flags() == FrameFlags::kUrgent);
 }
 
@@ -84,7 +82,7 @@ TEST_CASE("BLIP Receive Message", "[blip]") {
 }
 
 
-staticASYNC<void> testSendReceive(initializer_list<MessageBuilder::property> properties,
+staticASYNC<void> testSendReceive(std::initializer_list<MessageBuilder::property> properties,
                                   string body,
                                   bool compressed)
 {
@@ -97,7 +95,7 @@ staticASYNC<void> testSendReceive(initializer_list<MessageBuilder::property> pro
     CHECK(!fReply.hasResult());
     sender.closeSend();
 
-    vector<string> frames;
+    std::vector<string> frames;
     size_t size = 0;
     while (true) {
         Result<string> frame = AWAIT sender.output();

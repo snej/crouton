@@ -21,9 +21,9 @@
 #include "Internal.hh"
 #include "crouton/util/Logging.hh"
 #include <cstring>
-#include <iostream>
+#include "crouton/util/MiniOStream.hh"
 #include <mutex>
-#include <sstream>
+#include "crouton/util/MiniOStream.hh"
 
 namespace crouton {
     using namespace std;
@@ -69,7 +69,7 @@ namespace crouton {
         return string(domain()) + " error " + to_string(_code);
     }
 
-    std::ostream& operator<< (std::ostream& out, Error const& err) {
+    ostream& operator<< (ostream& out, Error const& err) {
         return out << err.description();
     }
 

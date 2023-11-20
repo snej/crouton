@@ -19,7 +19,7 @@
 #include "tests.hh"
 #include "io/blip/Codec_Impl.hh"
 
-using namespace std;
+using namespace crouton::mini;
 using namespace crouton::io::blip;
 
 
@@ -31,21 +31,21 @@ Donec maximus erat ligula, nec rutrum ante tristique vel. Integer et lacus eleme
 
 
 struct CodecTest {
-    unique_ptr<Codec> _compressor;
+    std::unique_ptr<Codec> _compressor;
 
     void init(bool compressZlib) {
         cout << "**** Test compressing with " << (compressZlib ? "zlib" : "miniz") << endl;
         if (compressZlib)
-            _compressor = make_unique<ZlibDeflater>();
+            _compressor = std::make_unique<ZlibDeflater>();
         else
-            _compressor = make_unique<MiniZDeflater>();
+            _compressor = std::make_unique<MiniZDeflater>();
     }
 
-    vector<string> compressToFrames(ConstBytes input, size_t frameSize) {
-        vector<string> compressed;
+    std::vector<string> compressToFrames(ConstBytes input, size_t frameSize) {
+        std::vector<string> compressed;
         size_t compressedSize = 0;
         ConstBytes inputBuf(input);
-        auto buffer = make_unique<char[]>(frameSize);
+        auto buffer = std::make_unique<char[]>(frameSize);
         while (!inputBuf.empty()) {
             //cout << "---- Frame " << (compressed.size() + 1) << " ----\n";
             MutableBytes outputBuf(buffer.get(), frameSize - 4);
@@ -62,12 +62,12 @@ struct CodecTest {
     }
 
 
-    string decompressFrames(vector<string> const& compressed, bool decompressZlib) {
-        unique_ptr<Codec> decompressor;
+    string decompressFrames(std::vector<string> const& compressed, bool decompressZlib) {
+        std::unique_ptr<Codec> decompressor;
         if (decompressZlib)
-            decompressor = make_unique<ZlibInflater>();
+            decompressor = std::make_unique<ZlibInflater>();
         else
-            decompressor = make_unique<MiniZInflater>();
+            decompressor = std::make_unique<MiniZInflater>();
         string decompressed;
         //int n = 0;
         for (string frame : compressed) {
@@ -81,7 +81,7 @@ struct CodecTest {
     }
 
     void roundTrip(string_view input, size_t frameSize = 4096) {
-        vector<string> compressed = compressToFrames(input, frameSize);
+        std::vector<string> compressed = compressToFrames(input, frameSize);
 
         cout << "---------- Decompressing with miniz\n";
         string decompressed = decompressFrames(compressed, false);
