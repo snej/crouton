@@ -23,70 +23,75 @@ namespace crouton::mini {
     using namespace std;
     using namespace i;
 
-    void vformat_types(ostream& out, string_view fmt, FmtIDList types, va_list args) {
-        auto itype = types;
-        size_t pos;
-        string_view rest = fmt;
-        while (string::npos != (pos = rest.find_first_of("{}"))) {
-            if (pos > 0)
-                out << rest.substr(0, pos);
+    static bool vformat_arg(ostream &out, i::FmtID itype, va_list &args) {
+        switch( itype ) {
+            case FmtID::None:       out << "{{{TOO FEW ARGS}}}"; return false;
+            case FmtID::Bool:       out << (va_arg(args, int) ? "true" : "false"); break;
+            case FmtID::Char:       out << char(va_arg(args, int)); break;
+            case FmtID::Int:        out << va_arg(args, int); break;
+            case FmtID::UInt:       out << va_arg(args, unsigned int); break;
+            case FmtID::Long:       out << va_arg(args, long); break;
+            case FmtID::ULong:      out << va_arg(args, unsigned long); break;
+            case FmtID::LongLong:   out << va_arg(args, long long); break;
+            case FmtID::ULongLong:  out << va_arg(args, unsigned long long); break;
+            case FmtID::Double:     out << va_arg(args, double); break;
+            case FmtID::CString:    out << va_arg(args, const char*); break;
+            case FmtID::Pointer:    out << va_arg(args, const void*); break;
+            case FmtID::String:     out << *va_arg(args, const string*); break;
+            case FmtID::StringView: out << *va_arg(args, const string_view*); break;
+            case FmtID::Arg:        va_arg(args, arg).writeTo(out); break;
+        }
+        return true;
+    }
 
-            if (rest[pos] == '}') [[unlikely]] {
-                // (The only reason to pay attention to "}" is that the std::format spec says
-                // "}}" is an escape and should be emitted as "}". Otherwise a "} is a syntax
-                // error, but let's just emit it as-is.
-                out << '}';
-                if (pos < rest.size() - 1 && rest[pos + 1] == '}')
-                    ++pos;
-                rest = rest.substr(pos + 1);
-            } else if (pos < rest.size() - 1 && rest[pos + 1] == '{') {
-                // "{{" is an escape; emit "{".
-                out << '{';
-                rest = rest.substr(pos + 2);
-            } else {
-                pos = rest.find('}', pos + 1);
-                //TODO: Pay attention to at least some formatting specs
-                rest = rest.substr(pos + 1);
-                switch( *(itype++) ) {
-                    case FmtID::None:       out << "{{{TOO FEW ARGS}}}"; return;
-                    case FmtID::Bool:       out << (va_arg(args, int) ? "true" : "false"); break;
-                    case FmtID::Char:       out << char(va_arg(args, int)); break;
-                    case FmtID::Int:        out << va_arg(args, int); break;
-                    case FmtID::UInt:       out << va_arg(args, unsigned int); break;
-                    case FmtID::Long:       out << va_arg(args, long); break;
-                    case FmtID::ULong:      out << va_arg(args, unsigned long); break;
-                    case FmtID::LongLong:   out << va_arg(args, long long); break;
-                    case FmtID::ULongLong:  out << va_arg(args, unsigned long long); break;
-                    case FmtID::Double:     out << va_arg(args, double); break;
-                    case FmtID::CString:    out << va_arg(args, const char*); break;
-                    case FmtID::Pointer:    out << va_arg(args, const void*); break;
-                    case FmtID::String:     out << *va_arg(args, const string*); break;
-                    case FmtID::StringView: out << *va_arg(args, const string_view*); break;
-                    case FmtID::Arg:        arg(args).writeTo(out); break;
-                }
+
+    void vformat_types(ostream& out, FormatString const& fmt, FmtIDList types, va_list args) {
+        auto itype = types;
+
+        for (size_t p = 0; p < fmt.size(); ++p) {
+            string_view part = fmt[p];
+            assert(!part.empty());
+            switch (part[0]) {
+                case '{':
+                    if (part[1] == '{')
+                        out << '{';
+                    else if (!vformat_arg(out, *itype++, args))
+                        return;
+                    break;
+                case '}':
+                    out << '}';
+                    break;
+                default:
+                    out << part;
+                    break;
             }
         }
 
-        if (!rest.empty())
-            out << rest;
-        if (*itype != FmtID::None)
-            out << "{{{TOO FEW PLACEHOLDERS}}}";
+        // If there are more args than specifiers, write the rest as a comma-separated list:
+        const char* delim = " : ";
+        while (*itype != FmtID::None) {
+            out << delim;
+            delim = ", ";
+            if (!vformat_arg(out, *itype++, args))
+                return;
+        }
     }
 
-    void format_types(ostream& out, string_view fmt, FmtIDList types, ...) {
+
+    void format_types(ostream& out, FormatString const& fmt, FmtIDList types, ...) {
         va_list args;
         va_start(args, types);
         vformat_types(out, fmt, types, args);
         va_end(args);
     }
 
-    string vformat_types(string_view fmt, FmtIDList types, va_list args) {
+    string vformat_types(FormatString const& fmt, FmtIDList types, va_list args) {
         stringstream out;
         vformat_types(out, fmt, types, args);
         return out.str();
     }
 
-    string format_types(string_view fmt, FmtIDList types, ...) {
+    string format_types(FormatString const& fmt, FmtIDList types, ...) {
         va_list args;
         va_start(args, types);
         string result = vformat_types(fmt, types, args);

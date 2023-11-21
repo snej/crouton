@@ -52,7 +52,7 @@ namespace crouton::mini {
             Arg,
         };
 
-        class arg;
+        struct arg;
 
         using enum FmtID;
 
@@ -99,30 +99,91 @@ namespace crouton::mini {
     using FmtIDList = i::FmtID const*;
 
 
+    class FormatString {
+    public:
+        consteval FormatString(const char* cstr) :_spec(parse(cstr)) { }
+
+        size_t size() const Pure {return _spec._size;}
+
+        string_view operator[] (size_t part) const Pure {
+            assert(part < _spec._size);
+            const char* start = _spec._str;
+            for (size_t i = 0; i < part; i++)
+                start += _spec._parts[i];
+            return string_view(start, _spec._parts[part]);
+        }
+
+    private:
+        struct spec {
+            const char* const   _str;
+            uint8_t             _size;
+            uint8_t             _parts[15];
+        };
+
+        static constexpr spec parse(const char* cstr) {
+            spec s {cstr, 0, {}};
+            unsigned part = 0;
+            size_t lastPos = 0;
+
+            auto append = [&](size_t pos) {
+                if(part >= sizeof(s._parts))
+                    throw std::invalid_argument("Too many format specifiers");
+                if (pos - lastPos > 0xFF)
+                    throw std::invalid_argument("Format string too long");
+                s._parts[part++] = uint8_t(pos - lastPos);
+                lastPos = pos;
+            };
+
+            string_view str(cstr);
+            size_t pos;
+            while (string::npos != (pos = str.find_first_of("{}", lastPos))) {
+                if (pos > lastPos)
+                    append(pos);
+                if (str[pos] == '}') {
+                    // (The only reason to pay attention to "}" is that the std::format spec says
+                    // "}}" is an escape and should be emitted as "}". Otherwise a "} is a syntax
+                    // error, but let's just emit it as-is.
+                    if (pos + 1 >= str.size() || str[pos + 1] != '}')
+                        throw std::invalid_argument("Invalid '}' in format string");
+                    pos += 2;
+                } else if (pos + 1 < str.size() && str[pos + 1] == '{') {
+                    // "{{" is an escape
+                    pos += 2;
+                } else {
+                    pos = str.find('}', pos + 1);
+                    if (pos == string::npos)
+                        throw std::invalid_argument("Unclosed format specifier");
+                    ++pos;
+                }
+                append(pos);
+            }
+            
+            pos = str.size();
+            if (pos > lastPos)
+                append(pos);
+            s._size = uint8_t(part);
+            return s;
+        }
+
+        spec const _spec;
+    };
+
+
     namespace i {
         // Struct that type-erases an `ostreamable` value; passed as arg to formatting fns.
-        class arg {
-        public:
+        struct arg {
             template <ostreamable T>
-            explicit arg(T &&value)
-            :_ptr(reinterpret_cast<const void*>(&value))
-            ,_write(&writeFn<std::remove_cvref_t<T>>)
-            { }
-
-            explicit arg(va_list& args)
-            :_ptr(va_arg(args, const void*))
-            ,_write(va_arg(args, writeFn_t))
-            { }
+            static arg make(T &&value) {
+                return arg{._ptr = reinterpret_cast<const void*>(&value),
+                           ._write = &writeFn<std::remove_cvref_t<T>>};
+            }
 
             void writeTo(ostream& out) const                        {_write(out, _ptr);}
 
-            // for compatibility with std::fmt or spdlog, this object can itself be written
-            //friend ostream& operator<< (ostream& out, arg const& f) {f.writeTo(out); return out;}
-        private:
             using writeFn_t = void (*)(ostream&, const void*);
 
             template <typename T>
-            static void writeFn(ostream& out, const void* ptr) { out << *(const T*)ptr; }
+            static void writeFn(ostream& out, const void* ptr)      { out << *(const T*)ptr; }
 
             const void* _ptr;                       // address of value -- type-erased T*
             writeFn_t   _write;                     // pointer to writeFn<T>()
@@ -141,15 +202,15 @@ namespace crouton::mini {
 
         template <ostreamable T>
         requires (i::Formatting<T>::id == FmtID::Arg)
-        auto passArg(T const& t)                            {return arg{t};}
+        auto passArg(T const& t)                            {return arg::make(t);}
     }
 
 
     // The core formatting functions:
-    void format_types(ostream&, string_view fmt, FmtIDList types, ...);
-    void vformat_types(ostream&, string_view fmt, FmtIDList types, va_list);
-    string format_types(string_view fmt, FmtIDList types, ...);
-    string vformat_types(string_view fmt, FmtIDList types, va_list);
+    void format_types(ostream&, FormatString const& fmt, FmtIDList types, ...);
+    void vformat_types(ostream&, FormatString const& fmt, FmtIDList types, va_list);
+    string format_types(FormatString const&, FmtIDList types, ...);
+    string vformat_types(FormatString const&, FmtIDList types, va_list);
 
 
     /** Writes formatted output to an ostream.
@@ -157,7 +218,7 @@ namespace crouton::mini {
         @param fmt  Format string, with `{}` placeholders for args.
         @param args  Arguments; any type satisfying `Formattable`. */
     template<Formattable... Args>
-    void format(ostream& out, string_view fmt, Args &&...args) {
+    void format(ostream& out, FormatString const& fmt, Args &&...args) {
         format_types(out, fmt, FmtIDs<Args...>::ids, i::passArg(args)...);
     }
 
@@ -166,7 +227,7 @@ namespace crouton::mini {
         @param fmt  Format string, with `{}` placeholders for args.
         @param args  Arguments; any type satisfying `Formattable`. */
     template<Formattable... Args>
-    string format(string_view fmt, Args &&...args) {
+    string format(FormatString const& fmt, Args &&...args) {
         return format_types(fmt, FmtIDs<Args...>::ids, i::passArg(args)...);
     }
 }

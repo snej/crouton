@@ -127,7 +127,7 @@ Task mainTask() {
     esp_log_level_set("Crouton", ESP_LOG_VERBOSE);
     log::logger::load_env_levels("Net=debug,BLIP=info,Coro=trace");
 
-#if 0
+#if 1
     Log->info("---------- Testing Generator");
     {
         Generator<int64_t> fib = fibonacci(100, true);
@@ -170,6 +170,7 @@ Task mainTask() {
     Log->info("---------- Testing Codec");
     testCodec();
 #endif
+    
     Log->info("---------- Testing BLIP");
     testBLIP().waitForResult();
 

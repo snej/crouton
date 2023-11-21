@@ -33,7 +33,49 @@ void RunCoroutine(std::function<Future<void>()> test) {
 }
 
 
-TEST_CASE("MiniFormat") {
+TEST_CASE("FormatString", "[mini]") {
+    InitLogging(); //FIXME: Put this somewhere where it gets run before any test
+
+    {
+        mini::FormatString fmt("hi");
+        CHECK(fmt.size() == 1);
+        CHECK(fmt[0] == "hi");
+    }
+    {
+        mini::FormatString fmt("{}");
+        CHECK(fmt.size() == 1);
+        CHECK(fmt[0] == "{}");
+    }
+    {
+        mini::FormatString fmt("this is {..} a {}{} test");
+        CHECK(fmt.size() == 6);
+        CHECK(fmt[0] == "this is ");
+        CHECK(fmt[1] == "{..}");
+        CHECK(fmt[2] == " a ");
+        CHECK(fmt[3] == "{}");
+        CHECK(fmt[4] == "{}");
+        CHECK(fmt[5] == " test");
+    }
+    {
+        mini::FormatString fmt("this is a {{ test }}");
+        CHECK(fmt.size() == 4);
+        CHECK(fmt[0] == "this is a ");
+        CHECK(fmt[1] == "{{");
+        CHECK(fmt[2] == " test ");
+        CHECK(fmt[3] == "}}");
+    }
+    {
+        mini::FormatString fmt("{{Escaped ... {}!");
+        CHECK(fmt.size() == 4);
+        CHECK(fmt[0] == "{{");
+        CHECK(fmt[1] == "Escaped ... ");
+        CHECK(fmt[2] == "{}");
+        CHECK(fmt[3] == "!");
+    }
+}
+
+
+TEST_CASE("MiniFormat", "[mini]") {
     CHECK(mini::format("No placeholders") == "No placeholders");
     CHECK(mini::format("Escaped {{... {}!", 7) == "Escaped {... 7!");
     CHECK(mini::format("Escaped {{{{... {}!", 7) == "Escaped {{... 7!");
@@ -41,7 +83,7 @@ TEST_CASE("MiniFormat") {
     CHECK(mini::format("{{Escaped ... {}!", 7) == "{Escaped ... 7!");
     CHECK(mini::format("Escaped ... {}!{{", 7) == "Escaped ... 7!{");
     CHECK(mini::format("Escaped {{... {}! ...}}", 7) == "Escaped {... 7! ...}");
-    CHECK(mini::format("Escaped {{... {}! }", 7) == "Escaped {... 7! }");
+//    CHECK(mini::format("Escaped {{... {}! }", 7) == "Escaped {... 7! }"); // now a compile-time error
 
     CHECK(mini::format("{} {}", false, true) == "false true");
     CHECK(mini::format("char '{}', i16 {}, u16 {}, i32 {}, u32 {}, i {}, u {}",
@@ -61,12 +103,14 @@ TEST_CASE("MiniFormat") {
           == "cstr 'C string', C++ str 'C++ string', string_view 'C++ string'");
 
     CHECK(mini::format("One {} two {} three", 1, 2, 3)
-          == "One 1 two 2 three{{{TOO FEW PLACEHOLDERS}}}");
+          == "One 1 two 2 three : 3");
+    CHECK(mini::format("One {} two {} three", 1, 2, 3, "hi")
+          == "One 1 two 2 three : 3, hi");
     CHECK(mini::format("One {} two {} three {} four {}", 1, 2)
           == "One 1 two 2 three {{{TOO FEW ARGS}}}");
 
     coro_handle h = std::noop_coroutine();
-    CHECK(mini::format("{}", mini::i::arg(logCoro{h}))
+    CHECK(mini::format("{}", mini::i::arg::make(logCoro{h}))
           == "¢exit");
     CHECK(mini::format("{}", logCoro{h})
           == "¢exit");
@@ -79,8 +123,6 @@ TEST_CASE("MiniFormat") {
 
 
 TEST_CASE("Randomize") {
-    InitLogging(); //FIXME: Put this somewhere where it gets run before any test
-
     uint8_t buf[10];
     ::memset(buf, 0, sizeof(buf));
     for (int pass = 0; pass < 5; ++pass) {

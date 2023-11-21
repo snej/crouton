@@ -191,8 +191,8 @@ namespace crouton::io::esp {
             else
                 pbuf_cat(_readBufs, pb);
         } else {
-            _readErr = err ? Error(LWIPError(err)) : Error(CroutonError::EndOfData);
-            LNet->error("read completed, error {}", minifmt::write{_readErr});
+            _readErr = err ? Error(LWIPError(err)) : Error(CroutonError::UnexpectedEOF);
+            LNet->error("read completed, error {}", _readErr);
         }
         assert(_readBufs || _readErr);
         _readBlocker.notify();
