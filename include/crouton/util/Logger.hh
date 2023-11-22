@@ -49,7 +49,7 @@ namespace crouton::log {
         template<mini::Formattable... Args>
         void log(level::level_enum lvl, mini::FormatString const& fmt, Args &&...args) {
             if (should_log(lvl)) [[unlikely]]
-                _log(lvl, fmt, mini::FmtIDs<Args...>::ids, mini::i::passArg(args)...);
+                _log(lvl, fmt, mini::ArgTypes<Args...>::ids, mini::i::passArg(args)...);
         }
 
         void log(level::level_enum lvl, string_view msg);
@@ -102,7 +102,7 @@ namespace crouton::log {
         static void set_output(Sink);
 
     private:
-        void _log(level::level_enum, mini::FormatString const& fmt, mini::FmtIDList, ...);
+        void _log(level::level_enum, mini::FormatString const& fmt, mini::ArgTypeList, ...);
         void _writeHeader(level::level_enum);
         void load_env_level();
 

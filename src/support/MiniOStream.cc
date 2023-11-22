@@ -20,6 +20,14 @@
 #include <charconv>
 #include <cstdio>
 
+#ifdef __APPLE__
+#  include <TargetConditionals.h>
+#endif
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunguarded-availability-new"
+
+
 namespace crouton::mini {
 
     fdstream cout(stdout);
@@ -41,30 +49,23 @@ namespace crouton::mini {
         return write(&buf[0], result.ptr - buf);
     }
 
-    ostream& ostream::writeFloat(float f) {
-        char buf[20];
-#if 0 // not available on macOS before 13.3; //TODO: Conditionalize this
-        auto result = std::to_chars(&buf[0], &buf[sizeof(buf)], f);
-        return write(&buf[0], result.ptr - buf);
-#else
-        snprintf(buf, sizeof(buf), "%g", f);
-        return write(buf);
-#endif
-    }
-
     ostream& ostream::writeDouble(double f) {
-        char buf[30];
-#if 0 // not available on macOS before 13.3; //TODO: Conditionalize this
-        auto result = std::to_chars(&buf[0], &buf[sizeof(buf)], f);
-        return write(&buf[0], result.ptr - buf);
-#else
-        snprintf(buf, sizeof(buf), "%g", f);
-        return write(buf);
+        char buf[20];
+#ifdef __APPLE__ // Apple's libc++ didn't add this method until later
+        if (__builtin_available(macOS 13.3, iOS 16.3, tvOS 16.3, watchOS 9.3, *)) {
+#endif
+            auto result = std::to_chars(&buf[0], &buf[sizeof(buf)], f);
+            return write(&buf[0], result.ptr - buf);
+#ifdef __APPLE__
+        } else {
+            snprintf(buf, sizeof(buf), "%g", f);
+            return write(buf);
+        }
 #endif
     }
 
     ostream& operator<< (ostream& out, const void* ptr) {
-        return out.write("0x").writeUInt64(uintptr_t(ptr));
+        return out.write("0x").writeUInt64(uintptr_t(ptr), 16);
     }
 
 
@@ -78,3 +79,5 @@ namespace crouton::mini {
     }
     
 }
+
+#pragma GCC diagnostic pop

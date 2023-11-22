@@ -20,7 +20,6 @@
 #include "crouton/Actor.hh"
 #include "crouton/Misc.hh"
 #include "crouton/Producer.hh"
-#include "crouton/util/MiniFormat.hh"
 #include "crouton/util/Relation.hh"
 #include "crouton/io/uv/UVBase.hh"
 
@@ -30,95 +29,6 @@ void RunCoroutine(std::function<Future<void>()> test) {
     Future<void> f = test();
     Scheduler::current().runUntil([&]{return f.hasResult();});
     f.result(); // check exception
-}
-
-
-TEST_CASE("FormatString", "[mini]") {
-    InitLogging(); //FIXME: Put this somewhere where it gets run before any test
-
-    {
-        mini::FormatString fmt("hi");
-        CHECK(fmt.size() == 1);
-        CHECK(fmt[0] == "hi");
-    }
-    {
-        mini::FormatString fmt("{}");
-        CHECK(fmt.size() == 1);
-        CHECK(fmt[0] == "{}");
-    }
-    {
-        mini::FormatString fmt("this is {..} a {}{} test");
-        CHECK(fmt.size() == 6);
-        CHECK(fmt[0] == "this is ");
-        CHECK(fmt[1] == "{..}");
-        CHECK(fmt[2] == " a ");
-        CHECK(fmt[3] == "{}");
-        CHECK(fmt[4] == "{}");
-        CHECK(fmt[5] == " test");
-    }
-    {
-        mini::FormatString fmt("this is a {{ test }}");
-        CHECK(fmt.size() == 4);
-        CHECK(fmt[0] == "this is a ");
-        CHECK(fmt[1] == "{{");
-        CHECK(fmt[2] == " test ");
-        CHECK(fmt[3] == "}}");
-    }
-    {
-        mini::FormatString fmt("{{Escaped ... {}!");
-        CHECK(fmt.size() == 4);
-        CHECK(fmt[0] == "{{");
-        CHECK(fmt[1] == "Escaped ... ");
-        CHECK(fmt[2] == "{}");
-        CHECK(fmt[3] == "!");
-    }
-}
-
-
-TEST_CASE("MiniFormat", "[mini]") {
-    CHECK(mini::format("No placeholders") == "No placeholders");
-    CHECK(mini::format("Escaped {{... {}!", 7) == "Escaped {... 7!");
-    CHECK(mini::format("Escaped {{{{... {}!", 7) == "Escaped {{... 7!");
-    CHECK(mini::format("Escaped {{{}!", 7) == "Escaped {7!");
-    CHECK(mini::format("{{Escaped ... {}!", 7) == "{Escaped ... 7!");
-    CHECK(mini::format("Escaped ... {}!{{", 7) == "Escaped ... 7!{");
-    CHECK(mini::format("Escaped {{... {}! ...}}", 7) == "Escaped {... 7! ...}");
-//    CHECK(mini::format("Escaped {{... {}! }", 7) == "Escaped {... 7! }"); // now a compile-time error
-
-    CHECK(mini::format("{} {}", false, true) == "false true");
-    CHECK(mini::format("char '{}', i16 {}, u16 {}, i32 {}, u32 {}, i {}, u {}",
-                          'X', int16_t(-1234), uint16_t(65432), int32_t(123456789), uint32_t(987654321),
-                          int(-1234567), unsigned(7654321))
-          == "char 'X', i16 -1234, u16 65432, i32 123456789, u32 987654321, i -1234567, u 7654321");
-    CHECK(mini::format("long {}, ulong {}, i64 {}, u64 {}",
-                          12345678l, 87654321ul, int64_t(-12345678901234), uint64_t(12345678901234))
-          == "long 12345678, ulong 87654321, i64 -12345678901234, u64 12345678901234");
-    double d = 3.1415926;
-    CHECK(mini::format("float {}, double {}", 12345.125f, d)
-          == "float 12345.1, double 3.14159");
-
-    const char* cstr = "C string";
-    string str = "C++ string";
-    CHECK(mini::format("cstr '{}', C++ str '{}', string_view '{}'", cstr, str, string_view(str))
-          == "cstr 'C string', C++ str 'C++ string', string_view 'C++ string'");
-
-    CHECK(mini::format("One {} two {} three", 1, 2, 3)
-          == "One 1 two 2 three : 3");
-    CHECK(mini::format("One {} two {} three", 1, 2, 3, "hi")
-          == "One 1 two 2 three : 3, hi");
-    CHECK(mini::format("One {} two {} three {} four {}", 1, 2)
-          == "One 1 two 2 three {{{TOO FEW ARGS}}}");
-
-    coro_handle h = std::noop_coroutine();
-    CHECK(mini::format("{}", mini::i::arg::make(logCoro{h}))
-          == "¢exit");
-    CHECK(mini::format("{}", logCoro{h})
-          == "¢exit");
-
-    InitLogging();
-    logCoro lc{h};
-    Log->info("After '{}', should say ¢exit: {}", cstr, lc);
-    Log->info("After '{}', should say ¢exit: {}", cstr, logCoro{h});
 }
 
 

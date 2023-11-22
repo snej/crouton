@@ -40,7 +40,6 @@ namespace crouton::mini {
 
         ostream& writeInt64(int64_t, int base =10);
         ostream& writeUInt64(uint64_t, int base =10);
-        ostream& writeFloat(float);
         ostream& writeDouble(double);
 
         virtual void flush() { }
@@ -74,6 +73,34 @@ namespace crouton::mini {
     };
 
 
+    /** ostream that writes to a fixed-size caller-provided buffer. */
+    class bufferstream final : public ostream {
+    public:
+        bufferstream(char* begin, char* end)
+            :_begin(begin), _next(begin), _end(end) {assert(_end >= _begin); }
+        explicit bufferstream(MutableBytes b) :bufferstream((char*)b.data(), (char*)b.endByte()) { }
+
+        ostream& write(const char* src, size_t len) override {
+            if (_next + len > _end)
+                throw std::runtime_error("bufferstream overflow");
+            ::memcpy(_next, src, len);
+            _next += len;
+            return *this;
+        }
+
+        size_t available() const Pure       {return _end - _next;}
+
+        string_view str() const Pure        {return {_begin, _next};}
+        MutableBytes bytes() const Pure     {return {_begin, _next};}
+        MutableBytes buffer() const Pure    {return {_begin, _end};}
+
+        void clear()                        {_next = _begin;}
+
+    private:
+        char *_begin, *_next, *_end;
+    };
+
+
     /** Minimalist file stream suitable for cout and cerr. */
     class fdstream final : public ostream {
     public:
@@ -104,7 +131,7 @@ namespace crouton::mini {
     template <std::unsigned_integral UINT>
     ostream& operator<< (ostream& o, UINT i)            {return o.writeInt64(uint64_t(i));}
 
-    inline ostream& operator<< (ostream& o, float f)    {return o.writeFloat(f);}
+    inline ostream& operator<< (ostream& o, float f)    {return o.writeDouble(f);}
     inline ostream& operator<< (ostream& o, double d)   {return o.writeDouble(d);}
 
     

@@ -185,7 +185,7 @@ namespace crouton::log {
     }
 
 
-    void logger::_log(level::level_enum lvl, FormatString const& fmt, mini::FmtIDList types, ...) {
+    void logger::_log(level::level_enum lvl, FormatString const& fmt, mini::ArgTypeList types, ...) {
         if (auto sink = sLogSink) {
             stringstream out;
             va_list args;

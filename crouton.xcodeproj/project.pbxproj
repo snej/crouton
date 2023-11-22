@@ -65,6 +65,7 @@
 		275EB4372ACDCC5D0022ED53 /* BLIPIO.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B330502AB2763B0066C8DA /* BLIPIO.cc */; };
 		275EB4402ACDCD660022ED53 /* libBLIP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 275EB43F2ACDCC5D0022ED53 /* libBLIP.a */; };
 		275EB4412ACDCD760022ED53 /* libBLIP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 275EB43F2ACDCC5D0022ED53 /* libBLIP.a */; };
+		27793A312B0EA1AB0000B1C6 /* test_mini.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27793A302B0EA1AB0000B1C6 /* test_mini.cc */; };
 		277B652C2AD8B5D8006F053D /* betterassert.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277B652B2AD8B5D8006F053D /* betterassert.cc */; };
 		277B652E2AD9FCDC006F053D /* Backtrace+Unix.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277B652D2AD9FCDC006F053D /* Backtrace+Unix.cc */; };
 		277B6C172ADDB6B7006F053D /* ESPTCPSocket.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277B6C152ADDB6B7006F053D /* ESPTCPSocket.hh */; };
@@ -419,6 +420,7 @@
 		275EB3E92ACC7AC10022ED53 /* docs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = docs; sourceTree = "<group>"; };
 		275EB3EA2ACDC7450022ED53 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		275EB43F2ACDCC5D0022ED53 /* libBLIP.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libBLIP.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		27793A302B0EA1AB0000B1C6 /* test_mini.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_mini.cc; sourceTree = "<group>"; };
 		277B65272AD739B1006F053D /* Producer.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Producer.hh; sourceTree = "<group>"; };
 		277B65282AD766EF006F053D /* Relation.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Relation.hh; sourceTree = "<group>"; };
 		277B652A2AD8B5CA006F053D /* betterassert.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = betterassert.hh; sourceTree = "<group>"; };
@@ -888,6 +890,7 @@
 			children = (
 				27F49CD02A9D3AC600BFB24C /* tests.hh */,
 				272728C62A8D6505000CCA22 /* tests.cc */,
+				27793A302B0EA1AB0000B1C6 /* test_mini.cc */,
 				27E98EDE2AC2099E002F3D35 /* test_generator.cc */,
 				2788E3592AC500B700254A88 /* test_pubsub.cc */,
 				27F49CCE2A9D011B00BFB24C /* test_io.cc */,
@@ -1960,6 +1963,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				272728C72A8D6505000CCA22 /* tests.cc in Sources */,
+				27793A312B0EA1AB0000B1C6 /* test_mini.cc in Sources */,
 				27E98EDF2AC2099E002F3D35 /* test_generator.cc in Sources */,
 				2788E35A2AC500B700254A88 /* test_pubsub.cc in Sources */,
 				27F49CCF2A9D011B00BFB24C /* test_io.cc in Sources */,
