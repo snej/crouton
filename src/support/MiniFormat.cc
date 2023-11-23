@@ -25,14 +25,14 @@ namespace crouton::mini {
     using namespace i;
 
 
-    FormatString::iterator::iterator(FormatString const& fmt)
+    BaseFormatString::iterator::iterator(BaseFormatString const& fmt)
     :_str(fmt._impl._str)
     ,_pLength(&fmt._impl._lengths[0])
     ,_pSpec(&fmt._impl._specs[0])
     { }
 
 
-    string_view FormatString::iterator::literal() const {
+    string_view BaseFormatString::iterator::literal() const {
         assert(isLiteral());
         if (_str[0] == '{' || _str[0] == '}') [[unlikely]]
             return {_str, 1};
@@ -41,8 +41,8 @@ namespace crouton::mini {
     }
 
 
-    FormatString::iterator& FormatString::iterator::operator++ () {
-        if (isLiteral())
+    BaseFormatString::iterator& BaseFormatString::iterator::operator++ () {
+        if (!isLiteral())
             ++_pSpec;
         _str += *_pLength;
         ++_pLength;
@@ -50,7 +50,7 @@ namespace crouton::mini {
     }
 
 
-    static constexpr FormatString::Spec kDefaultSpec {};
+    static constexpr BaseFormatString::Spec kDefaultSpec {};
 
 
     static bool isupper(char c) {
@@ -67,7 +67,7 @@ namespace crouton::mini {
     }
 
 
-    static int baseForInt(ostream &out, FormatString::Spec const& spec) {
+    static int baseForInt(ostream &out, BaseFormatString::Spec const& spec) {
         switch (spec.type) {
             case 'd': case 0: 
                 return 10;
@@ -89,8 +89,8 @@ namespace crouton::mini {
     }
 
 
-    static void writeNonNegativeSign(ostream& out, FormatString::sign_t mode) {
-        using enum FormatString::sign_t;
+    static void writeNonNegativeSign(ostream& out, BaseFormatString::sign_t mode) {
+        using enum BaseFormatString::sign_t;
         if (mode == minusPlus)
             out << '+';
         else if (mode == minusSpace)
@@ -100,7 +100,7 @@ namespace crouton::mini {
 
     template <std::integral INT>
     static void vformat_integer(ostream &out,
-                                FormatString::Spec const& spec,
+                                BaseFormatString::Spec const& spec,
                                 va_list &args)
     {
         INT i = va_arg(args, INT);
@@ -126,7 +126,7 @@ namespace crouton::mini {
 
 
     static void vformat_double(ostream &out,
-                               FormatString::Spec const& spec,
+                               BaseFormatString::Spec const& spec,
                                double d)
     {
         if (d >= 0.0)
@@ -174,7 +174,7 @@ namespace crouton::mini {
 
 
     static void vformat_string(ostream &out,
-                               FormatString::Spec const& spec,
+                               BaseFormatString::Spec const& spec,
                                string_view str)
     {
         if (spec.type != 0 && spec.type != 's') [[unlikely]]
@@ -184,7 +184,7 @@ namespace crouton::mini {
 
 
     static void vformat_arg_nowidth(ostream &out,
-                                    FormatString::Spec const& spec,
+                                    BaseFormatString::Spec const& spec,
                                     i::ArgType itype,
                                     va_list &args)
     {
@@ -237,7 +237,7 @@ namespace crouton::mini {
 
 
     static void vformat_arg(ostream &out,
-                            FormatString::Spec const& spec,
+                            BaseFormatString::Spec const& spec,
                             i::ArgType itype,
                             va_list &args)
     {
@@ -265,27 +265,27 @@ namespace crouton::mini {
                 // String needs padding on one or both sides:
                 auto pad = spec.width - s;
                 auto align = spec.align;
-                if (align == FormatString::align_t::normal) {
+                if (align == BaseFormatString::align_t::normal) {
                     if (itype >= Int && itype <= Double)
-                        align = FormatString::align_t::right;
+                        align = BaseFormatString::align_t::right;
                     else
-                        align = FormatString::align_t::left;
+                        align = BaseFormatString::align_t::left;
                 }
-                if (spec.align == FormatString::align_t::center)
+                if (spec.align == BaseFormatString::align_t::center)
                     pad /= 2;
-                if (spec.align != FormatString::align_t::left) {
+                if (spec.align != BaseFormatString::align_t::left) {
                     out << string(pad, spec.fill);
                     pad = spec.width - s - pad; // for centering
                 }
                 out << str;
-                if (spec.align != FormatString::align_t::right)
+                if (spec.align != BaseFormatString::align_t::right)
                     out << string(pad, spec.fill);
             }
         }
     }
 
 
-    void vformat_types(ostream& out, FormatString const& fmt, ArgTypeList types, va_list args) {
+    void vformat_types(ostream& out, BaseFormatString const& fmt, ArgTypeList types, va_list args) {
         auto itype = types;
         for (auto i = fmt.begin(); i != fmt.end(); ++i) {
             if (i.isLiteral())
@@ -303,20 +303,20 @@ namespace crouton::mini {
     }
 
 
-    void format_types(ostream& out, FormatString const& fmt, ArgTypeList types, ...) {
+    void format_types(ostream& out, BaseFormatString const& fmt, ArgTypeList types, ...) {
         va_list args;
         va_start(args, types);
         vformat_types(out, fmt, types, args);
         va_end(args);
     }
 
-    string vformat_types(FormatString const& fmt, ArgTypeList types, va_list args) {
+    string vformat_types(BaseFormatString const& fmt, ArgTypeList types, va_list args) {
         stringstream out;
         vformat_types(out, fmt, types, args);
         return out.str();
     }
 
-    string format_types(FormatString const& fmt, ArgTypeList types, ...) {
+    string format_types(BaseFormatString const& fmt, ArgTypeList types, ...) {
         va_list args;
         va_start(args, types);
         string result = vformat_types(fmt, types, args);

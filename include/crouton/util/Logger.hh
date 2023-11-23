@@ -47,7 +47,7 @@ namespace crouton::log {
         bool should_log(level::level_enum level) const Pure  {return level >= _level;}
 
         template<mini::Formattable... Args>
-        void log(level::level_enum lvl, mini::FormatString const& fmt, Args &&...args) {
+        void log(level::level_enum lvl, mini::FormatString<Args...> const& fmt, Args &&...args) {
             if (should_log(lvl)) [[unlikely]]
                 _log(lvl, fmt, mini::ArgTypes<Args...>::ids, mini::i::passArg(args)...);
         }
@@ -55,37 +55,37 @@ namespace crouton::log {
         void log(level::level_enum lvl, string_view msg);
 
         template<mini::Formattable... Args>
-        void trace(mini::FormatString const& fmt, Args &&...args) {
+        void trace(mini::FormatString<Args...> const& fmt, Args &&...args) {
             log(level::trace, fmt, std::forward<Args>(args)...);
         }
         void trace(string_view msg)                         {log(level::trace, msg);}
 
         template<mini::Formattable... Args>
-        void debug(mini::FormatString const& fmt, Args &&...args) {
+        void debug(mini::FormatString<Args...> const& fmt, Args &&...args) {
             log(level::debug, fmt, std::forward<Args>(args)...);
         }
         void debug(string_view msg)                         {log(level::debug, msg);}
 
         template<mini::Formattable... Args>
-        void info(mini::FormatString const& fmt, Args &&...args) {
+        void info(mini::FormatString<Args...> const& fmt, Args &&...args) {
             log(level::info, fmt, std::forward<Args>(args)...);
         }
         void info(string_view msg)                          {log(level::info, msg);}
 
         template<mini::Formattable... Args>
-        void warn(mini::FormatString const& fmt, Args &&...args) {
+        void warn(mini::FormatString<Args...> const& fmt, Args &&...args) {
             log(level::warn, fmt, std::forward<Args>(args)...);
         }
         void warn(string_view msg)                          {log(level::warn, msg);}
 
         template<mini::Formattable... Args>
-        void error(mini::FormatString const& fmt, Args &&...args) {
+        void error(mini::FormatString<Args...> const& fmt, Args &&...args) {
             log(level::err, fmt, std::forward<Args>(args)...);
         }
         void error(string_view msg)                         {log(level::err, msg);}
 
         template<mini::Formattable... Args>
-        void critical(mini::FormatString const& fmt, Args &&...args) {
+        void critical(mini::FormatString<Args...> const& fmt, Args &&...args) {
             log(level::critical, fmt, std::forward<Args>(args)...);
         }
         void critical(string_view msg)                      {log(level::critical, msg);}
@@ -102,7 +102,7 @@ namespace crouton::log {
         static void set_output(Sink);
 
     private:
-        void _log(level::level_enum, mini::FormatString const& fmt, mini::ArgTypeList, ...);
+        void _log(level::level_enum, mini::BaseFormatString const& fmt, mini::ArgTypeList, ...);
         void _writeHeader(level::level_enum);
         void load_env_level();
 

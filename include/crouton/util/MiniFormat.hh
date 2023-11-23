@@ -54,10 +54,24 @@ namespace crouton::mini {
             ULongLong,
             Double,
             CString,
-            Pointer,
             String,
             StringView,
+            Pointer,
             Arg,
+        };
+
+        static constexpr const char kDefaultTypeCharForArgType[] = " scdddddd sssp ";
+        static_assert(sizeof(kDefaultTypeCharForArgType) == size_t(ArgType::Arg) + 2);
+
+        static constexpr const char* kValidTypeCharsForArgType[15] = {
+            "",
+            "sbBdoxX",      // Bool
+            "cbBdoxX",      // Char
+            "bBcdoxX", "bBcdoxX", "bBcdoxX", "bBcdoxX", "bBcdoxX", "bBcdoxX",  // integers
+            "aAeEfFgG",     // Double
+            "s", "s", "s"   // strings
+            "pP",           // Pointer
+            "s"             // Arg
         };
 
         struct ostreamableArg;
@@ -102,74 +116,6 @@ namespace crouton::mini {
                                            i::ArgType::None};
     };
     using ArgTypeList = i::ArgType const*;
-
-
-    // A compiled format string
-    class FormatString {
-    public:
-        consteval FormatString(const char* cstr) :_impl(parse(cstr)) { }
-
-        string_view str() const     {return _impl._str;}
-
-        enum class align_t : uint8_t {normal, left, center, right};
-        enum class sign_t : uint8_t  {minusOnly, minusPlus, minusSpace};
-
-        // Parsed format specifier
-        struct Spec {
-            char    fill            = ' ';
-            uint8_t width           = 0;
-            uint8_t precision       = 255;
-            char    type            = 0;
-            align_t align       :2  = align_t::normal;
-            sign_t  sign        :2  = sign_t::minusOnly;
-            bool    alternate   :1  = false;
-            bool    zeroPad     :1  = false;
-            bool    localize    :1  = false;
-            bool    ordinary    :1  = true;     // if true, all other fields have default values
-
-            constexpr void parse(const char*);
-            friend constexpr bool operator==(Spec const& a, Spec const& b) = default;
-        };
-
-
-        // iterator over format string & specifiers
-        class iterator {
-        public:
-            bool isLiteral() const              {return _str[0] != '{' || _str[1] == '{';}
-            struct Spec const& spec() const     {return *_pSpec;}
-            string_view literal() const;
-            iterator& operator++ ();
-            friend bool operator== (iterator const& a, iterator const& b) {
-                return a._pLength == b._pLength;}
-        private:
-            friend class FormatString;
-
-            iterator(FormatString const& fmt);
-            explicit iterator(uint8_t const* endLength) :_pLength(endLength) { }
-
-            const char*     _str;
-            uint8_t const*  _pLength;
-            Spec const*     _pSpec;
-        };
-
-        iterator begin() const Pure {return iterator(*this);}
-        iterator end()   const Pure {return iterator(&_impl._lengths[_impl._nSegments]);}
-
-    private:
-        static constexpr size_t kMaxSegments = 15;
-        static constexpr size_t kMaxSpecs = 8;
-
-        struct Impl {
-            const char* const   _str;
-            uint8_t             _nSegments;
-            uint8_t             _lengths[kMaxSegments];
-            Spec                _specs[kMaxSpecs];
-        };
-
-        static constexpr Impl parse(const char* cstr);
-
-        Impl const _impl;
-    };
 
 
     namespace i {
@@ -219,11 +165,97 @@ namespace crouton::mini {
     }
 
 
+    // A compiled format string
+    class BaseFormatString {
+    public:
+        consteval BaseFormatString(const char* cstr, ArgTypeList argTypes)
+        :_impl(parse(cstr, argTypes)) { }
+
+        string_view get() const     {return _impl._str;}
+
+        enum class align_t : uint8_t {normal, left, center, right};
+        enum class sign_t : uint8_t  {minusOnly, minusPlus, minusSpace};
+
+        // Parsed format specifier
+        struct Spec {
+            char    fill            = ' ';
+            uint8_t width           = 0;
+            uint8_t precision       = 255;
+            char    type            = 0;
+            align_t align       :2  = align_t::normal;
+            sign_t  sign        :2  = sign_t::minusOnly;
+            bool    alternate   :1  = false;
+            bool    localize    :1  = false;
+            bool    ordinary    :1  = true;     // if true, all other fields have default values
+
+            constexpr void parse(const char*, i::ArgType);
+            friend constexpr bool operator==(Spec const& a, Spec const& b) = default;
+        };
+
+
+        // iterator over format string & specifiers
+        class iterator {
+        public:
+            bool isLiteral() const              {return _str[0] != '{' || _str[1] == '{';}
+            struct Spec const& spec() const     {return *_pSpec;}
+            string_view literal() const;
+            iterator& operator++ ();
+            friend bool operator== (iterator const& a, iterator const& b) {
+                return a._pLength == b._pLength;}
+        private:
+            friend class BaseFormatString;
+
+            iterator(BaseFormatString const& fmt);
+            explicit iterator(uint8_t const* endLength) :_pLength(endLength) { }
+
+            const char*     _str;
+            uint8_t const*  _pLength;
+            Spec const*     _pSpec;
+        };
+
+        iterator begin() const Pure {return iterator(*this);}
+        iterator end()   const Pure {return iterator(&_impl._lengths[_impl._nSegments]);}
+
+        static BaseFormatString testParse(const char* cstr, ArgTypeList argTypes) {
+            return BaseFormatString(parse(cstr, argTypes));
+        }
+    private:
+        static constexpr size_t kMaxSegments = 15;
+        static constexpr size_t kMaxSpecs = 8;
+
+        struct Impl {
+            const char* const   _str;
+            uint8_t             _nSegments;
+            uint8_t             _lengths[kMaxSegments];
+            Spec                _specs[kMaxSpecs];
+        };
+
+        explicit BaseFormatString(Impl impl) :_impl(impl) { }
+        static constexpr Impl parse(const char* cstr, ArgTypeList);
+
+        Impl const _impl;
+    };
+
+
+    template<Formattable... Args>
+    class FormatString_ : public BaseFormatString {
+    public:
+        consteval FormatString_(const char* cstr) 
+        :BaseFormatString(cstr, ArgTypes<Args...>::ids) { }
+    };
+
+    template<Formattable... Args>
+    using FormatString = FormatString_<std::type_identity_t<std::decay_t<Args>>...>;
+
+
     // The core formatting functions:
-    void format_types(ostream&, FormatString const& fmt, ArgTypeList types, ...);
-    void vformat_types(ostream&, FormatString const& fmt, ArgTypeList types, va_list);
-    string format_types(FormatString const&, ArgTypeList types, ...);
-    string vformat_types(FormatString const&, ArgTypeList types, va_list);
+    void format_types(ostream&, BaseFormatString const& fmt, ArgTypeList types, ...);
+    void vformat_types(ostream&, BaseFormatString const& fmt, ArgTypeList types, va_list);
+    string format_types(BaseFormatString const&, ArgTypeList types, ...);
+    string vformat_types(BaseFormatString const&, ArgTypeList types, va_list);
+
+
+    static constexpr bool kAllowExtraArgs = true;
 
 
     /** Writes formatted output to an ostream.
@@ -231,7 +263,7 @@ namespace crouton::mini {
         @param fmt  Format string, with `{}` placeholders for args.
         @param args  Arguments; any type satisfying `Formattable`. */
     template<Formattable... Args>
-    void format(ostream& out, FormatString const& fmt, Args &&...args) {
+    void format(ostream& out, FormatString<Args...> const& fmt, Args &&...args) {
         format_types(out, fmt, ArgTypes<Args...>::ids, i::passArg(args)...);
     }
 
@@ -240,7 +272,7 @@ namespace crouton::mini {
         @param fmt  Format string, with `{}` placeholders for args.
         @param args  Arguments; any type satisfying `Formattable`. */
     template<Formattable... Args>
-    string format(FormatString const& fmt, Args &&...args) {
+    string format(FormatString<Args...> const& fmt, Args &&...args) {
         return format_types(fmt, ArgTypes<Args...>::ids, i::passArg(args)...);
     }
 
@@ -249,10 +281,13 @@ namespace crouton::mini {
 
     // (These have to be in the header because they're constexpr.)
 
-    constexpr FormatString::Impl FormatString::parse(const char* cstr) {
+    constexpr BaseFormatString::Impl BaseFormatString::parse(const char* cstr,
+                                                             ArgTypeList argTypes)
+    {
         Impl impl {cstr, 0, {}, {}};
         unsigned iSegment = 0, iSpec = 0;
         size_t lastPos = 0;
+        auto iArg = argTypes;
 
         auto append = [&](size_t pos) {
             if(iSegment >= kMaxSegments)
@@ -279,12 +314,16 @@ namespace crouton::mini {
                 // "{{" is an escape
                 pos += 2;
             } else {
+                // OK, we have a format specifier!
                 auto endPos = str.find('}', pos + 1);
                 if (endPos == string::npos)
                     throw format_error("Unclosed format specifier");
                 if (iSpec >= kMaxSpecs)
                     throw format_error("Too many format specifiers");
-                impl._specs[iSpec++].parse(&str[pos + 1]);
+                if (*iArg == i::ArgType::None)
+                    throw format_error("More format specifiers than arguments");
+                impl._specs[iSpec++].parse(&str[pos + 1], *iArg);
+                iArg++;
                 pos = endPos + 1;
             }
             append(pos);
@@ -297,10 +336,16 @@ namespace crouton::mini {
         return impl;
     }
 
-    constexpr void FormatString::Spec::parse(const char* str) {
+
+    constexpr void BaseFormatString::Spec::parse(const char* str, i::ArgType argType) {
         // https://en.cppreference.com/w/cpp/utility/format/formatter
 
-        // skip arg-id for now
+        // Set a default type based on the arg type:
+        if (argType == i::ArgType::None) throw format_error("None");//TEMP
+        if (char c = i::kDefaultTypeCharForArgType[uint8_t(argType)]; c != ' ')
+            this->type = c;
+
+        // skip arg-number for now...   //TODO: Implement arg numbers
         for (; *str != ':'; ++str) {
             if (*str == '}') return; // empty spec `{}`
             else if (!i::isdigit(*str))
@@ -316,13 +361,13 @@ namespace crouton::mini {
 
         // parse fill and align:
         char alignChar = 0;
-        if (str[0] == '<' || str[0] == '^' || str[0] == '>') {
+        if (char c = str[0]; c == '<' || c == '^' || c == '>') {
             this->fill = ' ';
-            alignChar = str[0];
+            alignChar = c;
             str += 1;
-        } else if (str[1] == '<' || str[1] == '^' || str[1] == '>') {
+        } else if (char c1 = str[1]; c1 == '<' || c1 == '^' || c1 == '>') {
             this->fill = str[0];
-            alignChar = str[1];
+            alignChar = c1;
             str += 2;
         }
         switch (alignChar) {
@@ -378,11 +423,14 @@ namespace crouton::mini {
             this->localize = true;
             ++str;
         }
-        // type char:
-        if (*str != '}') {
-            if (!i::isalpha(*str) && *str != '?')
-                throw format_error("invalid format spec: unknown type");
-            this->type = *str;
+        // type code:
+        if (char t = *str; t != '}') {
+            const char *valid = i::kValidTypeCharsForArgType[uint8_t(argType)];
+            while (*valid && *valid != t)
+                ++valid;
+            if (!*valid)
+                throw format_error("invalid format type character for argument");
+            this->type = t;
             if (str[1] != '}')
                 throw format_error("invalid format spec: unknown chars at end");
         }

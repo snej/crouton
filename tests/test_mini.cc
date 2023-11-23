@@ -22,10 +22,10 @@
 
 TEST_CASE("FormatString Spec", "[mini]") {
     InitLogging(); //FIXME: Put this somewhere where it gets run before any test
-    using enum mini::FormatString::align_t;
-    using enum mini::FormatString::sign_t;
+    using enum mini::BaseFormatString::align_t;
+    using enum mini::BaseFormatString::sign_t;
 
-    static constexpr struct {const char* str; mini::FormatString::Spec spec;} kTests[] = {
+    static constexpr struct {const char* str; mini::BaseFormatString::Spec spec;} kTests[] = {
         {"{}", {}},
         {"{:}", {}},
         {"{:d}", {.type = 'd', .ordinary = false}},
@@ -37,8 +37,8 @@ TEST_CASE("FormatString Spec", "[mini]") {
     };
     for (auto const& test : kTests) {
         INFO("Testing " << test.str);
-        mini::FormatString::Spec spec;
-        spec.parse(test.str + 1);
+        mini::BaseFormatString::Spec spec;
+        spec.parse(test.str + 1, mini::i::ArgType::None);
         CHECK(spec == test.spec);
     }
 }
@@ -46,7 +46,7 @@ TEST_CASE("FormatString Spec", "[mini]") {
 
 TEST_CASE("FormatString", "[mini]") {
     {
-        mini::FormatString fmt("hi");
+        mini::FormatString<> fmt("hi");
         auto i = fmt.begin();
         CHECK(i.isLiteral());
         CHECK(i.literal() == "hi");
@@ -54,29 +54,33 @@ TEST_CASE("FormatString", "[mini]") {
         CHECK(i == fmt.end());
     }
     {
-        mini::FormatString fmt("{}");
+        mini::FormatString<int> fmt("{}");
         auto i = fmt.begin();
         CHECK(!i.isLiteral());
-        CHECK(i.spec() == FormatString::Spec{});
+        CHECK(i.spec() == BaseFormatString::Spec{.type = 'd'});
         ++i;
         CHECK(i == fmt.end());
     }
     {
-        mini::FormatString fmt("this is {:} a {}{} test");
+        using enum mini::i::ArgType;
+        mini::i::ArgType argTypes[3] = {Int, String, Char};
+        auto fmt = mini::BaseFormatString::testParse("this is {:} a {}{} test", argTypes);
         auto i = fmt.begin();
+        CHECK(i.isLiteral());
         CHECK(i.literal() == "this is ");
-        CHECK(!(++i).isLiteral());
-        CHECK(i.spec() == FormatString::Spec{});
+        ++i;
+        CHECK(!i.isLiteral());
+        CHECK(i.spec() == BaseFormatString::Spec{.type = 'd'});
         CHECK((++i).literal() == " a ");
         CHECK(!(++i).isLiteral());
-        CHECK(i.spec() == FormatString::Spec{});
+        CHECK(i.spec() == BaseFormatString::Spec{.type = 's'});
         CHECK(!(++i).isLiteral());
-        CHECK(i.spec() == FormatString::Spec{});
+        CHECK(i.spec() == BaseFormatString::Spec{.type = 'c'});
         CHECK((++i).literal() == " test");
         CHECK(++i == fmt.end());
     }
     {
-        mini::FormatString fmt("this is a {{ test }}");
+        mini::FormatString<> fmt("this is a {{ test }}");
         auto i = fmt.begin();
         CHECK(i.isLiteral());
         CHECK(i.literal() == "this is a ");
@@ -88,14 +92,14 @@ TEST_CASE("FormatString", "[mini]") {
         CHECK(i.literal() == "}");
     }
     {
-        mini::FormatString fmt("{{Escaped ... {}!");
+        mini::FormatString<char> fmt("{{Escaped ... {}!");
         auto i = fmt.begin();
         CHECK(i.isLiteral());
         CHECK(i.literal()== "{");
         CHECK((++i).isLiteral());
         CHECK(i.literal() == "Escaped ... ");
         CHECK(!(++i).isLiteral());
-        CHECK(i.spec() == FormatString::Spec{});
+        CHECK(i.spec() == BaseFormatString::Spec{.type = 'c'});
         CHECK((++i).isLiteral());
         CHECK(i.literal() == "!");
     }
@@ -152,8 +156,28 @@ TEST_CASE("MiniFormat", "[mini]") {
 }
 
 
+TEST_CASE("MiniFormat Bools", "[mini]") {
+    static constexpr struct {mini::FormatString<bool> fmt; bool b; string_view formatted;} kTests[] = {
+        // default:
+        {"{}",      false, "false"},
+        {"{}",      true,  "true"},
+        // string:
+        {"{:s}",    false, "false"},
+        {"{:s}",    true,  "true"},
+        // as int:
+        {"{:d}",    false, "0"},
+        {"{:d}",    true,  "1"},
+        {"{:x}",    true,  "1"},
+    };
+    for (auto const& test : kTests) {
+        INFO("Testing " << test.fmt.get());
+        CHECK(format(test.fmt, test.b) == test.formatted);
+    }
+}
+
+
 TEST_CASE("MiniFormat Ints", "[mini]") {
-    static constexpr struct {mini::FormatString fmt; int n; string_view formatted;} kTests[] = {
+    static constexpr struct {mini::FormatString<int> fmt; int n; string_view formatted;} kTests[] = {
         // bases:
         {"{}",      123456789,  "123456789"},
         {"{:d}",    123456789,  "123456789"},
@@ -181,14 +205,14 @@ TEST_CASE("MiniFormat Ints", "[mini]") {
         {"{: d}",   0,          " 0"},
     };
     for (auto const& test : kTests) {
-        INFO("Testing " << test.fmt.str());
+        INFO("Testing " << test.fmt.get());
         CHECK(format(test.fmt, test.n) == test.formatted);
     }
 }
 
 
 TEST_CASE("MiniFormat Floats", "[mini]") {
-    static constexpr struct {mini::FormatString fmt; double n; string_view formatted;} kTests[] = {
+    static constexpr struct {mini::FormatString<double> fmt; double n; string_view formatted;} kTests[] = {
         // formats:
         {"{}",      1234.5678,  "1234.5678"},
         {"{:f}",    1234.5678,  "1234.567800"},
@@ -223,14 +247,14 @@ TEST_CASE("MiniFormat Floats", "[mini]") {
         {"{: }",   0.0,        " 0"},
     };
     for (auto const& test : kTests) {
-        INFO("Testing " << test.fmt.str());
+        INFO("Testing " << test.fmt.get());
         CHECK(format(test.fmt, test.n) == test.formatted);
     }
 }
 
 
 TEST_CASE("MiniFormat Widths", "[mini]") {
-    static constexpr struct {mini::FormatString fmt; int n; string_view formatted;} kTests[] = {
+    static constexpr struct {mini::FormatString<int> fmt; int n; string_view formatted;} kTests[] = {
         // widths:
         {"{:1d}",   1234,  "1234"},
         {"{:4d}",   1234,  "1234"},
@@ -250,7 +274,7 @@ TEST_CASE("MiniFormat Widths", "[mini]") {
 //        {"{:08d}", -1234,  "-00001234"},  //FIXME: Ugh, make this work right
     };
     for (auto const& test : kTests) {
-        INFO("Testing " << test.fmt.str());
+        INFO("Testing " << test.fmt.get());
         CHECK(format(test.fmt, test.n) == test.formatted);
     }
 }
