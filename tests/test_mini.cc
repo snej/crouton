@@ -28,12 +28,12 @@ TEST_CASE("FormatString Spec", "[mini]") {
     static constexpr struct {const char* str; mini::BaseFormatString::Spec spec;} kTests[] = {
         {"{}", {}},
         {"{:}", {}},
-        {"{:d}", {.type = 'd', .ordinary = false}},
-        {"{:^}", {.align = center, .fill = ' ', .ordinary = false}},
-        {"{:*>}", {.align = right, .fill = '*', .ordinary = false}},
-        {"{:+0}", {.sign = minusPlus, .align = right, .fill = '0', .ordinary = false}},
-        {"{:+3.4f}", {.sign = minusPlus, .width = 3, .precision = 4, .type = 'f', .ordinary = false}},
-        {"{:+0.4z}", {.sign = minusPlus, .align = right, .fill = '0', .precision = 4, .type = 'z', .ordinary = false}},
+        {"{:d}", {.type = 'd'}},
+        {"{:^}", {.align = center, .fill = ' '}},
+        {"{:*>}", {.align = right, .fill = '*'}},
+        {"{:+0}", {.sign = minusPlus, .align = right, .fill = '0'}},
+        {"{:+3.4f}", {.sign = minusPlus, .width = 3, .precision = 4, .type = 'f'}},
+        {"{:+0.4z}", {.sign = minusPlus, .align = right, .fill = '0', .precision = 4, .type = 'z'}},
     };
     for (auto const& test : kTests) {
         INFO("Testing " << test.str);
@@ -45,6 +45,7 @@ TEST_CASE("FormatString Spec", "[mini]") {
 
 
 TEST_CASE("FormatString", "[mini]") {
+    using enum crouton::mini::BaseFormatString::align_t;
     {
         mini::FormatString<> fmt("hi");
         auto i = fmt.begin();
@@ -57,7 +58,7 @@ TEST_CASE("FormatString", "[mini]") {
         mini::FormatString<int> fmt("{}");
         auto i = fmt.begin();
         CHECK(!i.isLiteral());
-        CHECK(i.spec() == BaseFormatString::Spec{.type = 'd'});
+        CHECK(i.spec() == BaseFormatString::Spec{.type = 'd', .align = right});
         ++i;
         CHECK(i == fmt.end());
     }
@@ -70,7 +71,7 @@ TEST_CASE("FormatString", "[mini]") {
         CHECK(i.literal() == "this is ");
         ++i;
         CHECK(!i.isLiteral());
-        CHECK(i.spec() == BaseFormatString::Spec{.type = 'd'});
+        CHECK(i.spec() == BaseFormatString::Spec{.type = 'd', .align = right});
         CHECK((++i).literal() == " a ");
         CHECK(!(++i).isLiteral());
         CHECK(i.spec() == BaseFormatString::Spec{.type = 's'});

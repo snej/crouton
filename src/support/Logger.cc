@@ -249,7 +249,7 @@ namespace crouton::log {
     }
 
 
-    void logger::_log(level::level_enum lvl, FormatString const& fmt, mini::FmtIDList types, ...) {
+    void logger::_log(level::level_enum lvl, BaseFormatString const& fmt, mini::ArgTypeList types, ...) {
         va_list args;
         va_start(args, types);
         string message = mini::vformat_types(fmt, types, args);

@@ -173,20 +173,19 @@ namespace crouton::mini {
 
         string_view get() const     {return _impl._str;}
 
-        enum class align_t : uint8_t {normal, left, center, right};
+        enum class align_t : uint8_t {left, center, right};
         enum class sign_t : uint8_t  {minusOnly, minusPlus, minusSpace};
 
         // Parsed format specifier
         struct Spec {
+            char    type            = 0;
             char    fill            = ' ';
             uint8_t width           = 0;
             uint8_t precision       = 255;
-            char    type            = 0;
-            align_t align       :2  = align_t::normal;
+            align_t align       :2  = align_t::left;
             sign_t  sign        :2  = sign_t::minusOnly;
             bool    alternate   :1  = false;
             bool    localize    :1  = false;
-            bool    ordinary    :1  = true;     // if true, all other fields have default values
 
             constexpr void parse(const char*, i::ArgType);
             friend constexpr bool operator==(Spec const& a, Spec const& b) = default;
@@ -341,23 +340,23 @@ namespace crouton::mini {
         // https://en.cppreference.com/w/cpp/utility/format/formatter
 
         // Set a default type based on the arg type:
-        if (argType == i::ArgType::None) throw format_error("None");//TEMP
         if (char c = i::kDefaultTypeCharForArgType[uint8_t(argType)]; c != ' ')
             this->type = c;
+        // Numbers default to right alignment:
+        if (argType >= i::ArgType::Int && argType <= i::ArgType::Double)
+            this->align = BaseFormatString::align_t::right;
 
         // skip arg-number for now...   //TODO: Implement arg numbers
         for (; *str != ':'; ++str) {
             if (*str == '}') return; // empty spec `{}`
             else if (!i::isdigit(*str))
                 throw format_error("invalid format spec: invalid arg number "
-                                            "(did you forget the ':'?)");
+                                   "(did you forget the ':'?)");
             throw format_error("invalid format spec: arg numbers not supported "
-                                        "(or did you forget the ':'?)");
+                               "(or did you forget the ':'?)");
         }
         ++str;
         if (str[0] == '}') return; // empty spec `{:}`
-
-        this->ordinary = false;
 
         // parse fill and align:
         char alignChar = 0;
@@ -425,11 +424,15 @@ namespace crouton::mini {
         }
         // type code:
         if (char t = *str; t != '}') {
-            const char *valid = i::kValidTypeCharsForArgType[uint8_t(argType)];
-            while (*valid && *valid != t)
-                ++valid;
-            if (!*valid)
-                throw format_error("invalid format type character for argument");
+            if (!i::isalpha(t))
+                throw format_error("invalid format spec: invalid type character");
+            if (argType != i::ArgType::None) {
+                const char *valid = i::kValidTypeCharsForArgType[uint8_t(argType)];
+                while (*valid && *valid != t)
+                    ++valid;
+                if (!*valid)
+                    throw format_error("invalid format spec: invalid spec for argument");
+            }
             this->type = t;
             if (str[1] != '}')
                 throw format_error("invalid format spec: unknown chars at end");

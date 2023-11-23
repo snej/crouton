@@ -34,6 +34,8 @@ namespace crouton::mini {
         virtual ~ostream() = default;
         virtual ostream& write(const char* src, size_t len) =0;
 
+        ostream& write(const char* begin, const char* end) {return write(begin, end - begin);}
+
         ostream& write(ConstBytes b);
         ostream& write(const char* str);
         ostream& write(string const& str);

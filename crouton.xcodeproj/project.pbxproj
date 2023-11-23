@@ -1962,8 +1962,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				272728C72A8D6505000CCA22 /* tests.cc in Sources */,
 				27793A312B0EA1AB0000B1C6 /* test_mini.cc in Sources */,
+				272728C72A8D6505000CCA22 /* tests.cc in Sources */,
 				27E98EDF2AC2099E002F3D35 /* test_generator.cc in Sources */,
 				2788E35A2AC500B700254A88 /* test_pubsub.cc in Sources */,
 				27F49CCF2A9D011B00BFB24C /* test_io.cc in Sources */,

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9)
 
 # MacOS deployment target must be set before the `project` call
-set(CMAKE_OSX_DEPLOYMENT_TARGET 11.0 CACHE INTERNAL "")
+set(CMAKE_OSX_DEPLOYMENT_TARGET 13.3 CACHE INTERNAL "")
 set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64")
 
 project( Crouton
@@ -259,6 +259,7 @@ endif()
 if (NOT CROUTON_IOS)
     add_executable( CroutonTests
         tests/tests.cc
+        tests/test_mini.cc
         tests/test_generator.cc
         tests/test_io.cc
         tests/test_http.cc
