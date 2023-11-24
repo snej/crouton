@@ -19,6 +19,8 @@
 #pragma once
 #include "crouton/util/Bytes.hh"
 #include <concepts>
+#include <cstring>
+#include <stdexcept>
 
 /*
  Lightweight replacement for std::ostream.

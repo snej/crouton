@@ -20,6 +20,7 @@
 #include "MiniOStream.hh"
 #include <concepts>
 #include <cstdarg>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 

@@ -29,11 +29,11 @@ TEST_CASE("FormatString Spec", "[mini]") {
         {"{}", {}},
         {"{:}", {}},
         {"{:d}", {.type = 'd'}},
-        {"{:^}", {.align = center, .fill = ' '}},
-        {"{:*>}", {.align = right, .fill = '*'}},
-        {"{:+0}", {.sign = minusPlus, .align = right, .fill = '0'}},
-        {"{:+3.4f}", {.sign = minusPlus, .width = 3, .precision = 4, .type = 'f'}},
-        {"{:+0.4z}", {.sign = minusPlus, .align = right, .fill = '0', .precision = 4, .type = 'z'}},
+        {"{:^}", {.fill = ' ', .align = center}},
+        {"{:*>}", {.fill = '*', .align = right}},
+        {"{:+0}", {.fill = '0', .align = right, .sign = minusPlus}},
+        {"{:+3.4f}", {.type = 'f', .width = 3, .precision = 4, .sign = minusPlus}},
+        {"{:+0.4z}", {.type = 'z', .fill = '0', .precision = 4, .align = right, .sign = minusPlus}},
     };
     for (auto const& test : kTests) {
         INFO("Testing " << test.str);
