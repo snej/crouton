@@ -190,7 +190,7 @@ namespace crouton::log {
             stringstream out;
             va_list args;
             va_start(args, types);
-            mini::vformat_types(out, fmt, types, args);
+            mini::vformat_types_to(out, fmt, types, args);
             va_end(args);
             sink(*this, lvl, out.str());
         } else {
@@ -199,7 +199,7 @@ namespace crouton::log {
             _writeHeader(lvl);
             va_list args;
             va_start(args, types);
-            mini::vformat_types(cerr, fmt, types, args);
+            mini::vformat_types_to(cerr, fmt, types, args);
             va_end(args);
             cerr << io::TTY::err().reset << endl;
         }

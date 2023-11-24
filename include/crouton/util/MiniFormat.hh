@@ -20,7 +20,6 @@
 #include "MiniOStream.hh"
 #include <concepts>
 #include <cstdarg>
-#include <initializer_list>
 #include <string>
 #include <string_view>
 
@@ -33,15 +32,12 @@ namespace crouton::mini {
     using std::string;
     using std::string_view;
 
-    
-    class format_error : public std::runtime_error {
-    public:
-        explicit format_error(const char *msg) :runtime_error(msg) { }
-    };
+
+#pragma mark - ARGUMENT TYPES:
 
 
-    namespace i {
-        // Enumeration identifying all formattable types.
+    namespace i { // internal stuff
+        // Enumeration identifying the argument types passed thru varargs.
         enum class ArgType : uint8_t {
             None = 0,
             Bool,
@@ -75,7 +71,6 @@ namespace crouton::mini {
         };
 
         struct ostreamableArg;
-
         using enum ArgType;
 
         // This maps types to FmtID values. Every formattable type needs an entry here.
@@ -91,7 +86,7 @@ namespace crouton::mini {
         template<> struct Formatting<long>              { static constexpr ArgType id = Long; };
         template<> struct Formatting<unsigned long>     { static constexpr ArgType id = ULong; };
         template<> struct Formatting<long long>         { static constexpr ArgType id = LongLong; };
-        template<> struct Formatting<unsigned long long>{ static constexpr ArgType id = ULongLong; };
+        template<> struct Formatting<unsigned long long>{ static constexpr ArgType id = ULongLong;};
         template<> struct Formatting<float>             { static constexpr ArgType id = Double; };
         template<> struct Formatting<double>            { static constexpr ArgType id = Double; };
         template<> struct Formatting<const char*>       { static constexpr ArgType id = CString; };
@@ -99,27 +94,33 @@ namespace crouton::mini {
         template<> struct Formatting<const void*>       { static constexpr ArgType id = Pointer; };
         template<> struct Formatting<void*>             { static constexpr ArgType id = Pointer; };
         template<> struct Formatting<std::string>       { static constexpr ArgType id = String; };
-        template<> struct Formatting<std::string_view>  { static constexpr ArgType id = StringView; };
-        template<> struct Formatting<ostreamableArg>               { static constexpr ArgType id = Arg; };
+        template<> struct Formatting<std::string_view>  { static constexpr ArgType id= StringView;};
+        template<> struct Formatting<ostreamableArg>    { static constexpr ArgType id = Arg; };
         template <ostreamable T> struct Formatting<T>   { static constexpr ArgType id = Arg; };
     }
 
-    /** The concept `Formattable` defines what types can be passed as args to `format`. */
+
+    /** The concept `Formattable` matches the types that can be passed as args to `format`. */
     template <typename T>
     concept Formattable = requires { i::Formatting<std::decay_t<T>>::id; };
 
 
-    // ArgTypes<...>::ids is a C array of the ArgTypes corresponding to the template argument types.
+    /** A pointer to a C array of argument types, terminated with `None`.
+        This is constructed at compile-time and passed to the `format` implementation.*/
+    using ArgTypeList = i::ArgType const*;
+
+
+    // `ArgTypes<...>::ids` is an `ArgTypeList` whose items match the template arguments.
     template<Formattable... Args>
     struct ArgTypes {
         static constexpr i::ArgType ids[] {i::Formatting<std::decay_t<Args>>::id... ,
                                            i::ArgType::None};
     };
-    using ArgTypeList = i::ArgType const*;
 
 
-    namespace i {
+    namespace i { // internal stuff, cont'd
         // Struct that type-erases an `ostreamable` value; passed as arg to formatting fns.
+        // Since this is passed through varargs it cannot have a constructor.
         struct ostreamableArg {
             template <ostreamable T>
             static ostreamableArg make(T &&value) {
@@ -134,38 +135,38 @@ namespace crouton::mini {
             template <typename T>
             static void writeFn(ostream& out, const void* ptr)      { out << *(const T*)ptr; }
 
-            const void* _ptr;                       // address of value -- type-erased T*
-            writeFn_t   _write;                     // pointer to writeFn<T>()
+            const void* _ptr;                       // address of value -- a type-erased `T*`
+            writeFn_t   _write;                     // address of `writeFn<T>()`
         };
 
-        // Transforms args before they're passed as varargs to `format`.
+        // `passArg()` transforms args before they're passed as varargs to `format`.
         template <std::integral T>       auto passArg(T t)  {return t;}
         template <std::floating_point T> auto passArg(T t)  {return t;}
         inline auto passArg(char* t)                        {return t;}
         inline auto passArg(const char* t)                  {return t;}
         inline auto passArg(void* t)                        {return t;}
         inline auto passArg(const void* t)                  {return t;}
-        inline auto passArg(std::string const& t)           {return &t;}
-        inline auto passArg(std::string_view const& t)      {return &t;}
-        inline auto passArg(ostreamableArg const& t)        {return t;}
+        inline auto passArg(std::string const& t)           {return &t;} // pass by reference!
+        inline auto passArg(std::string_view const& t)      {return &t;} // pass by reference!
 
-        template <ostreamable T>
+        template <ostreamable T> // ostreamable values are passed as a type-erased struct
         requires (i::Formatting<T>::id == ArgType::Arg)
         auto passArg(T const& t)                            {return ostreamableArg::make(t);}
 
-        static constexpr bool isdigit(char c) {
-            return c >= '0' && c <= '9';
-        }
-        static constexpr bool isalpha(char c) {
-            return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
-        }
-        static constexpr int digittoint(char c) {
-            return c - '0';
-        }
+        // constexpr and non-localized versions of ctypes fns
+        static constexpr bool isdigit(char c)   {return c >= '0' && c <= '9';}
+        static constexpr bool isalpha(char c)   {return (c >= 'A' && c <= 'Z') ||
+                                                        (c >= 'a' && c <= 'z');}
+        static constexpr int digittoint(char c) {return c - '0';}
     }
 
 
-    // A compiled format string
+#pragma mark - FORMAT STRING:
+
+
+    /** A compiled format string. Functions that are passed format strings by other functions
+        instead of being called directly should take a `BaseFormatString const&` parameter; see
+        `format_types()` and `vformat_types` as examples. */
     class BaseFormatString {
     public:
         consteval BaseFormatString(const char* cstr, ArgTypeList argTypes)
@@ -174,14 +175,15 @@ namespace crouton::mini {
         string_view get() const     {return _impl._str;}
 
         enum class align_t : uint8_t {left, center, right};
-        enum class sign_t : uint8_t  {minusOnly, minusPlus, minusSpace};
+        enum class sign_t  : uint8_t {minusOnly, minusPlus, minusSpace};
+        static constexpr uint8_t kDefaultPrecision = 255, kMaxPrecision = 255, kMaxWidth = 255;
 
         // Parsed format specifier
         struct Spec {
             char    type            = 0;
             char    fill            = ' ';
             uint8_t width           = 0;
-            uint8_t precision       = 255;
+            uint8_t precision       = kDefaultPrecision;
             align_t align       :2  = align_t::left;
             sign_t  sign        :2  = sign_t::minusOnly;
             bool    alternate   :1  = false;
@@ -190,7 +192,6 @@ namespace crouton::mini {
             constexpr void parse(const char*, i::ArgType);
             friend constexpr bool operator==(Spec const& a, Spec const& b) = default;
         };
-
 
         // iterator over format string & specifiers
         class iterator {
@@ -203,7 +204,6 @@ namespace crouton::mini {
                 return a._pLength == b._pLength;}
         private:
             friend class BaseFormatString;
-
             iterator(BaseFormatString const& fmt);
             explicit iterator(uint8_t const* endLength) :_pLength(endLength) { }
 
@@ -215,18 +215,20 @@ namespace crouton::mini {
         iterator begin() const Pure {return iterator(*this);}
         iterator end()   const Pure {return iterator(&_impl._lengths[_impl._nSegments]);}
 
+#ifndef NDEBUG
         static BaseFormatString testParse(const char* cstr, ArgTypeList argTypes) {
             return BaseFormatString(parse(cstr, argTypes));
         }
+#endif
     private:
         static constexpr size_t kMaxSegments = 15;
         static constexpr size_t kMaxSpecs = 8;
 
         struct Impl {
-            const char* const   _str;
-            uint8_t             _nSegments;
-            uint8_t             _lengths[kMaxSegments];
-            Spec                _specs[kMaxSpecs];
+            const char* const   _str;                   // the format string
+            uint8_t             _nSegments;             // number of pieces; size of _lengths[]
+            uint8_t             _lengths[kMaxSegments]; // length in bytes of each piece of _str
+            Spec                _specs[kMaxSpecs];      // format specs, in order
         };
 
         explicit BaseFormatString(Impl impl) :_impl(impl) { }
@@ -236,6 +238,10 @@ namespace crouton::mini {
     };
 
 
+    // Templated subclass of BaseFormatString that takes the arg types as format parameters,
+    // so that the ArgTypeList can be passed to the parent constructor for compile-time checking.
+    // (The `type_identity` thing is magic; I just copied it from the `std::format_string` docs:
+    // https://en.cppreference.com/w/cpp/utility/format/basic_format_string )
     template<Formattable... Args>
     class FormatString_ : public BaseFormatString {
     public:
@@ -243,102 +249,113 @@ namespace crouton::mini {
         :BaseFormatString(cstr, ArgTypes<Args...>::ids) { }
     };
 
+    /** A format string, templated by the types of the runtime arguments.
+        Client-visible formatting functions should take a (reference to) this type,
+        using the parameter pack as the template args. See `format()` for example. */
     template<Formattable... Args>
     using FormatString = FormatString_<std::type_identity_t<std::decay_t<Args>>...>;
 
 
-    // The core formatting functions:
-    void format_types(ostream&, BaseFormatString const& fmt, ArgTypeList types, ...);
-    void vformat_types(ostream&, BaseFormatString const& fmt, ArgTypeList types, va_list);
+    // The core formatting functions implemented in the .cc file
+    void format_types_to(ostream&, BaseFormatString const& fmt, ArgTypeList types, ...);
+    void vformat_types_to(ostream&, BaseFormatString const& fmt, ArgTypeList types, va_list);
     string format_types(BaseFormatString const&, ArgTypeList types, ...);
     string vformat_types(BaseFormatString const&, ArgTypeList types, va_list);
 
 
+    /** Configuration parameter: If this is `true`, the `format` functions allow you to pass more
+        arguments than are specified in the format string. The extra arguments are printed after
+        a ":", with default formatting, and separated by ","s. */
     static constexpr bool kAllowExtraArgs = true;
 
 
-    /** Writes formatted output to an ostream.
+    /** Writes formatted output to a `mini::ostream`.
         @param out  The stream to write to.
-        @param fmt  Format string, with `{}` placeholders for args.
-        @param args  Arguments; any type satisfying `Formattable`. */
+        @param fmt  Format string. Must be a string literal, with `{…}` placeholders for args.
+        @param args  Arguments, of any types satisfying `Formattable`. */
     template<Formattable... Args>
-    void format(ostream& out, FormatString<Args...> const& fmt, Args &&...args) {
-        format_types(out, fmt, ArgTypes<Args...>::ids, i::passArg(args)...);
+    inline void format_to(ostream& out, FormatString<Args...> const& fmt, Args &&...args) {
+        format_types_to(out, fmt, ArgTypes<Args...>::ids, i::passArg(args)...);
     }
 
 
-    /** Returns a formatted string..
-        @param fmt  Format string, with `{}` placeholders for args.
-        @param args  Arguments; any type satisfying `Formattable`. */
+    /** Returns a formatted string. This is mostly a drop-in replacement for `std::format()`.
+        @param fmt  Format string. Must be a string literal, with `{…}` placeholders for args.
+        @param args  Arguments, of any types satisfying `Formattable`. */
     template<Formattable... Args>
-    string format(FormatString<Args...> const& fmt, Args &&...args) {
+    inline string format(FormatString<Args...> const& fmt, Args &&...args) {
         return format_types(fmt, ArgTypes<Args...>::ids, i::passArg(args)...);
     }
 
 
+    /** Exception thrown for invalid format specs or invalid arguments.
+        Mostly gets thrown _at compile time_, which manifests as a confusing build error about
+        a `consteval` function calling a runtime-only function (i.e. `throw`.) */
+    class format_error : public std::runtime_error {
+    public:
+        explicit format_error(const char *msg) :runtime_error(msg) { }
+    };
+
+
 #pragma mark - Method implementations:
 
-    // (These have to be in the header because they're constexpr.)
+    // (These have to be in the header because they're constexpr and run at compile time.)
 
     constexpr BaseFormatString::Impl BaseFormatString::parse(const char* cstr,
                                                              ArgTypeList argTypes)
     {
         Impl impl {cstr, 0, {}, {}};
-        unsigned iSegment = 0, iSpec = 0;
-        size_t lastPos = 0;
+        unsigned nSpecs = 0;
         auto iArg = argTypes;
 
-        auto append = [&](size_t pos) {
-            if(iSegment >= kMaxSegments)
-                throw format_error("Too many format specifiers");
-            if (pos - lastPos > 0xFF)
-                throw format_error("Format string too long");
-            impl._lengths[iSegment++] = uint8_t(pos - lastPos);
-            lastPos = pos;
+        // subroutine to append a string segment to `_lengths`
+        size_t lastPos = 0;
+        auto addSegment = [&](size_t pos) {
+            if (pos > lastPos) {
+                if (impl._nSegments >= kMaxSegments)
+                    throw format_error("Too many format specifiers");
+                if (pos - lastPos > 0xFF)
+                    throw format_error("Format string too long");
+                impl._lengths[impl._nSegments++] = uint8_t(pos - lastPos);
+                lastPos = pos;
+            }
         };
 
         string_view str(cstr);
         size_t pos;
         while (string::npos != (pos = str.find_first_of("{}", lastPos))) {
-            if (pos > lastPos)
-                append(pos);
+            addSegment(pos);
             if (str[pos] == '}') {
-                // (The only reason to pay attention to "}" is that the std::format spec says
-                // "}}" is an escape and should be emitted as "}". Otherwise a "} is a syntax
-                // error, but let's just emit it as-is.
+                // "}}" is an escape and should be emitted as "}". Otherwise a "} is a syntax error:
                 if (pos + 1 >= str.size() || str[pos + 1] != '}')
                     throw format_error("Invalid '}' in format string");
                 pos += 2;
             } else if (pos + 1 < str.size() && str[pos + 1] == '{') {
-                // "{{" is an escape
+                // "{{" is an escape, emitted as "{":
                 pos += 2;
             } else {
                 // OK, we have a format specifier!
                 auto endPos = str.find('}', pos + 1);
                 if (endPos == string::npos)
                     throw format_error("Unclosed format specifier");
-                if (iSpec >= kMaxSpecs)
+                else if (nSpecs >= kMaxSpecs)
                     throw format_error("Too many format specifiers");
-                if (*iArg == i::ArgType::None)
+                else if (*iArg == i::ArgType::None)
                     throw format_error("More format specifiers than arguments");
-                impl._specs[iSpec++].parse(&str[pos + 1], *iArg);
-                iArg++;
+                impl._specs[nSpecs++].parse(&str[pos + 1], *iArg++);
                 pos = endPos + 1;
             }
-            append(pos);
+            addSegment(pos);
         }
 
-        pos = str.size();
-        if (pos > lastPos)
-            append(pos);
-        impl._nSegments = uint8_t(iSegment);
+        // Add the last literal segment, if non-empty:
+        addSegment(str.size());
         return impl;
     }
 
 
     constexpr void BaseFormatString::Spec::parse(const char* str, i::ArgType argType) {
         // https://en.cppreference.com/w/cpp/utility/format/formatter
-
         // Set a default type based on the arg type:
         if (char c = i::kDefaultTypeCharForArgType[uint8_t(argType)]; c != ' ')
             this->type = c;
@@ -346,17 +363,17 @@ namespace crouton::mini {
         if (argType >= i::ArgType::Int && argType <= i::ArgType::Double)
             this->align = BaseFormatString::align_t::right;
 
-        // skip arg-number for now...   //TODO: Implement arg numbers
+        // parse argument number, if any:
         for (; *str != ':'; ++str) {
-            if (*str == '}') return; // empty spec `{}`
+            if (*str == '}') return; // -> empty spec `{}`
             else if (!i::isdigit(*str))
                 throw format_error("invalid format spec: invalid arg number "
                                    "(did you forget the ':'?)");
             throw format_error("invalid format spec: arg numbers not supported "
-                               "(or did you forget the ':'?)");
+                               "(or did you forget the ':'?)");  //TODO: Implement arg numbers
         }
         ++str;
-        if (str[0] == '}') return; // empty spec `{:}`
+        if (str[0] == '}') return; // -> empty spec `{:}`
 
         // parse fill and align:
         char alignChar = 0;
@@ -395,12 +412,12 @@ namespace crouton::mini {
             ++str;
         }
 
-        // parse width:
+        // parse field width:
         if (i::isdigit(*str)) {
             unsigned w = 0;
             while (i::isdigit(*str)) {
                 w = 10 * w + i::digittoint(*str++);
-                if (w > 255)
+                if (w > kMaxWidth)
                     throw format_error("invalid format spec: width too large");
             }
             this->width = uint8_t(w);
@@ -412,17 +429,17 @@ namespace crouton::mini {
             unsigned p = 0;
             while (i::isdigit(*str)) {
                 p = 10 * p + i::digittoint(*str++);
-                if (p > 255)
+                if (p > kMaxPrecision)
                     throw format_error("invalid format spec: precision too large");
             }
             this->precision = uint8_t(p);
         }
-        // "localized" specifier:
+        // parse "localized" specifier:
         if (*str == 'L') {
             this->localize = true;
             ++str;
         }
-        // type code:
+        // parse type code:
         if (char t = *str; t != '}') {
             if (!i::isalpha(t))
                 throw format_error("invalid format spec: invalid type character");

@@ -20,14 +20,6 @@
 #include <charconv>
 #include <cstdio>
 
-#ifdef __APPLE__
-#  include <TargetConditionals.h>
-#endif
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunguarded-availability-new"
-
-
 namespace crouton::mini {
 
     fdstream cout(stdout);
@@ -50,11 +42,12 @@ namespace crouton::mini {
     }
 
     ostream& ostream::writeDouble(double f) {
-        char buf[20];
+        char buf[30];
 #ifdef __APPLE__ // Apple's libc++ didn't add this method until later
         if (__builtin_available(macOS 13.3, iOS 16.3, tvOS 16.3, watchOS 9.3, *)) {
 #endif
             auto result = std::to_chars(&buf[0], &buf[sizeof(buf)], f);
+            assert(result.ec == std::errc{});
             return write(&buf[0], result.ptr - buf);
 #ifdef __APPLE__
         } else {
@@ -79,5 +72,3 @@ namespace crouton::mini {
     }
     
 }
-
-#pragma GCC diagnostic pop

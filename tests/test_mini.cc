@@ -145,8 +145,6 @@ TEST_CASE("MiniFormat", "[mini]") {
 //          == "One 1 two 2 three {{{TOO FEW ARGS}}}"); // TODO: Re-enable with exception check
 
     coro_handle h = std::noop_coroutine();
-    CHECK(mini::format("{}", mini::i::ostreamableArg::make(logCoro{h}))
-          == "¢exit");
     CHECK(mini::format("{}", logCoro{h})
           == "¢exit");
 

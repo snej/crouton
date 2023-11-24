@@ -50,6 +50,7 @@ namespace crouton::mini {
     }
 
 
+    // non-localized ASCII-specific equivalents of ctypes:
     static Pure bool isupper(char c) {return c >= 'A' && c <= 'Z';}
     static Pure char toupper(char c) {return (c >= 'a' && c <= 'z') ? (c - 32) : c;}
 
@@ -59,6 +60,7 @@ namespace crouton::mini {
     }
 
 
+    // Returns the base to format an integer in according to the Spec
     static int baseForInt(ostream &out, BaseFormatString::Spec const& spec) {
         switch (spec.type) {
             case 'd': case 0: 
@@ -81,6 +83,7 @@ namespace crouton::mini {
     }
 
 
+    // Writes a '+', ' ' or nothing, according to the spec's sign mode
     static void writeNonNegativeSign(ostream& out, BaseFormatString::sign_t mode) {
         using enum BaseFormatString::sign_t;
         if (mode == minusPlus)
@@ -92,6 +95,7 @@ namespace crouton::mini {
     // Note: For some reason a parameter type of `va_list&` causes a compile error in Clang,
     // but only in optimized builds. So I've changed it to `auto&` as a workaround.
 
+    // Reads an integer from `args` and writes it to `out` according to `spec`
     template <std::integral INT>
     static void vformat_integer(ostream &out,
                                 BaseFormatString::Spec const& spec,
@@ -119,6 +123,7 @@ namespace crouton::mini {
     }
 
 
+    // Writes a floating-point number to `out` according to `spec`.
     static void vformat_double(ostream &out,
                                BaseFormatString::Spec const& spec,
                                double d)
@@ -131,11 +136,11 @@ namespace crouton::mini {
 #endif
 
             std::to_chars_result result;
-            if (spec.type == 0 && spec.precision == 255) {
+            if (spec.type == 0 && spec.precision == BaseFormatString::kDefaultPrecision) {
                 result = std::to_chars(&buf[0], &buf[sizeof(buf)], d);
             } else {
                 std::chars_format format;
-                int precision = (spec.precision != 255) ? spec.precision : 6;
+                int precision = (spec.precision != BaseFormatString::kDefaultPrecision) ? spec.precision : 6;
                 switch (spec.type) {
                     case 'a': case 'A': format = std::chars_format::hex; break;
                     case 'e': case 'E': format = std::chars_format::scientific; break;
@@ -171,13 +176,17 @@ namespace crouton::mini {
     }
 
 
+    // Writes a string to `out` according to `spec`.
     static void vformat_string(ostream &out,
                                BaseFormatString::Spec const& spec,
                                string_view str)
     {
         if (spec.type != 0 && spec.type != 's') [[unlikely]]
             throw format_error("invalid type for string arg");
-        out << str;
+        size_t size = str.size();
+        if (spec.precision < size && spec.precision != BaseFormatString::kDefaultPrecision)
+            size = spec.precision;
+        out.write(str.data(), size);
     }
 
 
@@ -235,7 +244,8 @@ namespace crouton::mini {
     }
 
 
-    // Top-level formatter for one argument. Applies width/alignment.
+    // Top-level formatter for one argument.
+    // Calls `vformat_arg_nowidth`, then applies width/alignment.
     static void vformat_arg(ostream &out,
                             BaseFormatString::Spec const& spec,
                             i::ArgType itype,
@@ -246,20 +256,18 @@ namespace crouton::mini {
         // complicated when non-ASCII characters are involved. I'm ignoring this.
         //TODO: fancy Unicode width computation
 
-        if (spec.width == 0 && spec.precision == 255) [[likely]] {
+        if (spec.width == 0) [[likely]] {
+            // Simple case if there is no max field width:
             vformat_arg_nowidth(out, spec, itype, args);
         } else {
-            // First format to a string:
+            // General case. First format to a string:
             stringstream buf;
             vformat_arg_nowidth(buf, spec, itype, args);
             string str = buf.extract_str();
             size_t s = str.size();
 
-            if (s >= spec.precision && (itype >= ArgType::CString && itype <= ArgType::StringView)) {
-                // Clip string to the precision:
-                out.write(str.data(), spec.precision);
-            } else if (s >= spec.width) {
-                // String is full width, write it all:
+            if (s >= spec.width) {
+                // String is full width, so write it all:
                 out << str;
             } else {
                 // String needs padding on one or both sides:
@@ -278,7 +286,7 @@ namespace crouton::mini {
     }
 
 
-    void vformat_types(ostream& out, BaseFormatString const& fmt, ArgTypeList types, va_list args) {
+    void vformat_types_to(ostream& out, BaseFormatString const& fmt, ArgTypeList types, va_list args) {
         auto itype = types;
         for (auto i = fmt.begin(); i != fmt.end(); ++i) {
             if (i.isLiteral())
@@ -289,25 +297,24 @@ namespace crouton::mini {
         // If there are more args than specifiers, write the rest as a comma-separated list:
         const char* delim = " : ";
         while (*itype != ArgType::None) {
-            static constexpr BaseFormatString::Spec kDefaultSpec {};
             out << delim;
             delim = ", ";
-            vformat_arg(out, kDefaultSpec, *itype++, args);
+            vformat_arg(out, BaseFormatString::Spec{}, *itype++, args);
         }
     }
 
 
     string vformat_types(BaseFormatString const& fmt, ArgTypeList types, va_list args) {
         stringstream out;
-        vformat_types(out, fmt, types, args);
+        vformat_types_to(out, fmt, types, args);
         return out.extract_str();
     }
 
 
-    void format_types(ostream& out, BaseFormatString const& fmt, ArgTypeList types, ...) {
+    void format_types_to(ostream& out, BaseFormatString const& fmt, ArgTypeList types, ...) {
         va_list args;
         va_start(args, types);
-        vformat_types(out, fmt, types, args);
+        vformat_types_to(out, fmt, types, args);
         va_end(args);
     }
 
