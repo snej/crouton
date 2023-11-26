@@ -21,13 +21,15 @@
 #include <cstdio>
 
 namespace crouton::mini {
+    
 
     fdstream cout(stdout);
     fdstream cerr(stderr);
 
-    ostream& ostream::write(ConstBytes b)      {return write((const char*)b.data(), b.size());}
+    ostream& ostream::write(std::span<const char> b){return write(b.data(), b.size());}
+    ostream& ostream::write(std::span<const std::byte> b){return write((const char*)b.data(), b.size());}
     ostream& ostream::write(const char* str)   {return write(str, strlen(str));}
-    ostream& ostream::write(string const& str) {return write(str.data(), str.size());}
+    ostream& ostream::write(std::string const& str) {return write(str.data(), str.size());}
 
     ostream& ostream::writeInt64(int64_t i, int base) {
         char buf[20];
@@ -47,7 +49,6 @@ namespace crouton::mini {
         if (__builtin_available(macOS 13.3, iOS 16.3, tvOS 16.3, watchOS 9.3, *)) {
 #endif
             auto result = std::to_chars(&buf[0], &buf[sizeof(buf)], f);
-            assert(result.ec == std::errc{});
             return write(&buf[0], result.ptr - buf);
 #ifdef __APPLE__
         } else {

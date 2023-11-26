@@ -18,7 +18,7 @@
 
 #pragma once
 
-// By default, Crouton uses its own small logging library, defined in Logger.hh.
+// By default, Crouton uses its own small logging library, defined in MiniLogger.hh.
 // To make it use spdlog instead, pre-define the macro `CROUTON_USE_SPDLOG` to `1`.
 #ifndef CROUTON_USE_SPDLOG
 #define CROUTON_USE_SPDLOG 0
@@ -31,13 +31,15 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>    // Makes custom types loggable via `operator <<` overloads
 #else
-#include "crouton/util/Logger.hh"
+#include "crouton/util/MiniLogger.hh"
 #endif
 
 namespace crouton {
 
 #if CROUTON_USE_SPDLOG
     namespace log = ::spdlog;
+#else
+    namespace log = ::crouton::mini;
 #endif
 
 

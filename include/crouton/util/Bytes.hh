@@ -55,7 +55,7 @@ namespace crouton {
 
 
     /** Low-level struct pointing to immutable data.
-     Usually serves as the source of a `write`, or as a returned buffer from `readNoCopy`. */
+        Usually serves as the source of a `write`, or as a returned buffer from `readNoCopy`. */
     class ConstBytes : public Bytes<const byte, ConstBytes> {
     public:
         using Bytes::Bytes;

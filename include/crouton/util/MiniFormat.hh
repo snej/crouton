@@ -27,6 +27,20 @@
 /*
  A string formatting API mostly compatible with `std::format`, but optimized for small code size.
  https://en.cppreference.com/w/cpp/utility/format/formatter
+
+ Missing functionality and limitations:
+ - You can't create custom formatters that interpret custom field specs. (But you can format
+   custom types by implementing `operator<<`.)
+ - Arguments can't be reordered (i.e. a field spec like `{nn:}` isn't allowed.)
+ - Field widths & alignment are not Unicode-aware; they assume 1 byte == 1 space.
+ - Localized variants are unimplemented (using 'L' in a format spec has no effect.)
+ - Only 10 arguments are allowed. (You can change this by changing BaseFormatString::kMaxSpecs.)
+ - Field width and precision are limited to 255.
+
+ Known bugs:
+ - When a number is zero-padded, the zeroes go before the sign character, not afterward.
+ - When the alternate ('#') form of a float adds a decimal point, it will go after any exponent,
+   when it should go before.
  */
 
 namespace crouton::mini {
@@ -107,7 +121,7 @@ namespace crouton::mini {
 
 
     /** A pointer to a C array of argument types, terminated with `None`.
-        This is constructed at compile-time and passed to the `format` implementation.*/
+        This is constructed at compile-time and passed to the `format` implementation. */
     using ArgTypeList = i::ArgType const*;
 
 
@@ -213,8 +227,8 @@ namespace crouton::mini {
             Spec const*     _pSpec;
         };
 
-        iterator begin() const Pure {return iterator(*this);}
-        iterator end()   const Pure {return iterator(&_impl._lengths[_impl._nSegments]);}
+        iterator begin() const {return iterator(*this);}
+        iterator end()   const {return iterator(&_impl._lengths[_impl._nSegments]);}
 
 #ifndef NDEBUG
         static BaseFormatString testParse(const char* cstr, ArgTypeList argTypes) {
@@ -222,8 +236,8 @@ namespace crouton::mini {
         }
 #endif
     private:
-        static constexpr size_t kMaxSegments = 15;
-        static constexpr size_t kMaxSpecs = 8;
+        static constexpr size_t kMaxSpecs = 10;
+        static constexpr size_t kMaxSegments = 2 * kMaxSpecs + 1;
 
         struct Impl {
             const char* const   _str;                   // the format string

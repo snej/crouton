@@ -17,18 +17,32 @@
 //
 
 #pragma once
-#include "crouton/util/Bytes.hh"
 #include <concepts>
 #include <cstring>
+#include <span>
 #include <stdexcept>
+#include <string>
+#include <string_view>
+
+#if __has_include("betterassert.hh")
+#include "betterassert.hh"
+#else
+#include <cassert>
+#endif
 
 /*
  Lightweight replacement for std::ostream.
  */
 
 namespace crouton::mini {
+    using string = std::string;
+    using string_view = std::string_view;
 
+#ifdef _WIN32
+    static constexpr const char* endl = "\n\r";
+#else
     static constexpr const char* endl = "\n";
+#endif
 
     /** Abstract base class of output streams. */
     class ostream {
@@ -38,7 +52,8 @@ namespace crouton::mini {
 
         ostream& write(const char* begin, const char* end) {return write(begin, end - begin);}
 
-        ostream& write(ConstBytes b);
+        ostream& write(std::span<const char> b);
+        ostream& write(std::span<const std::byte> b);
         ostream& write(const char* str);
         ostream& write(string const& str);
 
@@ -59,30 +74,32 @@ namespace crouton::mini {
     class stringstream final : public ostream {
     public:
         stringstream() = default;
-        stringstream(std::string s)     :_str(std::move(s)) { }
+        stringstream(string s)     :_str(std::move(s)) { }
 
         ostream& write(const char* src, size_t len) override {_str.append(src, len); return *this;}
 
-        string const& str() const &     {return _str;}
-        string&& str() &&               {return std::move(_str);}
-        string extract_str()            {return std::move(_str);}
+        string const& str() const &      {return _str;}
+        string str() &&                  {return std::move(_str);}
 
         template <typename T>
         void str(T&& s)                 {_str = std::forward<T>(s);}
 
+        string_view view() const        {return _str;}
+
         void clear()                    {_str.clear();}
 
     private:
-        std::string _str;
+        string _str;
     };
 
 
     /** ostream that writes to a fixed-size caller-provided buffer. */
-    class bufferstream final : public ostream {
+    class bufstream : public ostream {
     public:
-        bufferstream(char* begin, char* end)
-            :_begin(begin), _next(begin), _end(end) {assert(_end >= _begin); }
-        explicit bufferstream(MutableBytes b) :bufferstream((char*)b.data(), (char*)b.endByte()) { }
+        bufstream(char* begin, char* end)
+        :_begin(begin), _next(begin), _end(end) {assert(_end >= _begin); }
+        bufstream(char* begin, size_t size)     :bufstream(begin, begin + size) { }
+        explicit bufstream(std::span<char> b)   :bufstream(b.data(), b.size_bytes()) { }
 
         ostream& write(const char* src, size_t len) override {
             if (_next + len > _end)
@@ -92,16 +109,29 @@ namespace crouton::mini {
             return *this;
         }
 
-        size_t available() const Pure       {return _end - _next;}
+        size_t available() const            {return _end - _next;}
 
-        string_view str() const Pure        {return {_begin, _next};}
-        MutableBytes bytes() const Pure     {return {_begin, _next};}
-        MutableBytes buffer() const Pure    {return {_begin, _end};}
+        string_view str() const             {return {_begin, _next};}
+        std::span<char> buffer() const      {return {_begin, _end};}
 
         void clear()                        {_next = _begin;}
 
-    private:
+    protected:
+        bufstream() = default;
         char *_begin, *_next, *_end;
+    };
+
+
+    /** ostream that writes to a fixed-size buffer it allocates itself.
+        A small buffer lives inside the object; a large one is heap-allocated. */
+    template <size_t SIZE>
+    class owned_bufstream : public bufstream {
+    public:
+        owned_bufstream()  :bufstream(SIZE > kMaxInlSize ? new char[SIZE] : _buffer, SIZE) { }
+        ~owned_bufstream() {if constexpr (SIZE > kMaxInlSize) delete[] _begin;}
+    private:
+        static constexpr size_t kMaxInlSize = 64;
+        char _buffer[ (SIZE <= kMaxInlSize) ? SIZE : 1 ];
     };
 
 
@@ -117,13 +147,14 @@ namespace crouton::mini {
 
     /** ostream that writes to stdout. */
     extern fdstream cout;
+    
     /** ostream that writes to stderr. */
     extern fdstream cerr;
 
 
-    inline ostream& operator<< (ostream& o, ConstBytes bytes)    {return o.write(bytes);}
+    inline ostream& operator<< (ostream& o, std::span<const std::byte> bytes)    {return o.write(bytes);}
     inline ostream& operator<< (ostream& o, const char* str)     {return o.write(str);}
-    inline ostream& operator<< (ostream& o, string_view str)     {return o.write(str);}
+    inline ostream& operator<< (ostream& o, string_view str)     {return o.write(str.data(), str.size());}
     inline ostream& operator<< (ostream& o, string const& str)   {return o.write(str);}
     inline ostream& operator<< (ostream& o, char c)              {return o.write(&c, 1);}
 
@@ -133,7 +164,7 @@ namespace crouton::mini {
     ostream& operator<< (ostream& o, INT i)             {return o.writeInt64(int64_t(i));}
 
     template <std::unsigned_integral UINT>
-    ostream& operator<< (ostream& o, UINT i)            {return o.writeInt64(uint64_t(i));}
+    ostream& operator<< (ostream& o, UINT i)            {return o.writeUInt64(uint64_t(i));}
 
     inline ostream& operator<< (ostream& o, float f)    {return o.writeDouble(f);}
     inline ostream& operator<< (ostream& o, double d)   {return o.writeDouble(d);}

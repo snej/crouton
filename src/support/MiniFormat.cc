@@ -51,8 +51,8 @@ namespace crouton::mini {
 
 
     // non-localized ASCII-specific equivalents of ctypes:
-    static Pure bool isupper(char c) {return c >= 'A' && c <= 'Z';}
-    static Pure char toupper(char c) {return (c >= 'a' && c <= 'z') ? (c - 32) : c;}
+    static bool isupper(char c) {return c >= 'A' && c <= 'Z';}
+    static char toupper(char c) {return (c >= 'a' && c <= 'z') ? (c - 32) : c;}
 
     static void upperize(char *begin, char *end) {
         for (char *c = begin; c != end; ++c)
@@ -263,7 +263,7 @@ namespace crouton::mini {
             // General case. First format to a string:
             stringstream buf;
             vformat_arg_nowidth(buf, spec, itype, args);
-            string str = buf.extract_str();
+            string str = std::move(buf).str();
             size_t s = str.size();
 
             if (s >= spec.width) {
@@ -307,7 +307,7 @@ namespace crouton::mini {
     string vformat_types(BaseFormatString const& fmt, ArgTypeList types, va_list args) {
         stringstream out;
         vformat_types_to(out, fmt, types, args);
-        return out.extract_str();
+        return std::move(out).str();
     }
 
 

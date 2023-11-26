@@ -142,10 +142,10 @@ add_library( LibCrouton STATIC
     src/support/Backtrace+Unix.cc
     src/support/Backtrace+Windows.cc
     src/support/betterassert.cc
-    src/support/Memoized.cc
-    src/support/Logger.cc
     src/support/Logging.cc
+    src/support/Memoized.cc
     src/support/MiniFormat.cc
+    src/support/MiniLogger.cc
     src/support/MiniOStream.cc
     src/support/StringUtils.cc
     src/support/Varint.cc

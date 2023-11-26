@@ -149,7 +149,7 @@
 		27BCD3382AF30A20009DFCED /* libmbedcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 27BCD3352AF30A20009DFCED /* libmbedcrypto.a */; };
 		27E98EDF2AC2099E002F3D35 /* test_generator.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E98EDE2AC2099E002F3D35 /* test_generator.cc */; };
 		27E9A0C72AFAB8FE00EF3726 /* Task.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E9A0C62AFAB8FE00EF3726 /* Task.cc */; };
-		27E9A0D62AFDAA6100EF3726 /* Logger.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E9A0D52AFDAA6100EF3726 /* Logger.cc */; };
+		27E9A0D62AFDAA6100EF3726 /* MiniLogger.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27E9A0D52AFDAA6100EF3726 /* MiniLogger.cc */; };
 		27E9A1122B02C61A00EF3726 /* miniz_tinfl.c in Sources */ = {isa = PBXBuildFile; fileRef = 27E9A10B2B02C52C00EF3726 /* miniz_tinfl.c */; settings = {COMPILER_FLAGS = "-Wno-comma -O3"; }; };
 		27E9A1162B02CD1800EF3726 /* miniz_tdef.c in Sources */ = {isa = PBXBuildFile; fileRef = 27E9A0E72B02C52C00EF3726 /* miniz_tdef.c */; settings = {COMPILER_FLAGS = "-Wno-comma -O3"; }; };
 		27E9A1172B02CF9A00EF3726 /* miniz.c in Sources */ = {isa = PBXBuildFile; fileRef = 27E9A0E22B02C52C00EF3726 /* miniz.c */; settings = {COMPILER_FLAGS = "-Wno-comma -O3"; }; };
@@ -715,8 +715,8 @@
 		27E98EDE2AC2099E002F3D35 /* test_generator.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_generator.cc; sourceTree = "<group>"; };
 		27E98EE02AC21940002F3D35 /* Awaitable.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Awaitable.hh; sourceTree = "<group>"; };
 		27E9A0C62AFAB8FE00EF3726 /* Task.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Task.cc; sourceTree = "<group>"; };
-		27E9A0D42AFDA91200EF3726 /* Logger.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Logger.hh; sourceTree = "<group>"; };
-		27E9A0D52AFDAA6100EF3726 /* Logger.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Logger.cc; sourceTree = "<group>"; };
+		27E9A0D42AFDA91200EF3726 /* MiniLogger.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MiniLogger.hh; sourceTree = "<group>"; };
+		27E9A0D52AFDAA6100EF3726 /* MiniLogger.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MiniLogger.cc; sourceTree = "<group>"; };
 		27E9A0E12B02C52C00EF3726 /* miniz_zip.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = miniz_zip.h; sourceTree = "<group>"; };
 		27E9A0E22B02C52C00EF3726 /* miniz.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = miniz.c; sourceTree = "<group>"; };
 		27E9A0E32B02C52C00EF3726 /* miniz_tinfl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = miniz_tinfl.h; sourceTree = "<group>"; };
@@ -1183,8 +1183,8 @@
 				27B3306A2AB391F30066C8DA /* Bytes.hh */,
 				2727304B2A8E811B000CCA22 /* Defer.hh */,
 				277E8A432ABA50FB00E78CB1 /* LinkedList.hh */,
-				27E9A0D42AFDA91200EF3726 /* Logger.hh */,
 				278F7F222AAA98FE005B12F2 /* Logging.hh */,
+				27E9A0D42AFDA91200EF3726 /* MiniLogger.hh */,
 				277B6C272AE06CDA006F053D /* MiniFormat.hh */,
 				2755E81C2B0947D40005AC35 /* MiniOStream.hh */,
 				277B65282AD766EF006F053D /* Relation.hh */,
@@ -1622,11 +1622,11 @@
 				27F49CD42A9E4E8E00BFB24C /* Backtrace.hh */,
 				277B652B2AD8B5D8006F053D /* betterassert.cc */,
 				27B330692AB388960066C8DA /* Endian.hh */,
-				27E9A0D52AFDAA6100EF3726 /* Logger.cc */,
 				278F7F232AAA98FE005B12F2 /* Logging.cc */,
 				275A5F132AAFB3B1009791E8 /* Memoized.hh */,
 				275A5F142AAFB3B1009791E8 /* Memoized.cc */,
 				277B6C282AE06CDA006F053D /* MiniFormat.cc */,
+				27E9A0D52AFDAA6100EF3726 /* MiniLogger.cc */,
 				2755E81D2B0947D40005AC35 /* MiniOStream.cc */,
 				278F7E3E2AA24FEE005B12F2 /* StringUtils.hh */,
 				27B330572AB278870066C8DA /* StringUtils.cc */,
@@ -1999,7 +1999,7 @@
 				272730482A8D8A73000CCA22 /* Scheduler.cc in Sources */,
 				2755E81F2B0947D40005AC35 /* MiniOStream.cc in Sources */,
 				277B652C2AD8B5D8006F053D /* betterassert.cc in Sources */,
-				27E9A0D62AFDAA6100EF3726 /* Logger.cc in Sources */,
+				27E9A0D62AFDAA6100EF3726 /* MiniLogger.cc in Sources */,
 				272730532A8EC61D000CCA22 /* FileStream.cc in Sources */,
 				272A852B2A97B2090083D947 /* HTTPConnection.cc in Sources */,
 				2727304E2A8E9D99000CCA22 /* UVBase.cc in Sources */,

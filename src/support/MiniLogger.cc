@@ -16,11 +16,9 @@
 // limitations under the License.
 //
 
-#include "crouton/util/Logging.hh"
-
 #if ! CROUTON_USE_SPDLOG
 
-#include "crouton/util/Logger.hh"
+#include "crouton/util/MiniLogger.hh"
 #include "crouton/io/Process.hh"
 #include "support/StringUtils.hh"
 
@@ -33,12 +31,9 @@
 #  include <chrono>
 #  include <ctime>
 #  include <iomanip>
-#  include "crouton/util/MiniOStream.hh"
 #endif
 
-namespace crouton::log {
-    using namespace std;
-    using namespace crouton::mini;
+namespace crouton::mini {
 
     static constexpr string_view kLevelName[] = {
         "trace", "debug", "info", "warn", "error", "critical", "off"
@@ -48,8 +43,8 @@ namespace crouton::log {
     };
 
 
-    static mutex            sLogMutex;          // Thread-safety & prevents overlapping msgs
-    static vector<logger*>* sLoggers;           // All registered Loggers
+    static std::mutex       sLogMutex;          // Thread-safety & prevents overlapping msgs
+    static std::vector<logger*>* sLoggers;           // All registered Loggers
     static logger::Sink     sLogSink = nullptr; // Optional function to write messages
     static const char*      sEnvLevelsStr;
 
@@ -59,16 +54,16 @@ namespace crouton::log {
     logger::logger(string name, level::level_enum level)
     :_name(std::move(name))
     ,_level(level) {
-        unique_lock lock(sLogMutex);
+        std::unique_lock lock(sLogMutex);
         load_env_level();
         if (!sLoggers)
-            sLoggers = new vector<logger*>;
+            sLoggers = new std::vector<logger*>;
         sLoggers->push_back(this);
     }
 
 
     logger* logger::get(string_view name) {
-        unique_lock lock(sLogMutex);
+        std::unique_lock lock(sLogMutex);
         if (sLoggers) {
             for (auto logger : *sLoggers)
                 if (logger->name() == name)
@@ -79,7 +74,7 @@ namespace crouton::log {
 
     
     void logger::apply_all(std::function<void(logger&)> fn) {
-        unique_lock lock(sLogMutex);
+        std::unique_lock lock(sLogMutex);
         if (sLoggers) {
             for (auto logger : *sLoggers)
                 fn(*logger);
@@ -88,7 +83,7 @@ namespace crouton::log {
 
 
     void logger::set_output(logger::Sink sink) {
-        unique_lock lock(sLogMutex);
+        std::unique_lock lock(sLogMutex);
         sLogSink = sink;
     }
 
@@ -100,12 +95,12 @@ namespace crouton::log {
                 return level::level_enum(level);
             ++level;
         }
-        return log::level::info; // default if unrecognized name
+        return level::info; // default if unrecognized name
     }
 
 
     void logger::load_env_levels(const char *envValue) {
-        unique_lock lock(sLogMutex);
+        std::unique_lock lock(sLogMutex);
         if (!sEnvLevelsStr)
             sEnvLevelsStr = strdup(envValue ? envValue : "");
         for (auto logger : *sLoggers)
@@ -129,6 +124,9 @@ namespace crouton::log {
             }
         }
     }
+
+
+#pragma mark - NON-ESP32 METHODS:
 
 
 #ifndef ESP_PLATFORM
@@ -161,14 +159,14 @@ namespace crouton::log {
         }
 
         const char* color = "";
-        if (lvl >= log::level::err)
+        if (lvl >= level::err)
             color = tty.red;
-        else if (lvl == log::level::warn)
+        else if (lvl == level::warn)
             color = tty.yellow;
 
-        fprintf(stderr, "%s%06ld%s %s%s| <%s> ",
-                sTimeBuf, now.tv_nsec / 1000, tty.reset,
-                color, kLevelDisplayName[int(lvl)], _name.c_str());
+        format_to(cerr, "{}{:06d}{} {}{}| <{}> ",
+                  sTimeBuf, now.tv_nsec / 1000, tty.reset,
+                  color, kLevelDisplayName[int(lvl)], _name);
     }
 
 
@@ -177,7 +175,7 @@ namespace crouton::log {
             if (auto sink = sLogSink) {
                 sink(*this, lvl, msg);
             } else {
-                unique_lock<mutex> lock(sLogMutex);
+                std::unique_lock lock(sLogMutex);
                 _writeHeader(lvl);
                 cerr << msg << io::TTY::err().reset << endl;
             }
@@ -185,25 +183,22 @@ namespace crouton::log {
     }
 
 
-    void logger::_log(level::level_enum lvl, BaseFormatString const& fmt, mini::ArgTypeList types, ...) {
+    void logger::_log(level::level_enum lvl, BaseFormatString const& fmt, ArgTypeList types, ...) {
+        va_list args;
+        va_start(args, types);
         if (auto sink = sLogSink) {
-            stringstream out;
-            va_list args;
-            va_start(args, types);
-            mini::vformat_types_to(out, fmt, types, args);
-            va_end(args);
-            sink(*this, lvl, out.str());
+            sink(*this, lvl, vformat_types(fmt, types, args));
         } else {
-            unique_lock<mutex> lock(sLogMutex);
-
+            std::unique_lock lock(sLogMutex);
             _writeHeader(lvl);
-            va_list args;
-            va_start(args, types);
-            mini::vformat_types_to(cerr, fmt, types, args);
-            va_end(args);
+            vformat_types_to(cerr, fmt, types, args);
             cerr << io::TTY::err().reset << endl;
         }
+        va_end(args);
     }
+
+
+#pragma mark - ESP32 METHODS
 
 #else // ESP_PLATFORM
 
@@ -221,11 +216,11 @@ namespace crouton::log {
             io::TTY const& tty = io::TTY::err();
             const char* color;
             switch (lvl) {
-                case log::level::critical:
-                case log::level::err:     color = tty.red; break;
-                case log::level::warn:    color = tty.yellow; break;
-                case log::level::debug:
-                case log::level::trace:   color = tty.dim; break;
+                case level::critical:
+                case level::err:     color = tty.red; break;
+                case level::warn:    color = tty.yellow; break;
+                case level::debug:
+                case level::trace:   color = tty.dim; break;
                 default:                color = ""; break;
             }
 #if CONFIG_LOG_TIMESTAMP_SOURCE_RTOS
@@ -249,10 +244,10 @@ namespace crouton::log {
     }
 
 
-    void logger::_log(level::level_enum lvl, BaseFormatString const& fmt, mini::ArgTypeList types, ...) {
+    void logger::_log(level::level_enum lvl, BaseFormatString const& fmt, ArgTypeList types, ...) {
         va_list args;
         va_start(args, types);
-        string message = mini::vformat_types(fmt, types, args);
+        string message = vformat_types(fmt, types, args);
         va_end(args);
         log(lvl, message);
     }

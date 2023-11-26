@@ -1,5 +1,5 @@
 //
-// Logger.hh
+// MiniLogger.hh
 //
 // Copyright 2023-Present Couchbase, Inc. All rights reserved.
 //
@@ -16,16 +16,13 @@
 // limitations under the License.
 //
 
-#if CROUTON_USE_SPDLOG != 0
-#error "Don't include Logger.hh directly; include Logging.hh instead"
-#endif
-
 #pragma once
-#include "crouton/util/Base.hh"
 #include "crouton/util/MiniFormat.hh"
 #include <functional>
 
-namespace crouton::log {
+namespace crouton::mini {
+    using std::string;
+    using std::string_view;
 
     // Minimal logging API, mostly compatible with spdlog
 
@@ -36,23 +33,36 @@ namespace crouton::log {
     };
 
 
+    /** A named logger, which can have its own level. */
     class logger {
     public:
-        logger(string name, level::level_enum level);
+        /// Constructs a logger with a name and a default initial level.
+        logger(string name, level::level_enum defaultLevel);
         ~logger() = delete;
 
-        string const& name() const Pure                      {return _name;}
-        level::level_enum level() const Pure                 {return _level;}
-        void set_level(level::level_enum level)              {_level = level;}
-        bool should_log(level::level_enum level) const Pure  {return level >= _level;}
+        /// The logger's name.
+        string const& name() const                       {return _name;}
 
+        /// The logger's current level. Messages with a lower level will not be logged.
+        level::level_enum level() const                  {return _level;}
+
+        /// Sets the current level.
+        void set_level(level::level_enum level)              {_level = level;}
+
+        /// Returns true if the logger will log messages at the given level.
+        bool should_log(level::level_enum level) const   {return level >= _level;}
+
+        /// Logs a formatted message at the given level.
         template<mini::Formattable... Args>
         void log(level::level_enum lvl, mini::FormatString<Args...> const& fmt, Args &&...args) {
             if (should_log(lvl)) [[unlikely]]
                 _log(lvl, fmt, mini::ArgTypes<Args...>::ids, mini::i::passArg(args)...);
         }
 
+        /// Logs an unformatted message at the given level.
         void log(level::level_enum lvl, string_view msg);
+
+        // The methods below all call `log` with the levels indicated by their names.
 
         template<mini::Formattable... Args>
         void trace(mini::FormatString<Args...> const& fmt, Args &&...args) {
@@ -90,15 +100,29 @@ namespace crouton::log {
         }
         void critical(string_view msg)                      {log(level::critical, msg);}
 
+        /// Initializes levels based on the value of the `CROUTON_LOG_LEVEL` environment variable.
+        /// @note  This just calls `load_env_levels(getenv("CROUTON_LOG_LEVEL"))`.
+        /// @note  This function isn't available on ESP32 since it has no environment API.
         static void load_env_levels();
+
+        /// Initializes levels based on the given string. 
+        /// - First, the string is split into sections at commas.
+        /// - A section of the form "name=levelname" sets the level of the named logger.
+        /// - If no logger with that name exists yet, the level will be set when it's created.
+        /// - A section that's just "levelname" applies to all loggers that aren't explicitly named.
         static void load_env_levels(const char *envValue);
 
+        /// Returns the logger with the given name, else nullptr.
         static logger* get(string_view name);
 
+        /// Calls a function on every logger.
         static void apply_all(std::function<void(logger&)>);
 
         using Sink = void (*)(logger const&, level::level_enum, string_view) noexcept;
 
+        /// Registers a function that handles log messages.
+        /// If non-null, every log message triggers a call to this function, instead of the
+        /// default behavior of writing to `stderr`.
         static void set_output(Sink);
 
     private:
