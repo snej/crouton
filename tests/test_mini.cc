@@ -142,7 +142,7 @@ TEST_CASE("MiniFormat", "[mini]") {
     CHECK(mini::format("One {} two {} three", 1, 2, 3, "hi")
           == "One 1 two 2 three : 3, hi");
 //    CHECK(mini::format("One {} two {} three {} four {}", 1, 2)
-//          == "One 1 two 2 three {{{TOO FEW ARGS}}}"); // TODO: Re-enable with exception check
+//          == "One 1 two 2 three {{{TOO FEW ARGS}}}");     // This is now a compile error
 
     coro_handle h = std::noop_coroutine();
     CHECK(mini::format("{}", logCoro{h})

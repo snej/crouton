@@ -55,15 +55,16 @@ How is that better than threads? It's safer and easier to reason about. The only
     
 * Core classes & APIs:
     * General-purpose `Error` and `Result<T>` types
-    * Logging uses either a thin wrapper around [spdlog][SPDLOG], or a smaller compatible library I wrote.
+    * Logging, a very compact library with an API inspired by [spdlog][SPDLOG].
+    * Type-safe string formatting, similar to `std::format` but with a much lower code footprint.
 
 * Cross-Platform:
     * macOS (builds and passes tests)
       * iOS? ("It's still Darwin…")
     * Linux (builds and passes test)
       * Android? ("It's still Linux…")
-    * [ESP32][ESP32] embedded CPUs (builds and passes tests. File APIs not available yet.)
-    * Windows (sometimes builds; not yet tested; help wanted!)
+    * [ESP32][ESP32] embedded CPUs (builds and passes tests. Networking works, but filesystem APIs aren't implemented yet.)
+    * Windows (builds, but I don't have any Windows machines to test on. Help wanted!)
 
 ## Example
 
@@ -94,7 +95,7 @@ An example embedded app is at [tests/ESP32](tests/ESP32/README.md).
 
 [![Build](https://github.com/couchbaselabs/crouton/actions/workflows/build.yml/badge.svg)](https://github.com/couchbaselabs/crouton/actions/workflows/build.yml)
 
-This is new code, under heavy development! So far, it builds with Clang (Xcode 15) on macOS, GCC 12 on Ubuntu, Visual Studio 17 2022 on Windows, and ESP-IDF 5.0.
+This is new code, under heavy development! So far, it builds with Clang (Xcode 15) on macOS, GCC 12 on Ubuntu, Visual Studio 17 2022 on Windows, and ESP-IDF 5.1.
 
 The tests run regularly on macOS, and occasionally on Ubuntu (though not in CI.) Test coverage is very limited.
 

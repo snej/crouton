@@ -11,7 +11,7 @@
     * [Coroutine Types](Coroutine%20Types.md)
     * [Awaitable Types](Awaitable%20Types.md)
   * Scheduling and Event Loops
-  * Logging
+  * [Logging and Formatted Output](Mini.md)
   * [Publish And Subscribe](PubSub.md)
 * **I/O and Networking**
   * Filesystem operations

@@ -17,7 +17,7 @@
 //
 
 #pragma once
-#include "crouton/util/MiniFormat.hh"
+#include "MiniFormat.hh"
 #include <functional>
 
 namespace crouton::mini {
