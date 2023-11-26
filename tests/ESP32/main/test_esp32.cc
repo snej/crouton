@@ -125,9 +125,9 @@ Task mainTask() {
 
     printf("---------- TESTING CROUTON ----------\n\n");
     esp_log_level_set("Crouton", ESP_LOG_VERBOSE);
-    log::logger::load_env_levels("Net=debug,BLIP=info,Coro=trace");
+    log::logger::load_env_levels("Net=debug,BLIP=debug");
 
-#if 1
+#if 0
     Log->info("---------- Testing Generator");
     {
         Generator<int64_t> fib = fibonacci(100, true);
@@ -172,7 +172,7 @@ Task mainTask() {
 #endif
     
     Log->info("---------- Testing BLIP");
-    testBLIP().waitForResult();
+    AWAIT testBLIP();
 
     Log->info("---------- End of tests");
     postcondition(Scheduler::current().assertEmpty());

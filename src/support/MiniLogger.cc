@@ -22,6 +22,7 @@
 #include "crouton/io/Process.hh"
 #include "support/StringUtils.hh"
 
+#include <atomic>
 #include <cstring>
 #include <mutex>
 
@@ -43,11 +44,13 @@ namespace crouton::mini {
     };
 
 
-    static std::mutex       sLogMutex;          // Thread-safety & prevents overlapping msgs
+    static std::mutex            sLogMutex;          // Thread-safety & prevents overlapping msgs
     static std::vector<logger*>* sLoggers;           // All registered Loggers
-    static logger::Sink     sLogSink = nullptr; // Optional function to write messages
-    static const char*      sEnvLevelsStr;
+    static logger::Sink          sLogSink = nullptr; // Optional function to write messages
+    static const char*           sEnvLevelsStr;
 
+    static std::atomic_int       sThreadCounter = 0;
+    thread_local int             tThreadID = ++sThreadCounter;
 
 
 
@@ -164,8 +167,8 @@ namespace crouton::mini {
         else if (lvl == level::warn)
             color = tty.yellow;
 
-        format_to(cerr, "{}{:06d}{} {}{}| <{}> ",
-                  sTimeBuf, now.tv_nsec / 1000, tty.reset,
+        format_to(cerr, "{}{:06d} ⇅{:02}{} {}{}| <{}> ",
+                  sTimeBuf, now.tv_nsec / 1000, tThreadID, tty.reset,
                   color, kLevelDisplayName[int(lvl)], _name);
     }
 
@@ -224,18 +227,20 @@ namespace crouton::mini {
                 default:                color = ""; break;
             }
 #if CONFIG_LOG_TIMESTAMP_SOURCE_RTOS
-            esp_log_write(kESPLevel[lvl], "Crouton", "%s%c (%4ld) <%s> %.*s%s\n",
+            esp_log_write(kESPLevel[lvl], "Crouton", "%s%c (%4ld) t%02d <%s> %.*s%s\n",
                           color,
                           kESPLevelChar[lvl],
                           esp_log_timestamp(),
+                          tThreadID,
                           _name.c_str(),
                           int(msg.size()), msg.data(),
                           tty.reset);
 #else
-            esp_log_write(kESPLevel[lvl], "Crouton", "%s%c (%s) <%s> %.*s%s\n",
+            esp_log_write(kESPLevel[lvl], "Crouton", "%s%c (%s) t%02d <%s> %.*s%s\n",
                           color,
                           kESPLevelChar[lvl],
                           esp_log_system_timestamp(),
+                          tThreadID,
                           _name.c_str(),
                           int(msg.size()), msg.data(),
                           tty.reset);

@@ -67,14 +67,15 @@ namespace crouton::io::esp {
         ASYNC<ConstBytes> fillInputBuf();
 
         tcp_pcb*    _tcp;
-        bool        _isOpen = false;
-
+        std::mutex              _mutex;
         ConstBytes              _inputBuf;
         pbuf*                   _readBufs = nullptr;
         Error                   _readErr;
 
         Blocker<void>           _readBlocker;
         Blocker<void>           _writeBlocker;
+
+        bool        _isOpen = false;
     };
 
 }

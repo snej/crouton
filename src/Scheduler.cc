@@ -265,6 +265,7 @@ namespace crouton {
         LSched->debug("suspend {}", logCoro{h});
         precondition(isCurrent());
         assert(!isReady(h));
+        (void)eventLoop();  // Must have an event loop in order to wake up (see _wakeUp)
         auto [i, added] = _suspended->try_emplace(h.address(), h, this);
         i->second._visible = true;
         return Suspension(&i->second);

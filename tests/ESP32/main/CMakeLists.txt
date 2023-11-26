@@ -1,6 +1,6 @@
 idf_component_register(
     SRCS
-        "main.cc"
+        "test_esp32.cc"
     PRIV_INCLUDE_DIRS
         "../../../src/"
 )

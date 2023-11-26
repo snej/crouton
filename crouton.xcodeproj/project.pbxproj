@@ -431,7 +431,7 @@
 		277B65332ADA07E0006F053D /* sdkconfig */ = {isa = PBXFileReference; lastKnownFileType = text; path = sdkconfig; sourceTree = "<group>"; };
 		277B65362ADA07E0006F053D /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		277B6C122ADA07E3006F053D /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
-		277B6C132ADA07E3006F053D /* main.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cc; sourceTree = "<group>"; };
+		277B6C132ADA07E3006F053D /* test_esp32.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_esp32.cc; sourceTree = "<group>"; };
 		277B6C142ADA0873006F053D /* ESPEventLoop.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ESPEventLoop.cc; sourceTree = "<group>"; };
 		277B6C152ADDB6B7006F053D /* ESPTCPSocket.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ESPTCPSocket.hh; sourceTree = "<group>"; };
 		277B6C162ADDB6B7006F053D /* ESPTCPSocket.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ESPTCPSocket.cc; sourceTree = "<group>"; };
@@ -1209,7 +1209,7 @@
 			children = (
 				277B6C122ADA07E3006F053D /* CMakeLists.txt */,
 				277B6C212ADDEEF3006F053D /* Kconfig.projbuild */,
-				277B6C132ADA07E3006F053D /* main.cc */,
+				277B6C132ADA07E3006F053D /* test_esp32.cc */,
 			);
 			path = main;
 			sourceTree = "<group>";

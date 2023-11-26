@@ -68,12 +68,16 @@ namespace crouton {
         inline void suspendInitial(coro_handle cur) { }
         inline coro_handle suspendingTo(coro_handle cur,
                                         std::type_info const& toType, const void* to,
-                                        coro_handle next = CORO_NS::noop_coroutine()) {return next;}
+                                        coro_handle next = CORO_NS::noop_coroutine()) {
+            return next ? next : CORO_NS::noop_coroutine();}
         inline coro_handle suspendingTo(coro_handle cur,
                                         coro_handle awaiting,
-                                        coro_handle next) {return next;}
-        inline coro_handle yieldingTo(coro_handle cur, coro_handle next, bool) {return next;}
-        inline coro_handle finalSuspend(coro_handle cur, coro_handle next) {return next;}
+                                        coro_handle next) {
+            return next ? next : CORO_NS::noop_coroutine();}
+        inline coro_handle yieldingTo(coro_handle cur, coro_handle next, bool) {
+            return next ? next : CORO_NS::noop_coroutine();}
+        inline coro_handle finalSuspend(coro_handle cur, coro_handle next) {
+            return next ? next : CORO_NS::noop_coroutine();}
         inline void threw(coro_handle) { }
         inline void returning(coro_handle) { }
         inline void ended(coro_handle) { }

@@ -88,6 +88,7 @@ namespace crouton::io::esp {
     Future<void> TCPSocket::close() {
         if (_isOpen) {
             LNet->info("Closing TCPSocket");
+            unique_lock lock(_mutex);
             err_t err = tcp_close(_tcp);
             _tcp = nullptr;
             _isOpen = false;
@@ -149,7 +150,8 @@ namespace crouton::io::esp {
     /// Low-level read method that points `_inputBuf` to the next input buffer.
     Future<ConstBytes> TCPSocket::fillInputBuf() {
         precondition(isOpen() && _inputBuf.empty());
-        //FIXME: Needs a mutex accessing _readBufs?
+
+        unique_lock lock(_mutex);
         _readBlocker.reset();
         if (_readBufs) {
             // Clean up the pbuf I just completed:
@@ -162,20 +164,24 @@ namespace crouton::io::esp {
         }
 
         if (!_readBufs && !_readErr) {
-            // Wait for buffers to arrive:
+            // Wait for buffers to arrive. (Don't hold the mutex while waiting!)
             LNet->debug("TCPSocket: waiting to receive data...");
+            lock.unlock();
             AWAIT _readBlocker;
-            LNet->debug("...TCPSocket: received data");
-            assert(_readBufs || _readErr);
+            lock.lock();
+            LNet->debug("...TCPSocket: end wait");
         }
 
+        assert(_readBufs || _readErr);
         if (_readBufs) {
             _inputBuf = {_readBufs->payload, _readBufs->len};
+            LNet->debug("TCPSocket: received {} bytes", _inputBuf.size());
             RETURN _inputBuf;
         } else if (_readErr == CroutonError::UnexpectedEOF) {
-            LNet->debug("TCPSocket: EOF, no data to read");
+            LNet->info("TCPSocket: EOF, no data to read");
             RETURN ConstBytes{};
         } else {
+            LNet->error("TCPSocket: error {}", _readErr);
             RETURN _readErr;
         }
     }
@@ -183,19 +189,24 @@ namespace crouton::io::esp {
 
     int TCPSocket::_readCallback(::pbuf *pb, int err) {
         // Warning: This is called on the lwip thread.
-        //FIXME: Needs a mutex accessing _readBufs?
+        unique_lock lock(_mutex);
+        LNet->debug("---- entering TCPSocket::_readCallback ...");
         if (pb) {
-            LNet->debug("read completed, {} bytes", pb->tot_len);
+            LNet->debug("    read completed, {} bytes", pb->tot_len);
             if (_readBufs == nullptr)
                 _readBufs = pb;                 // Note: I take over the reference to pb
             else
                 pbuf_cat(_readBufs, pb);
+        } else if (err) {
+            _readErr = Error(LWIPError(err));
+            LNet->debug("    read completed: error {}", _readErr);
         } else {
-            _readErr = err ? Error(LWIPError(err)) : Error(CroutonError::UnexpectedEOF);
-            LNet->error("read completed, error {}", _readErr);
+            _readErr = Error(CroutonError::UnexpectedEOF);
+            LNet->debug("    read completed: EOF", _readErr);
         }
         assert(_readBufs || _readErr);
         _readBlocker.notify();
+        LNet->debug("---- ... exiting TCPSocket::_readCallback");
         return ERR_OK;
     }
 
@@ -233,7 +244,7 @@ namespace crouton::io::esp {
 
     int TCPSocket::_writeCallback(uint16_t len) {
         // Warning: This is called on the lwip thread.
-        LNet->debug("write completed, {} bytes", len);
+        LNet->debug("TCPSocket write completed, {} bytes", len);
         _writeBlocker.notify();
         return 0;
     }
