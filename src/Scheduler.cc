@@ -44,6 +44,7 @@ namespace crouton {
             if (_wakeMe.test_and_set() == false) {
                 _visible = false;
                 LSched->trace("{} unblocked", logCoro{_handle});
+                lifecycle::ready(_handle);
                 auto sched = _scheduler;
                 assert(sched);
                 _scheduler = nullptr;
@@ -144,11 +145,14 @@ namespace crouton {
             LSched->info("There are {} coroutines (on all threads)", coroCount);
         LSched->info("Scheduler::assertEmpty: Running event loop until {} ready and {} suspended coroutines finish...",
                      _ready.size(), _suspended->size());
-        int attempt = 0;
+        int attempt = 0;    //TODO: Wait for a time interval, not attempt count
         const_cast<Scheduler*>(this)->runUntil([&] {
-            return (isEmpty() && lifecycle::count() - stackDepth == 0) || ++attempt >= 10;
+            if ((isEmpty() && lifecycle::count() - stackDepth == 0) || ++attempt >= 100)
+                return true;
+            LSched->info("Scheduler::assertEmpty: still waiting...");
+            return false;
         });
-        if (attempt < 10) {
+        if (attempt < 100) {
             LSched->info("...OK, all coroutines finished now.");
             return true;
         }
@@ -159,9 +163,8 @@ namespace crouton {
         LSched->error("** On this Scheduler:");
         for (auto &r : _ready)
             LSched->info("ready: {}", logCoro{r});
-        for (auto &s : *_suspended) {
+        for (auto &s : *_suspended)
             LSched->info("\tsuspended: {}" , logCoro{s.second._handle});
-        }
         return false;
     }
 

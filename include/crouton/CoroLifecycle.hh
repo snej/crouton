@@ -37,7 +37,6 @@ namespace crouton {
 
 #if CROUTON_LIFECYCLES
         void created(coro_handle, bool ready, std::type_info const& implType);
-        void ready(coro_handle);
         void suspendInitial(coro_handle cur);
         coro_handle suspendingTo(coro_handle cur,
                                  std::type_info const& toType, const void* to,
@@ -47,6 +46,7 @@ namespace crouton {
                                  coro_handle next);
         coro_handle yieldingTo(coro_handle cur, coro_handle next, bool isCall);
         coro_handle finalSuspend(coro_handle cur, coro_handle next);
+        void ready(coro_handle);
         void resume(coro_handle);   // calls h.resume()
         void threw(coro_handle);
         void returning(coro_handle);

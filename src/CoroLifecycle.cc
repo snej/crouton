@@ -118,21 +118,25 @@ namespace crouton::lifecycle {
         if (i == sCoros.end()) {
             LCoro->critical("FATAL: Unknown coroutine_handle {}", h.address());
             abort();
-        } else if (i->second.handle == nullptr) {
-            LCoro->critical("FATAL: Using destroyed coroutine_handle {}; formerly ¢{} [{} {}]",
-                            h.address(), i->second.sequence, i->second.typeName, i->second.name);
-            abort();
         } else {
             return i;
         }
     }
 
-    static coroInfo& _getInfo(coro_handle h)  {return _getInfoIter(h)->second;}
+    static coroInfo& _getInfo(coro_handle h)  {
+        return _getInfoIter(h)->second;
+    }
 
     /// Gets a coro_handle's coroInfo.
     static coroInfo& getInfo(coro_handle h) {
         unique_lock<mutex> lock(sCorosMutex);
-        return _getInfo(h);
+        coroInfo& info = _getInfo(h);
+        if (info.handle == nullptr) {
+            LCoro->critical("FATAL: Using destroyed coroutine_handle {}; formerly ¢{} [{} {}]",
+                            h.address(), info.sequence, info.typeName, info.name);
+            abort();
+        }
+        return info;
     }
 
     /// Gets a coro_handle's sequence
@@ -276,15 +280,6 @@ namespace crouton::lifecycle {
         }
     }
 
-    void ready(coro_handle h) {
-        auto& curInfo = getInfo(h);
-        LCoro->trace("{} starting", curInfo);
-
-        assert(curInfo.state == coroState::born);
-        curInfo.setState(coroState::active);
-        pushCurrent(curInfo);
-    }
-
     static coro_handle switching(coroInfo& curInfo, coro_handle next) {
         if (next && !isNoop(next)) {
             auto& nextInfo = getInfo(next);
@@ -361,15 +356,26 @@ namespace crouton::lifecycle {
         return switching(curInfo, next);
     }
 
+    static void _ready(coroInfo &curInfo) {
+        assert(curInfo.state != coroState::ending);
+        curInfo.setState(coroState::active);
+        curInfo.awaiting = nullptr;
+        curInfo.awaitingCoro = nullptr;
+    }
+
+    void ready(coro_handle h) {
+        auto& curInfo = getInfo(h);
+        if (curInfo.state != coroState::active) {
+            LCoro->trace("{} ready", curInfo);
+            _ready(curInfo);
+        }
+    }
+
     void resume(coro_handle h) {
         auto& curInfo = getInfo(h);
         LCoro->trace("{}.resume() ...", curInfo);
-
         pushCurrent(curInfo);
-
-        assert(curInfo.state != coroState::active && curInfo.state != coroState::ending);
-        curInfo.setState(coroState::active);
-        curInfo.awaiting = nullptr;
+        _ready(curInfo);
 
         h.resume();
 
