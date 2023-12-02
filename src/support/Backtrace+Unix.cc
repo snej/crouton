@@ -175,7 +175,7 @@ namespace fleece {
     std::string RawFunctionName(const void *pc) {
         Dl_info info = {};
         dladdr(pc, &info);
-        return info.dli_sname;
+        return std::string(info.dli_sname ? info.dli_sname : "");
     }
 
 }

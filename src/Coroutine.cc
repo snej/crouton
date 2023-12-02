@@ -66,7 +66,7 @@ namespace crouton {
     string CoroutineName(coro_handle h) {
         if (h.address() == nullptr)
             return "(null)";
-#if 1//TEMP def __clang__
+#ifdef __clang__
         // libc++ specific:
         struct fake_coroutine_guts {
             void *resume, *destroy;
