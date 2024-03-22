@@ -21,6 +21,7 @@
 
 #include <array>
 #include <concepts>
+#include <exception>
 #include <source_location>
 #include <stdexcept>
 #include <type_traits>

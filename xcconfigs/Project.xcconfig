@@ -43,7 +43,7 @@ CLANG_CXX_LIBRARY                              = libc++
 GCC_C_LANGUAGE_STANDARD                        = gnu11
 CLANG_ENABLE_MODULES                           = YES
 GCC_NO_COMMON_BLOCKS                           = YES
-GCC_PREPROCESSOR_DEFINITIONS                   = $(inherited) SPDLOG_COMPILED_LIB
+GCC_PREPROCESSOR_DEFINITIONS                   = $(inherited) SPDLOG_COMPILED_LIB _LIBCPP_REMOVE_TRANSITIVE_INCLUDES
 
 // Obj-C
 CLANG_ENABLE_OBJC_ARC                          = YES
