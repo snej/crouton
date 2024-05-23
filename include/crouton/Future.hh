@@ -27,7 +27,6 @@
 #include <atomic>
 #include <exception>
 #include <functional>
-#include <mutex>
 
 namespace crouton {
     template <typename T> class FutureImpl;
@@ -56,7 +55,7 @@ namespace crouton {
     template <typename T>
     class Future : public Coroutine<FutureImpl<T>>, public ISelectable {
     public:
-        using nonvoidT = typename std::conditional<std::is_void_v<T>, std::byte, T>::type;
+        using nonvoidT = std::conditional_t<std::is_void_v<T>, std::byte, T>;
 
         /// Creates a FutureProvider, with which you can create a Future and later set its value.
         static FutureProvider<T> provider()             {return std::make_shared<FutureState<T>>();}
@@ -110,7 +109,7 @@ namespace crouton {
         [[nodiscard]] Future<U> then(FN);
 
         /// From ISelectable interface.
-        virtual void onReady(OnReadyFn fn)  {_state->onReady(std::move(fn));}
+        void onReady(OnReadyFn fn) override  {_state->onReady(std::move(fn));}
 
         //---- These methods make Future awaitable:
         bool await_ready() {
@@ -325,7 +324,7 @@ namespace crouton {
     public:
         using super = CoroutineImpl<FutureImpl<T>, true>;
         using handle_type = typename super::handle_type;
-        using nonvoidT = typename std::conditional<std::is_void_v<T>, std::byte, T>::type;
+        using nonvoidT = std::conditional_t<std::is_void_v<T>, std::byte, T>;
 
         FutureImpl() = default;
 
@@ -374,11 +373,10 @@ namespace crouton {
     template <typename T>
     template <typename FN, typename U>  requires(!std::is_void_v<T>)
     Future<U> Future<T>::then(FN fn) {
-        return _state->template chain<U>([fn](std::shared_ptr<FutureStateBase> baseState,
-                                              std::shared_ptr<FutureStateBase> myBaseState) mutable {
+        return _state->template chain<U>([fn](std::shared_ptr<FutureStateBase> const& baseState,
+                                              std::shared_ptr<FutureStateBase> const& myBaseState) mutable {
             auto& state = static_cast<FutureState<U>&>(*baseState);
             T&& result = static_cast<FutureState<T>&>(*myBaseState).resultValue();
-            myBaseState = nullptr;
             if constexpr (std::is_void_v<U>) {
                 fn(std::move(result));                      // <-- call fn
                 state.setResult();
@@ -392,9 +390,8 @@ namespace crouton {
     template <typename T>
     template <typename FN, typename U>  requires(std::is_void_v<T>)
     Future<U> Future<T>::then(FN fn) {
-        return _state->template chain<U>([fn](std::shared_ptr<FutureStateBase> baseState,
-                                              std::shared_ptr<FutureStateBase> myBaseState) mutable {
-            myBaseState = nullptr; // unused
+        return _state->template chain<U>([fn](std::shared_ptr<FutureStateBase> const& baseState,
+                                              std::shared_ptr<FutureStateBase> const& myBaseState) mutable {
             auto& state = static_cast<FutureState<U>&>(*baseState);
             if constexpr (std::is_void_v<U>) {
                 fn();                                       // <-- call fn

@@ -89,7 +89,6 @@ namespace crouton::io::blip {
             return;
         }
         size_t outputLen = output.size();
-        MutableBytes outBuf, written;
         do {
             if (outputLen == output.size()) {
                 // Grow string to make space available to write to:
@@ -97,8 +96,8 @@ namespace crouton::io::blip {
                 output.resize(output.size() + bufSize);
             }
             char* outStart = output.data();
-            outBuf = MutableBytes(outStart + outputLen, outStart + output.size());
-            written = write(input, outBuf, mode);
+            MutableBytes outBuf = MutableBytes(outStart + outputLen, outStart + output.size());
+            MutableBytes written = write(input, outBuf, mode);
             outputLen += written.size();
             // Continue until the input is consumed and the codec's run out of output:
         } while (! (input.empty() && outputLen < output.size()) );
@@ -152,7 +151,7 @@ namespace crouton::io::blip {
                    operation, inSize, outSize,
                    (int)mode, result, (long)(_z.next_in - (uint8_t*)input.data()),
                    (long)(_z.next_out - (uint8_t*)output.data()));
-        if (!kZlibRawDeflate) 
+        if constexpr (!kZlibRawDeflate)
             _checksum = (uint32_t)_z.adler;
         input = ConstBytes(_z.next_in, input.endByte());
         output = MutableBytes(_z.next_out, output.endByte());

@@ -13,7 +13,6 @@
 #pragma once
 #include "crouton/io/blip/Message.hh"
 
-#include <functional>
 #include <initializer_list>
 #include "crouton/util/MiniOStream.hh"
 
@@ -56,7 +55,7 @@ namespace crouton::io::blip {
         propertySetter operator[](string_view name) { return {*this, name}; }
 
         /** Makes a response an error. */
-        void makeError(Message::Error);
+        void makeError(Message::Error const&);
 
         /** Adds data to the body of the message. No more properties can be added afterwards. */
         MessageBuilder& write(ConstBytes);

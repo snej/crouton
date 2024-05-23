@@ -24,7 +24,7 @@ namespace crouton::io::blip {
                            MessageNo number)
     : Message(flags, number)
     ,_connection(connection)
-    ,_contents(payload)
+    ,_contents(std::move(payload))
     {}
 
 

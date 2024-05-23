@@ -25,7 +25,7 @@ namespace crouton::io::blip {
 
         /// Registers a handler for incoming requests with a specific `Profile` property value.
         /// The profile string `"*"` is a wild-card that matches any message.
-        void setRequestHandler(string profile, RequestHandler);
+        void setRequestHandler(string const& profile, RequestHandler);
 
         void addRequestHandlers(std::initializer_list<RequestHandlerItem>);
 

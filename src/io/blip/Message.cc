@@ -60,8 +60,7 @@ namespace crouton::io::blip {
     
     void Message::writeDescription(ConstBytes payload, ostream& out) const {
         if (type() == kRequestType) {
-            const char* profile = findProperty(payload, "Profile");
-            if (profile) 
+            if (const char* profile = findProperty(payload, "Profile"))
                 out << "'" << profile << "' ";
         }
         dumpHeader(out);
@@ -326,7 +325,7 @@ namespace crouton::io::blip {
     }
 
 
-    void MessageIn::respondWithError(Error err) {
+    void MessageIn::respondWithError(Error const& err) {
         if (!noReply()) {
             MessageBuilder mb(this);
             mb.makeError(err);

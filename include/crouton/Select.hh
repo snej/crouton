@@ -22,7 +22,6 @@
 
 #include <array>
 #include <bitset>
-#include <functional>
 #include <initializer_list>
 
 namespace crouton {

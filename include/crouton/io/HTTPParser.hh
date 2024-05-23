@@ -166,7 +166,7 @@ namespace crouton::io::http {
     private:
         Parser(IStream*, Role role);
         int gotBody(const char* data, size_t length);
-        int addHeader(string value);
+        int addHeader(string const& value);
 
         using SettingsRef = std::unique_ptr<llhttp_settings_s>;
         using ParserRef   = std::unique_ptr<llhttp__internal_s>;
@@ -185,9 +185,7 @@ namespace crouton::io::http {
 
 }
 
-namespace crouton {
-    template <> struct ErrorDomainInfo<io::http::Status> {
-        static constexpr string_view name = "HTTP";
-        static string description(errorcode_t);
-    };
-}
+template <> struct crouton::ErrorDomainInfo<crouton::io::http::Status> {
+    static constexpr string_view name = "HTTP";
+    static string                description(errorcode_t);
+};

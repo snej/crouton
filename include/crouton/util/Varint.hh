@@ -30,12 +30,12 @@ namespace crouton::uvarint {
     constexpr size_t kMaxSize = 10;
 
     /// Decodes a varint from `bytes` and returns it. Moves the start of `bytes` past the varint.
-    /// @throws `CroutonError::ParseError` if a complete varint cannot be read.
+    /// @throws CroutonError::ParseError if a complete varint cannot be read.
     uint64_t read(ConstBytes& bytes);
 
     /// Decodes a varint from `bytes` and returns it. Moves the start of `bytes` past the varint.
     /// If `bytes` contains only a prefix of a varint, returns `false` instead of throwing.
-    /// @throws `CroutonError::ParseError` if the data format is invalid, i.e. 10 or more bytes
+    /// @throws CroutonError::ParseError if the data format is invalid, i.e. 10 or more bytes
     ///     with their high bit set.
     bool readPartial(ConstBytes& bytes, uint64_t* outN);
 

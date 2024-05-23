@@ -90,7 +90,7 @@ namespace crouton::io {
         URL(URL const& url)                 :URL(url._str) { }
         URL& operator=(URL const& url)      {_str = url._str; parse(_str.c_str()); return *this;}
         URL(URL&& url) noexcept             :URL(std::move(url._str)) { }
-        URL& operator=(URL&& url)           {_str = std::move(url._str); parse(_str.c_str()); return *this;}
+        URL& operator=(URL&& url) noexcept  {_str = std::move(url._str); parse(_str.c_str()); return *this;}
 
         string const& asString() const noexcept Pure {return _str;}
         operator string() const             {return _str;}

@@ -14,7 +14,6 @@
 #include "crouton/io/blip/Message.hh"
 #include "crouton/io/blip/MessageBuilder.hh"
 #include "crouton/CroutonFwd.hh"
-#include "crouton/util/MiniOStream.hh"
 
 namespace crouton::io::blip {
     class BLIPIO;
@@ -58,7 +57,7 @@ namespace crouton::io::blip {
     private:
         std::pair<ConstBytes, ConstBytes> getPropsAndBody() const;
 
-        static const uint32_t kMaxUnackedBytes = 128000;
+        static constexpr uint32_t kMaxUnackedBytes = 128000;
 
         /** Manages the data (properties, body, data source) of a MessageOut. */
         class Contents {

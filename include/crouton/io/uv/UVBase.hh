@@ -26,9 +26,7 @@ namespace crouton::io::uv {
 
 }
 
-namespace crouton {
-    template <> struct ErrorDomainInfo<io::uv::UVError> {
-        static constexpr string_view name = "libuv";
-        static string description(errorcode_t);
-    };
-}
+template <> struct crouton::ErrorDomainInfo<crouton::io::uv::UVError> {
+    static constexpr string_view name = "libuv";
+    static string                description(errorcode_t);
+};

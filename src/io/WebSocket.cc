@@ -189,7 +189,7 @@ namespace crouton::io::ws {
 #pragma mark - CLIENT WEBSOCKET:
 
 
-    ClientWebSocket::ClientWebSocket(string urlStr)
+    ClientWebSocket::ClientWebSocket(string_view urlStr)
     :_connection(urlStr)
     ,_clientParser(make_unique<uWS::ClientProtocol>())
     {

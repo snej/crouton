@@ -5,7 +5,6 @@
 //  <https://gist.github.com/KindDragon/4650442>
 
 #pragma once
-#include <utility>
 
 namespace crouton {
 

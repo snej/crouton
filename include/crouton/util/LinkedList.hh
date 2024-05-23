@@ -18,6 +18,7 @@
 
 #pragma once
 #include "crouton/util/Base.hh"
+#include "betterassert.hh"
 
 namespace crouton::util {
 

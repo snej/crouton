@@ -75,6 +75,7 @@ namespace crouton::util {
             _other = old._other;
             old._other = nullptr;
             hookup();
+            return *this;
         }
 
         /// Connects to an `Other` object, or none. Breaks any existing link.
@@ -218,6 +219,7 @@ namespace crouton::util {
             this->Link::operator=(std::move(old));
             _parent = old._parent;
             old._parent = nullptr;
+            return *this;
         }
 
         /// Connects to an `Other` object, or none. Breaks any existing link.

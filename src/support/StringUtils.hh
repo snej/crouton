@@ -20,6 +20,7 @@
 #include "crouton/util/Base.hh"
 
 #include <cstring>
+#include "crouton/util/betterassert.hh"
 
 namespace crouton {
     class ConstBytes;

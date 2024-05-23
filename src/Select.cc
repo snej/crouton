@@ -56,7 +56,7 @@ namespace crouton {
     int Select::await_resume() {
         for (unsigned i = 0; i < kMaxSources; ++i) {
             if (_ready[i]) {
-                _ready[i] = 0;
+                _ready[i] = false;
                 return i;
             }
         }

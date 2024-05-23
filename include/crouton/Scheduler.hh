@@ -19,7 +19,6 @@
 #pragma once
 #include "crouton/Coroutine.hh"
 
-#include <algorithm>
 #include <atomic>
 #include <deque>
 #include <functional>
@@ -64,7 +63,7 @@ namespace crouton {
 
         /// Runs the event loop until the function returns true.
         /// The function is checked before each iteration of the loop.
-        void runUntil(std::function<bool()> fn);
+        void runUntil(std::function<bool()> const& fn);
 
         /// Schedules the function to be run at the next iteration of the event loop.
         /// @note  This method is thread-safe.

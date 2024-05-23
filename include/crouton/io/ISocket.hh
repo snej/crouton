@@ -18,6 +18,7 @@
 
 #pragma once
 #include "crouton/CroutonFwd.hh"
+#include "crouton/util/betterassert.hh"
 
 
 namespace crouton::io {

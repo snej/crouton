@@ -65,8 +65,7 @@ namespace crouton::io::blip {
                 LBLIP->info("Connection received WebSocket CLOSE");
                 break;
             }
-            MessageInRef msg = _io.receive(*frame);
-            if (msg)
+            if (MessageInRef msg = _io.receive(*frame))
                 dispatchRequest(std::move(msg));
         } while (YIELD true);
         _io.closeReceive();

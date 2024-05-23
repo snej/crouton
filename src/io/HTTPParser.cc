@@ -122,9 +122,8 @@ namespace crouton::io::http {
 
     Future<string> Parser::readBody() {
         precondition(_stream);
-        ConstBytes data;
         while (_body.empty() && !complete()) {
-            data = AWAIT _stream->readNoCopy();
+            ConstBytes data = AWAIT _stream->readNoCopy();
             parseData(data);
             if (data.empty() && !complete())
                 RETURN CroutonError::UnexpectedEOF;
@@ -173,7 +172,7 @@ namespace crouton::io::http {
     }
 
 
-    int Parser::addHeader(string value) {
+    int Parser::addHeader(string const& value) {
         precondition(!_curHeaderName.empty());
         this->headers.add(_curHeaderName, value);
         _curHeaderName = "";

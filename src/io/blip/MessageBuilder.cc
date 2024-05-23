@@ -48,7 +48,7 @@ namespace crouton::io::blip {
     }
 
 
-    void MessageBuilder::makeError(Message::Error err) {
+    void MessageBuilder::makeError(Message::Error const& err) {
         precondition(!err.domain.empty() && err.code != 0);
         type = kErrorType;
         addProperty("Error-Domain", err.domain);

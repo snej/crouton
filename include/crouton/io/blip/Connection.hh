@@ -19,7 +19,6 @@
 #pragma once
 #include "crouton/io/blip/BLIPIO.hh"
 #include "crouton/io/blip/Dispatcher.hh"
-#include "crouton/CoCondition.hh"
 #include "crouton/Task.hh"
 #include "crouton/io/WebSocket.hh"
 
@@ -47,8 +46,8 @@ namespace crouton::io::blip {
 
         /// Registers a handler for incoming requests with a specific `Profile` property value.
         /// The profile string `"*"` is a wild-card that matches any message.
-        void setRequestHandler(string profile, RequestHandler h) {
-            Dispatcher::setRequestHandler(profile, h);
+        void setRequestHandler(string const& profile, RequestHandler h) {
+            Dispatcher::setRequestHandler(profile, std::move(h));
         }
 
         /// Begins listening for incoming messages and sending outgoing ones.

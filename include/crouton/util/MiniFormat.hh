@@ -246,7 +246,7 @@ namespace crouton::mini {
             Spec                _specs[kMaxSpecs];      // format specs, in order
         };
 
-        explicit BaseFormatString(Impl impl) :_impl(impl) { }
+        explicit BaseFormatString(Impl const& impl) :_impl(impl) { }
         static constexpr Impl parse(const char* cstr, ArgTypeList);
 
         Impl const _impl;

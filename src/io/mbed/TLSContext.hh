@@ -115,20 +115,18 @@ namespace crouton::io::mbed {
     enum class MbedError : errorcode_t { };
 }
 
-namespace crouton {
-    template <> struct ErrorDomainInfo<io::mbed::MbedError> {
-        static constexpr string_view name = "mbedTLS";
-        static string description(errorcode_t code) {
-            char msg[100];
-            mbedtls_strerror(code, msg, sizeof(msg));
-            //if (withCode) {
-            size_t len = strlen(msg);
-            snprintf(msg + len, sizeof(msg) - len, " (-0x%04x)", int(-code));
-            //}
-            return string(msg);
-        }
-    };
-}
+template <> struct crouton::ErrorDomainInfo<crouton::io::mbed::MbedError> {
+    static constexpr string_view name = "mbedTLS";
+    static string                description(errorcode_t code) {
+        char msg[100];
+        mbedtls_strerror(code, msg, sizeof(msg));
+        //if (withCode) {
+        size_t len = strlen(msg);
+        snprintf(msg + len, sizeof(msg) - len, " (-0x%04x)", int(-code));
+        //}
+        return string(msg);
+    }
+};
 
 namespace crouton::io::mbed {
     using namespace std;
@@ -153,7 +151,7 @@ namespace crouton::io::mbed {
     // - SPDLOG_LEVEL_CRITICAL 5
     // - SPDLOG_LEVEL_OFF 6
 
-    log::logger* LMbed;
+    inline log::logger* LMbed;
 
 
     // Simple RAII helper for mbedTLS cert struct

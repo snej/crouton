@@ -24,8 +24,8 @@
 #include <exception>
 #include <source_location>
 #include <stdexcept>
-#include <type_traits>
 #include <typeinfo>
+#include "crouton/util/betterassert.hh"
 
 namespace crouton {
 

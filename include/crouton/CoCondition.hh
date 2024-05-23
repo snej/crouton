@@ -21,7 +21,6 @@
 #include "crouton/Scheduler.hh"
 
 #include <atomic>
-#include <concepts>
 #include <optional>
 
 namespace crouton {
@@ -74,8 +73,8 @@ namespace crouton {
 
         BlockerBase() = default;
         // these decls exist to enable zero-copy returns. Not implemented:
-        BlockerBase(BlockerBase&&);
-        BlockerBase& operator==(BlockerBase&&);
+        BlockerBase(BlockerBase&&) noexcept;
+        BlockerBase& operator==(BlockerBase&&) noexcept;
     protected:
         void notify();
         enum State { Initial, Waiting, Ready };

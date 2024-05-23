@@ -33,7 +33,6 @@ namespace crouton::io::uv {
     Future<void> TCPSocket::open() {
         precondition(!isOpen());
         precondition(_binding);
-        int err;
 
         // Resolve the address/hostname:
         sockaddr addr;
@@ -50,8 +49,7 @@ namespace crouton::io::uv {
         _binding.reset();
 
         connect_request req("opening connection");
-        err = uv_tcp_connect(&req, tcpHandle, &addr,
-                             req.callback);
+        int err = uv_tcp_connect(&req, tcpHandle, &addr, req.callback);
         if (err < 0) {
             closeHandle(tcpHandle);
             check(err, "opening connection");

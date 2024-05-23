@@ -88,22 +88,22 @@ namespace crouton::io::uv {
             uv_timer_start(_distantFutureTimer.get(), callback, 1'000'000'000, 1'000'000'000);
         }
 
-        void run()  {
+        void run() override {
             _run(UV_RUN_DEFAULT);
         }
 
-        bool runOnce(bool waitForIO)  {
+        bool runOnce(bool waitForIO) override {
             return _run(waitForIO ? UV_RUN_ONCE : UV_RUN_NOWAIT);
         }
 
-        void stop(bool threadSafe) {
+        void stop(bool threadSafe) override {
             if (threadSafe)
                 uv_async_send(_async.get());
             else
                 uv_stop(_loop.get());
         }
 
-        void perform(std::function<void()> fn, bool synchronous) {
+        void perform(std::function<void()> fn, bool synchronous) override {
             struct uvAsyncFn : public uv_async_t {
                 std::function<void()> _fn;
                 bool _synchronous;

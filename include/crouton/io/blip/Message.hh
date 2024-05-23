@@ -111,7 +111,7 @@ namespace crouton::io::blip {
 
         /** Sends an error as a response. (The message must be complete.)
             This is a no-op if the message was sent NoReply. */
-        void respondWithError(Error);
+        void respondWithError(Error const&);
 
         /** Responds with an error saying that the message went unhandled.
             Call this if you don't know what to do with a request.

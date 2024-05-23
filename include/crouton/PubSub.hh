@@ -246,7 +246,7 @@ namespace crouton::ps {
         using Fn = std::function<Future<void>(Result<T>)>;
         explicit CollectorFn(Fn fn) :_fn(std::move(fn)) { }
     protected:
-        virtual Task run(SeriesRef<T> series) {
+        Task run(SeriesRef<T> series) override {
             bool ok;
             do {
                 Result<T> result = AWAIT *series;
@@ -321,7 +321,7 @@ namespace crouton::ps {
         }
 
         /// Sends the item to subscriber. Must be awaited; if result is false, stop.
-        [[nodiscard]] SeriesProducer<Out>::AwaitProduce produce(Result<Out> nextItem) {
+        [[nodiscard]] typename SeriesProducer<Out>::AwaitProduce produce(Result<Out> nextItem) {
             return _producer.produce(std::move(nextItem));
         }
 

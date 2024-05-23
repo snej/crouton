@@ -23,7 +23,6 @@
 #include "crouton/io/HTTPConnection.hh"
 #include "crouton/io/HTTPHandler.hh"
 
-#include <cstring>
 #include <deque>
 #include <optional>
 
@@ -134,7 +133,7 @@ namespace crouton::io::ws {
     class ClientWebSocket final : public WebSocket {
     public:
         /// Constructs a WebSocket, but doesn't connect yet.
-        explicit ClientWebSocket(string urlStr);
+        explicit ClientWebSocket(string_view urlStr);
         ~ClientWebSocket();
 
         /// Adds an HTTP request header.
@@ -193,9 +192,7 @@ namespace crouton::io::ws {
     };
 }
 
-namespace crouton {
-    template <> struct ErrorDomainInfo<io::ws::CloseCode> {
-        static constexpr string_view name = "WebSocket";
-        static string description(errorcode_t);
-    };
-}
+template <> struct crouton::ErrorDomainInfo<crouton::io::ws::CloseCode> {
+    static constexpr string_view name = "WebSocket";
+    static string                description(errorcode_t);
+};

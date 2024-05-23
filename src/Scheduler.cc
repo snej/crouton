@@ -21,6 +21,7 @@
 #include "Internal.hh"
 #include "crouton/util/Logging.hh"
 #include "crouton/Task.hh"
+#include <algorithm>
 
 namespace crouton {
     using namespace std;
@@ -189,7 +190,7 @@ namespace crouton {
         runUntil([]{return false;});
     }
 
-    void Scheduler::runUntil(std::function<bool()> fn) {
+    void Scheduler::runUntil(std::function<bool()> const& fn) {
         while (!fn()) {
             bool idle = !resume();
             if (!idle && fn())

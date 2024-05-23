@@ -19,12 +19,10 @@
 #pragma once
 #include "crouton/io/HTTPParser.hh"
 #include "crouton/io/IStream.hh"
-#include "crouton/io/ISocket.hh"
 #include "crouton/Task.hh"
 
 #include <functional>
 #include <regex>
-#include <tuple>
 #include <vector>
 
 namespace crouton::io::http {

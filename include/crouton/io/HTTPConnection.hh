@@ -19,7 +19,6 @@
 #pragma once
 #include "crouton/io/HTTPParser.hh"
 #include "crouton/io/IStream.hh"
-#include "crouton/io/ISocket.hh"
 #include "crouton/Future.hh"
 
 namespace crouton::io::http {

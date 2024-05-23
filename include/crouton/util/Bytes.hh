@@ -19,9 +19,9 @@
 #pragma once
 #include "crouton/util/Base.hh"
 
-#include <algorithm>
 #include <cstring>
 #include <span>
+#include "betterassert.hh"
 
 struct uv_buf_t;
 

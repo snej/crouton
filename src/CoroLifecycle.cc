@@ -21,6 +21,7 @@
 #include "support/Memoized.hh"
 #include "crouton/Scheduler.hh"
 #include "crouton/util/MiniOStream.hh"
+#include <algorithm>
 #include <mutex>
 #include <ranges>
 #include <unordered_map>
@@ -54,6 +55,7 @@ namespace crouton::lifecycle {
             name = name.substr(0, p);
         if (name.ends_with("Impl"))                             // Strip -Impl suffix
             name = name.substr(0, name.size() - 4);
+
         return name;
     }
 
@@ -188,7 +190,7 @@ namespace crouton::lifecycle {
     }
 
     /// Returns the coroutine this one called.
-    static coroInfo* _currentCalleeOf(coroInfo &caller) {
+    static coroInfo* _currentCalleeOf(coroInfo const& caller) {
         for (auto &[h, info] : sCoros) {
             if (info.caller == &caller && info.handle)
                 return &info;
@@ -413,7 +415,7 @@ namespace crouton::lifecycle {
         else
             LCoro->debug("{} destructed. ({} left)", info, _count() - 1);
 
-        if (kRememberDestroyedCoros) {
+        if constexpr (kRememberDestroyedCoros) {
             i->second.handle = nullptr; // mark as tombstone
         } else {
             sCoros.erase(i);
@@ -437,7 +439,7 @@ namespace crouton::lifecycle {
             if (info.handle)
                 infos.emplace_back(&info);
         }
-        sort(infos.begin(), infos.end(), [](auto a, auto b) {return a->sequence < b->sequence;});
+        ranges::sort(infos, [](auto a, auto b) {return a->sequence < b->sequence;});
         LCoro->info("{} Existing Coroutines:", infos.size());
         for (auto info : infos) {
             switch (info->state) {

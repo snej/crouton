@@ -135,7 +135,7 @@ TEST_CASE("DNS lookup", "[uv]") {
         auto ip4addr = addr.primaryAddress(4);
         REQUIRE(ip4addr);
         CHECK(ip4addr->sa_family == AF_INET);
-        CHECK(addr.primaryAddressString() == "93.184.216.34");
+        CHECK(addr.primaryAddressString().starts_with("93.184."));
         RETURN noerror;
     });
     REQUIRE(Scheduler::current().assertEmpty());

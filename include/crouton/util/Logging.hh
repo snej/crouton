@@ -25,7 +25,6 @@
 #endif
 
 #include "crouton/util/Base.hh"
-#include "crouton/util/MiniFormat.hh"
 
 #if CROUTON_USE_SPDLOG
 #include <spdlog/spdlog.h>

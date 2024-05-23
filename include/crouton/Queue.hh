@@ -38,7 +38,7 @@ namespace crouton {
         AsyncQueue(AsyncQueue&&) noexcept = default;
         AsyncQueue& operator=(AsyncQueue&&) noexcept = default;
 
-        virtual ~AsyncQueue() {close();}
+        virtual ~AsyncQueue() {close();}    // warning: will not call overridden `close` methods!
 
         enum State : uint8_t {Open, Closing, Closed};
 

@@ -197,7 +197,7 @@ namespace crouton::io {
         }
 
         if (*p == ':') {
-            if (url->hostname == NULL)
+            if (url->hostname == nullptr)
                 return -1;
             p += 1;
             char *pend;

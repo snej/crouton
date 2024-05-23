@@ -19,8 +19,6 @@
 #pragma once
 #include "crouton/Generator.hh"
 
-#include <vector>
-
 namespace crouton::io {
     class FileStream;
 }

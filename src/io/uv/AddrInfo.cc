@@ -72,10 +72,11 @@ namespace crouton::io {
 
     sockaddr const* AddrInfo::primaryAddress(int ipv) const {
         assert(_info);
-        int af = ipv;
+        int af;
         switch (ipv) {
             case 4: af = AF_INET; break;
             case 6: af = AF_INET6; break;
+            default: af = ipv; break;
         }
 
         for (auto i = _info.get(); i; i = i->ai_next) {

@@ -21,6 +21,7 @@
 
 #include <typeinfo>
 #include <vector>
+#include "crouton/util/betterassert.hh"
 
 namespace crouton {
     class Suspension;

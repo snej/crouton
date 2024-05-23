@@ -28,7 +28,7 @@ namespace crouton::io::blip {
     { }
 
 
-    void Dispatcher::setRequestHandler(string profile, RequestHandler handler) {
+    void Dispatcher::setRequestHandler(string const& profile, RequestHandler handler) {
         _handlers[profile] = std::move(handler);
     }
 

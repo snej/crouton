@@ -64,14 +64,14 @@ namespace crouton::io::blip {
 
         /** Reads a 4-byte checksum from the input slice and compares it with the codec's
             running checksum.
-            @throws `ProtocolError::BadChecksum` on mismatch. */
+            @throws ProtocolError::BadChecksum on mismatch. */
         void readAndVerifyChecksum(ConstBytes& input) const;
 
         /** Reads a 4-byte checksum from the input. */
         uint32_t readChecksum(ConstBytes& input) const;
 
         /** Verifies that the given checksum matches the data read.
-            @throws `ProtocolError::BadChecksum` on mismatch. */
+            @throws ProtocolError::BadChecksum on mismatch. */
         void verifyChecksum(uint32_t checksum) const;
 
         virtual ~Codec() = default;
