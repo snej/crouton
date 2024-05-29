@@ -31,16 +31,16 @@ option(CROUTON_BUILD_BLIP "Build BLIP library" OFF)
 
 
 # libuv options:
-set(LIBUV_BUILD_SHARED  OFF CACHE INTERNAL "")
+set(LIBUV_BUILD_SHARED      OFF CACHE INTERNAL "")
 
 # llhttp options:
-set(BUILD_STATIC_LIBS ON CACHE INTERNAL "")
-set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+set(BUILD_STATIC_LIBS       ON CACHE INTERNAL "")
+set(BUILD_SHARED_LIBS       OFF CACHE INTERNAL "")
 
 # mbedTLS options:
-set(ENABLE_PROGRAMS  OFF CACHE INTERNAL "")
-set(ENABLE_TESTING  OFF CACHE INTERNAL "")
-set(MBEDTLS_FATAL_WARNINGS OFF CACHE INTERNAL "") # Work around doc-comment syntax in 3.4
+set(ENABLE_PROGRAMS         OFF CACHE INTERNAL "")
+set(ENABLE_TESTING          OFF CACHE INTERNAL "")
+set(MBEDTLS_FATAL_WARNINGS  OFF CACHE INTERNAL "") # Work around doc-comment syntax in 3.4
 
 add_subdirectory(vendor/libuv)
 add_subdirectory(vendor/llhttp)
@@ -204,7 +204,8 @@ if (CROUTON_BUILD_BLIP)
         vendor/miniz/miniz.c
     )
 
-    target_include_directories( LibCrouton PUBLIC
+    target_include_directories( BLIP PUBLIC
+        include/
         src/io/blip/
     )
 
@@ -216,7 +217,6 @@ if (CROUTON_BUILD_BLIP)
     )
 
     target_link_libraries( BLIP
-        LibCrouton
         z
     )
 endif()
@@ -289,4 +289,3 @@ if (NOT CROUTON_IOS)
         )
     endif()
 endif()
-

@@ -22,6 +22,7 @@
 #include "crouton/util/Varint.hh"
 #include "support/StringUtils.hh"
 #include "crouton/Task.hh"
+#include <mutex>
 #include <ranges>
 
 namespace crouton {

@@ -21,7 +21,6 @@
 #include "crouton/util/MiniOStream.hh"
 #include <vector>
 
-using namespace std;
 using namespace crouton;
 using namespace crouton::io;
 using namespace crouton::mini;
