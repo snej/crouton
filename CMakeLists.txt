@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.9)
 
 # MacOS deployment target must be set before the `project` call
-set(CMAKE_OSX_DEPLOYMENT_TARGET 13.3 CACHE INTERNAL "")
-set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64")
+if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET 13.3 CACHE INTERNAL "")
+    set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64")
+endif()
 
 project( Crouton
     VERSION     0.1.0
@@ -22,10 +24,12 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)   # For JetBrains IDE
 
 
+# Set this if building for iOS; it disables executables & tests that don't work on that platform.
+option(CROUTON_IOS        "Building for iOS"   OFF)
+
 # Option to build the BLIP source files as a separate library.
 # Disabled by default because that code is not Apache-licensed; see src/io/BLIP/README.md.
 option(CROUTON_BUILD_BLIP "Build BLIP library" OFF)
-
 
 #### CMAKE SUBPROJECTS
 
@@ -289,3 +293,17 @@ if (NOT CROUTON_IOS)
         )
     endif()
 endif()
+
+
+#### DEPENDENCIES FOR XCODE BUILD
+
+
+add_library( CroutonXcodeDependencies STATIC
+    src/support/empty.c    # placeholder; CMake requires _something_ here
+)
+
+target_link_libraries( CroutonXcodeDependencies PUBLIC
+    mbedtls
+    spdlog
+    uv_a
+)
