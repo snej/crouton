@@ -132,6 +132,8 @@
 		2755E8642C3B05520092702E /* libllhttp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 279D5E302A954627005C3066 /* libllhttp.a */; };
 		2755E86F2C3B0CBB0092702E /* empty.c in Sources */ = {isa = PBXBuildFile; fileRef = 2755E86E2C3B0CBB0092702E /* empty.c */; };
 		2755E8702C3B0CBB0092702E /* empty.c in Sources */ = {isa = PBXBuildFile; fileRef = 2755E86E2C3B0CBB0092702E /* empty.c */; };
+		2755E8722C3B13110092702E /* Availability.hh in Headers */ = {isa = PBXBuildFile; fileRef = 2755E8712C3B13110092702E /* Availability.hh */; };
+		2755E8732C3B13110092702E /* Availability.hh in Headers */ = {isa = PBXBuildFile; fileRef = 2755E8712C3B13110092702E /* Availability.hh */; };
 		275A5F152AAFB3B1009791E8 /* Memoized.hh in Headers */ = {isa = PBXBuildFile; fileRef = 275A5F132AAFB3B1009791E8 /* Memoized.hh */; };
 		275A5F162AAFB3B1009791E8 /* Memoized.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275A5F142AAFB3B1009791E8 /* Memoized.cc */; };
 		275A5F172AB105EE009791E8 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278F7E312AA015B0005B12F2 /* CoreFoundation.framework */; };
@@ -503,6 +505,7 @@
 		2755E81D2B0947D40005AC35 /* MiniOStream.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MiniOStream.cc; sourceTree = "<group>"; };
 		2755E8692C3B05520092702E /* libcrouton-nodeps.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libcrouton-nodeps.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2755E86E2C3B0CBB0092702E /* empty.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = empty.c; sourceTree = "<group>"; };
+		2755E8712C3B13110092702E /* Availability.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Availability.hh; sourceTree = "<group>"; };
 		275A5F132AAFB3B1009791E8 /* Memoized.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Memoized.hh; sourceTree = "<group>"; };
 		275A5F142AAFB3B1009791E8 /* Memoized.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Memoized.cc; sourceTree = "<group>"; };
 		275EB3E92ACC7AC10022ED53 /* docs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = docs; sourceTree = "<group>"; };
@@ -1713,6 +1716,7 @@
 		279D5D572A9146DA005C3066 /* support */ = {
 			isa = PBXGroup;
 			children = (
+				2755E8712C3B13110092702E /* Availability.hh */,
 				27F49CD52A9E4E8E00BFB24C /* Backtrace.cc */,
 				277B652D2AD9FCDC006F053D /* Backtrace+Unix.cc */,
 				277B652F2AD9FD47006F053D /* Backtrace+Windows.cc */,
@@ -1814,6 +1818,7 @@
 				27B330532AB2763B0066C8DA /* BLIPIO.hh in Headers */,
 				27B330682AB384880066C8DA /* Codec.hh in Headers */,
 				275A5F152AAFB3B1009791E8 /* Memoized.hh in Headers */,
+				2755E8722C3B13110092702E /* Availability.hh in Headers */,
 				278F7F242AAA98FE005B12F2 /* Logging.hh in Headers */,
 				272A852A2A97B2090083D947 /* HTTPConnection.hh in Headers */,
 				277E8A412ABA4AA200E78CB1 /* CoCondition.hh in Headers */,
@@ -1856,6 +1861,7 @@
 				2755E8202C3B05520092702E /* BLIPIO.hh in Headers */,
 				2755E8212C3B05520092702E /* Codec.hh in Headers */,
 				2755E8222C3B05520092702E /* Memoized.hh in Headers */,
+				2755E8732C3B13110092702E /* Availability.hh in Headers */,
 				2755E8232C3B05520092702E /* Logging.hh in Headers */,
 				2755E8242C3B05520092702E /* HTTPConnection.hh in Headers */,
 				2755E8252C3B05520092702E /* CoCondition.hh in Headers */,

@@ -37,6 +37,11 @@
  - Only 10 arguments are allowed. (You can change this by changing BaseFormatString::kMaxSpecs.)
  - Field width and precision are limited to 255.
 
+ Compatibility:
+ - If building for Apple platforms, and your deployment version is earlier than macOS 13.3 or
+   iOS/watchOS/tvOS 16.3, floating-point formatting specifiers are ignored. This is because the
+   floating-point versions of `std::to_chars()` aren't available in older versions of libc++.
+
  Known bugs:
  - When a number is zero-padded, the zeroes go before the sign character, not afterward.
  - When the alternate ('#') form of a float adds a decimal point, it will go after any exponent,

@@ -18,6 +18,8 @@
 
 #include "crouton/util/MiniFormat.hh"
 #include "crouton/util/MiniOStream.hh"
+#include "crouton/util/Base.hh"
+#include "support/Availability.hh"
 #include <charconv>
 
 namespace crouton::mini {
@@ -51,8 +53,8 @@ namespace crouton::mini {
 
 
     // non-localized ASCII-specific equivalents of ctypes:
-    static bool isupper(char c) {return c >= 'A' && c <= 'Z';}
-    static char toupper(char c) {return (c >= 'a' && c <= 'z') ? (c - 32) : c;}
+    __unused static bool isupper(char c) {return c >= 'A' && c <= 'Z';}
+    __unused static char toupper(char c) {return (c >= 'a' && c <= 'z') ? (c - 32) : c;}
 
     static void upperize(char *begin, char *end) {
         for (char *c = begin; c != end; ++c)
@@ -131,47 +133,41 @@ namespace crouton::mini {
         if (d >= 0.0)
             writeNonNegativeSign(out, spec.sign);
         char buf[60];   // big enough for all but absurdly large precisions
-#ifdef __APPLE__ // Apple's libc++ may not have the floating point versions of std::to_chars
-        if (__builtin_available(macOS 13.3, iOS 16.3, tvOS 16.3, watchOS 9.3, *)) {
-#endif
-
-            std::to_chars_result result;
-            if (spec.type == 0 && spec.precision == BaseFormatString::kDefaultPrecision) {
-                result = std::to_chars(&buf[0], &buf[sizeof(buf)], d);
-            } else {
-                std::chars_format format;
-                int precision = (spec.precision != BaseFormatString::kDefaultPrecision) ? spec.precision : 6;
-                switch (spec.type) {
-                    case 'a': case 'A': format = std::chars_format::hex; break;
-                    case 'e': case 'E': format = std::chars_format::scientific; break;
-                    case 'f': case 'F': format = std::chars_format::fixed; break;
-                    case 0:
-                    case 'g': case 'G': format = std::chars_format::general; break;
-                    default:            throw format_error("invalid type for floating-point arg");
-                }
-                result = std::to_chars(&buf[0], &buf[sizeof(buf)], d, format, precision);
-                if (result.ec != std::errc{}) {
-                    out.write("FIELD OVERFLOW");    // FIXME: Use bigger buffer?
-                    return;
-                }
-                if (isupper(spec.type))
-                    upperize(buf, result.ptr);
-            }
-
-            if (spec.alternate) {
-                if (string_view(buf, result.ptr).find('.') == string::npos)
-                    *result.ptr++ = '.';    // append a '.' if there isn't one
-                //FIXME: In scientific notation it should go before the 'e'/'E'
-            }
-
-            out.write(&buf[0], result.ptr);
-
-#ifdef __APPLE__
+#if FLOAT_TO_CHARS_AVAILABLE
+        std::to_chars_result result;
+        if (spec.type == 0 && spec.precision == BaseFormatString::kDefaultPrecision) {
+            result = std::to_chars(&buf[0], &buf[sizeof(buf)], d);
         } else {
-            // lame fallback if to_chars isn't available:
-            snprintf(buf, sizeof(buf), "%g", d);
-            out.write(buf);
+            std::chars_format format;
+            int precision = (spec.precision != BaseFormatString::kDefaultPrecision) ? spec.precision : 6;
+            switch (spec.type) {
+                case 'a': case 'A': format = std::chars_format::hex; break;
+                case 'e': case 'E': format = std::chars_format::scientific; break;
+                case 'f': case 'F': format = std::chars_format::fixed; break;
+                case 0:
+                case 'g': case 'G': format = std::chars_format::general; break;
+                default:            throw format_error("invalid type for floating-point arg");
+            }
+            result = std::to_chars(&buf[0], &buf[sizeof(buf)], d, format, precision);
+            if (result.ec != std::errc{}) {
+                out.write("FIELD OVERFLOW");    // FIXME: Use bigger buffer?
+                return;
+            }
+            if (isupper(spec.type))
+                upperize(buf, result.ptr);
         }
+
+        if (spec.alternate) {
+            if (string_view(buf, result.ptr).find('.') == string::npos)
+                *result.ptr++ = '.';    // append a '.' if there isn't one
+            //FIXME: In scientific notation it should go before the 'e'/'E'
+        }
+
+        out.write(&buf[0], result.ptr);
+#else
+        // lame fallback if to_chars isn't available:
+        snprintf(buf, sizeof(buf), "%g", d);
+        out.write(buf);
 #endif
     }
 
