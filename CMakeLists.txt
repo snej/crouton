@@ -221,6 +221,7 @@ if (CROUTON_BUILD_BLIP)
     )
 
     target_link_libraries( BLIP
+        LibCrouton          # Seems redundant, but w/o it executables get link errors on Linux
         z
     )
 endif()
