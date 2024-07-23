@@ -1,5 +1,8 @@
 # Makefile! Just a launcher for scripts...
 
+export CMAKE_GENERATOR = Ninja
+export CMAKE_COLOR_DIAGNOSTICS = ON
+
 all: debug release
 
 clean:

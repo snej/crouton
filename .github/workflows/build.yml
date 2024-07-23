@@ -29,6 +29,12 @@ jobs:
         uses: Dup4/actions-setup-gcc@v1
         with:
           version: latest
+      - name: Install Ninja (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y ninja-build
+      - name: Install Ninja (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ninja
       - name: build debug
         run: make debug
         shell: bash

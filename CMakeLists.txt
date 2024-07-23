@@ -77,7 +77,6 @@ else()
         -Wpedantic
         -Wno-assume             # Lots of bogus "argument to '__builtin_assume' has side effects"
         -Wno-unknown-pragmas
-        -Wno-unknown-warning-option
     )
     if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
         # GCC-specific:
