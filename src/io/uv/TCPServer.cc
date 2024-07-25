@@ -29,7 +29,7 @@ namespace crouton::io {
     TCPServer::TCPServer(uint16_t port, const char* interfaceAddr)
     :_tcpHandle(new uv_tcp_s)
     {
-        if (!interfaceAddr)
+        if (!interfaceAddr || string_view(interfaceAddr) == "*")
             interfaceAddr = "0.0.0.0";
         sockaddr_in addr = {};
         check(uv_ip4_addr(interfaceAddr, port, &addr), "parsing server interface");
@@ -48,10 +48,12 @@ namespace crouton::io {
         sockaddr_storage addr;
         int addrLen = sizeof(addr);
         check(uv_tcp_getsockname(_tcpHandle, (sockaddr*)&addr, &addrLen), "getting server port");
+        uint16_t port;
         if (addr.ss_family == AF_INET)
-            return ((sockaddr_in&)addr).sin_port;
+            port = ((sockaddr_in&)addr).sin_port;
         else
-            return ((sockaddr_in6&)addr).sin6_port;
+            port = ((sockaddr_in6&)addr).sin6_port;
+        return ntohs(port);
     }
 
 

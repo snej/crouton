@@ -29,8 +29,10 @@ namespace crouton::io {
 
     class TCPServer {
     public:
-        /// Constructs a TCPServer that will listen on the given port,
-        /// or if port is 0, on any available port.
+        /// Constructs a TCPServer that will listen on the given port.
+        /// @param port  The port number, or 0 to pick an available port at random.
+        /// @param interfaceAddr  The IP address of the interface to listen on,
+        ///         or `"*"` or `nullptr` to listen on all interfaces.
         explicit TCPServer(uint16_t port, const char* interfaceAddr =nullptr);
         ~TCPServer();
 
