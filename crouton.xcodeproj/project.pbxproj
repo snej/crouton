@@ -85,7 +85,6 @@
 		2755E8302C3B05520092702E /* Filesystem.cc in Sources */ = {isa = PBXBuildFile; fileRef = 278F7E4E2AA2ADFD005B12F2 /* Filesystem.cc */; };
 		2755E8312C3B05520092702E /* HTTPParser.cc in Sources */ = {isa = PBXBuildFile; fileRef = 278F7E392AA1489B005B12F2 /* HTTPParser.cc */; };
 		2755E8322C3B05520092702E /* LocalSocket.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27BCD3012AEACE0C009DFCED /* LocalSocket.cc */; };
-		2755E8332C3B05520092702E /* Backtrace.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27F49CD52A9E4E8E00BFB24C /* Backtrace.cc */; };
 		2755E8342C3B05520092702E /* TLSSocket.cc in Sources */ = {isa = PBXBuildFile; fileRef = 278F76792A9FEF54005B12F2 /* TLSSocket.cc */; };
 		2755E8352C3B05520092702E /* ISocket.cc in Sources */ = {isa = PBXBuildFile; fileRef = 278F7E562AA7EDBF005B12F2 /* ISocket.cc */; };
 		2755E8362C3B05520092702E /* Select.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2788E3532AC38B5E00254A88 /* Select.cc */; };
@@ -94,7 +93,7 @@
 		2755E8392C3B05520092702E /* bundled_fmtlib_format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 278F7F162AAA91C2005B12F2 /* bundled_fmtlib_format.cpp */; };
 		2755E83A2C3B05520092702E /* miniz.c in Sources */ = {isa = PBXBuildFile; fileRef = 27E9A0E22B02C52C00EF3726 /* miniz.c */; settings = {COMPILER_FLAGS = "-Wno-comma -O3"; }; };
 		2755E83B2C3B05520092702E /* HTTPHandler.cc in Sources */ = {isa = PBXBuildFile; fileRef = 278F7E592AA93D5A005B12F2 /* HTTPHandler.cc */; };
-		2755E83C2C3B05520092702E /* Backtrace+Unix.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277B652D2AD9FCDC006F053D /* Backtrace+Unix.cc */; };
+		2755E83C2C3B05520092702E /* Backtrace_Apple.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277B652D2AD9FCDC006F053D /* Backtrace_Apple.cc */; };
 		2755E83D2C3B05520092702E /* TCPSocket.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2727303F2A8D6F35000CCA22 /* TCPSocket.cc */; };
 		2755E83E2C3B05520092702E /* MiniFormat.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277B6C282AE06CDA006F053D /* MiniFormat.cc */; };
 		2755E83F2C3B05520092702E /* NWConnection.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27F603072A9FA366006FA1D0 /* NWConnection.cc */; };
@@ -155,7 +154,7 @@
 		275EB4412ACDCD760022ED53 /* libBLIP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 275EB43F2ACDCC5D0022ED53 /* libBLIP.a */; };
 		27793A312B0EA1AB0000B1C6 /* test_mini.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27793A302B0EA1AB0000B1C6 /* test_mini.cc */; };
 		277B652C2AD8B5D8006F053D /* betterassert.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277B652B2AD8B5D8006F053D /* betterassert.cc */; };
-		277B652E2AD9FCDC006F053D /* Backtrace+Unix.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277B652D2AD9FCDC006F053D /* Backtrace+Unix.cc */; };
+		277B652E2AD9FCDC006F053D /* Backtrace_Apple.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277B652D2AD9FCDC006F053D /* Backtrace_Apple.cc */; };
 		277B6C172ADDB6B7006F053D /* ESPTCPSocket.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277B6C152ADDB6B7006F053D /* ESPTCPSocket.hh */; };
 		277B6C292AE06CDA006F053D /* MiniFormat.hh in Headers */ = {isa = PBXBuildFile; fileRef = 277B6C272AE06CDA006F053D /* MiniFormat.hh */; };
 		277B6C2A2AE06CDA006F053D /* MiniFormat.cc in Sources */ = {isa = PBXBuildFile; fileRef = 277B6C282AE06CDA006F053D /* MiniFormat.cc */; };
@@ -224,6 +223,8 @@
 		27B3307C2AB911250066C8DA /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278F7E332AA015C0005B12F2 /* Security.framework */; };
 		27B330832AB911470066C8DA /* demo_blipclient.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B330822AB911470066C8DA /* demo_blipclient.cc */; };
 		27B330852AB914D40066C8DA /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 27B3306F2AB4BE590066C8DA /* libz.tbd */; };
+		27B9A9592C54430B0091A66C /* Backtrace.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B9A9582C54430B0091A66C /* Backtrace.cc */; };
+		27B9A95A2C54430B0091A66C /* Backtrace.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B9A9582C54430B0091A66C /* Backtrace.cc */; };
 		27BCD2F62AE98994009DFCED /* Framer.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27BCD2F52AE98994009DFCED /* Framer.cc */; };
 		27BCD2F92AE98D10009DFCED /* Varint.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27BCD2F82AE98D10009DFCED /* Varint.cc */; };
 		27BCD3022AEACE0C009DFCED /* LocalSocket.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27BCD3002AEACE0C009DFCED /* LocalSocket.hh */; };
@@ -245,7 +246,6 @@
 		27ED1C732AABF47200ADC971 /* CoroLifecycle.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27ED1C712AABF47200ADC971 /* CoroLifecycle.cc */; };
 		27F49CCF2A9D011B00BFB24C /* test_io.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27F49CCE2A9D011B00BFB24C /* test_io.cc */; };
 		27F49CD62A9E4E8E00BFB24C /* Backtrace.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27F49CD42A9E4E8E00BFB24C /* Backtrace.hh */; };
-		27F49CD72A9E4E8E00BFB24C /* Backtrace.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27F49CD52A9E4E8E00BFB24C /* Backtrace.cc */; };
 		27F49CDB2A9E6DB600BFB24C /* demo_server.cc in Sources */ = {isa = PBXBuildFile; fileRef = 279D5D4F2A9031EF005C3066 /* demo_server.cc */; };
 		27F49CDD2A9E6E0500BFB24C /* demo_client.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2711C18C2A9965B600361566 /* demo_client.cc */; };
 		27F603042A9EB826006FA1D0 /* IStream.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27F603022A9EB826006FA1D0 /* IStream.hh */; };
@@ -516,8 +516,7 @@
 		277B65282AD766EF006F053D /* Relation.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Relation.hh; sourceTree = "<group>"; };
 		277B652A2AD8B5CA006F053D /* betterassert.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = betterassert.hh; sourceTree = "<group>"; };
 		277B652B2AD8B5D8006F053D /* betterassert.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = betterassert.cc; sourceTree = "<group>"; };
-		277B652D2AD9FCDC006F053D /* Backtrace+Unix.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "Backtrace+Unix.cc"; sourceTree = "<group>"; };
-		277B652F2AD9FD47006F053D /* Backtrace+Windows.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "Backtrace+Windows.cc"; sourceTree = "<group>"; };
+		277B652D2AD9FCDC006F053D /* Backtrace_Apple.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Backtrace_Apple.cc; sourceTree = "<group>"; };
 		277B65302AD9FECA006F053D /* Backtrace+ESP32.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "Backtrace+ESP32.cc"; sourceTree = "<group>"; };
 		277B65332ADA07E0006F053D /* sdkconfig */ = {isa = PBXFileReference; lastKnownFileType = text; path = sdkconfig; sourceTree = "<group>"; };
 		277B65362ADA07E0006F053D /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
@@ -787,6 +786,7 @@
 		27B330812AB911250066C8DA /* demo_blipclient */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = demo_blipclient; sourceTree = BUILT_PRODUCTS_DIR; };
 		27B330822AB911470066C8DA /* demo_blipclient.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = demo_blipclient.cc; sourceTree = "<group>"; };
 		27B330842AB912D30066C8DA /* BLIP.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = BLIP.hh; sourceTree = "<group>"; };
+		27B9A9582C54430B0091A66C /* Backtrace.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Backtrace.cc; sourceTree = "<group>"; };
 		27BA40742AA502DD0011BB86 /* Result.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Result.hh; sourceTree = "<group>"; };
 		27BCD2CE2AE73844009DFCED /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		27BCD2CF2AE738DF009DFCED /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -828,7 +828,7 @@
 		27F49CD12A9E45C300BFB24C /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		27F49CD22A9E48A100BFB24C /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		27F49CD42A9E4E8E00BFB24C /* Backtrace.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Backtrace.hh; sourceTree = "<group>"; };
-		27F49CD52A9E4E8E00BFB24C /* Backtrace.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Backtrace.cc; sourceTree = "<group>"; };
+		27F49CD52A9E4E8E00BFB24C /* Backtrace_cpptrace.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Backtrace_cpptrace.cc; sourceTree = "<group>"; };
 		27F49CD82A9E593700BFB24C /* Makefile */ = {isa = PBXFileReference; indentWidth = 8; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; usesTabs = 1; };
 		27F603022A9EB826006FA1D0 /* IStream.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = IStream.hh; sourceTree = "<group>"; };
 		27F603032A9EB826006FA1D0 /* IStream.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = IStream.cc; sourceTree = "<group>"; };
@@ -1278,6 +1278,7 @@
 		277B65292AD856EA006F053D /* util */ = {
 			isa = PBXGroup;
 			children = (
+				27F49CD42A9E4E8E00BFB24C /* Backtrace.hh */,
 				278F7E5D2AAA69B5005B12F2 /* Base.hh */,
 				277B652A2AD8B5CA006F053D /* betterassert.hh */,
 				27B3306A2AB391F30066C8DA /* Bytes.hh */,
@@ -1717,10 +1718,9 @@
 			isa = PBXGroup;
 			children = (
 				2755E8712C3B13110092702E /* Availability.hh */,
-				27F49CD52A9E4E8E00BFB24C /* Backtrace.cc */,
-				277B652D2AD9FCDC006F053D /* Backtrace+Unix.cc */,
-				277B652F2AD9FD47006F053D /* Backtrace+Windows.cc */,
-				27F49CD42A9E4E8E00BFB24C /* Backtrace.hh */,
+				27B9A9582C54430B0091A66C /* Backtrace.cc */,
+				27F49CD52A9E4E8E00BFB24C /* Backtrace_cpptrace.cc */,
+				277B652D2AD9FCDC006F053D /* Backtrace_Apple.cc */,
 				277B652B2AD8B5D8006F053D /* betterassert.cc */,
 				2755E86E2C3B0CBB0092702E /* empty.c */,
 				27B330692AB388960066C8DA /* Endian.hh */,
@@ -2168,17 +2168,17 @@
 				278F7E502AA2ADFD005B12F2 /* Filesystem.cc in Sources */,
 				278F7E3B2AA1489B005B12F2 /* HTTPParser.cc in Sources */,
 				27BCD3032AEACE0C009DFCED /* LocalSocket.cc in Sources */,
-				27F49CD72A9E4E8E00BFB24C /* Backtrace.cc in Sources */,
 				278F767B2A9FEF54005B12F2 /* TLSSocket.cc in Sources */,
 				278F7E572AA7EDBF005B12F2 /* ISocket.cc in Sources */,
 				2788E3542AC38B5E00254A88 /* Select.cc in Sources */,
+				27B9A95A2C54430B0091A66C /* Backtrace.cc in Sources */,
 				2755E86F2C3B0CBB0092702E /* empty.c in Sources */,
 				27E9A1122B02C61A00EF3726 /* miniz_tinfl.c in Sources */,
 				27BCD2F62AE98994009DFCED /* Framer.cc in Sources */,
 				278F7F202AAA9212005B12F2 /* bundled_fmtlib_format.cpp in Sources */,
 				27E9A1172B02CF9A00EF3726 /* miniz.c in Sources */,
 				278F7E5B2AA93D5A005B12F2 /* HTTPHandler.cc in Sources */,
-				277B652E2AD9FCDC006F053D /* Backtrace+Unix.cc in Sources */,
+				277B652E2AD9FCDC006F053D /* Backtrace_Apple.cc in Sources */,
 				272730412A8D6F35000CCA22 /* TCPSocket.cc in Sources */,
 				277B6C2A2AE06CDA006F053D /* MiniFormat.cc in Sources */,
 				27F603092A9FA366006FA1D0 /* NWConnection.cc in Sources */,
@@ -2224,17 +2224,17 @@
 				2755E8302C3B05520092702E /* Filesystem.cc in Sources */,
 				2755E8312C3B05520092702E /* HTTPParser.cc in Sources */,
 				2755E8322C3B05520092702E /* LocalSocket.cc in Sources */,
-				2755E8332C3B05520092702E /* Backtrace.cc in Sources */,
 				2755E8342C3B05520092702E /* TLSSocket.cc in Sources */,
 				2755E8352C3B05520092702E /* ISocket.cc in Sources */,
 				2755E8362C3B05520092702E /* Select.cc in Sources */,
+				27B9A9592C54430B0091A66C /* Backtrace.cc in Sources */,
 				2755E8702C3B0CBB0092702E /* empty.c in Sources */,
 				2755E8372C3B05520092702E /* miniz_tinfl.c in Sources */,
 				2755E8382C3B05520092702E /* Framer.cc in Sources */,
 				2755E8392C3B05520092702E /* bundled_fmtlib_format.cpp in Sources */,
 				2755E83A2C3B05520092702E /* miniz.c in Sources */,
 				2755E83B2C3B05520092702E /* HTTPHandler.cc in Sources */,
-				2755E83C2C3B05520092702E /* Backtrace+Unix.cc in Sources */,
+				2755E83C2C3B05520092702E /* Backtrace_Apple.cc in Sources */,
 				2755E83D2C3B05520092702E /* TCPSocket.cc in Sources */,
 				2755E83E2C3B05520092702E /* MiniFormat.cc in Sources */,
 				2755E83F2C3B05520092702E /* NWConnection.cc in Sources */,

@@ -10,3 +10,6 @@
 [submodule "vendor/miniz"]
 	path = vendor/miniz
 	url = https://github.com/richgel999/miniz.git
+[submodule "vendor/cpptrace"]
+	path = vendor/cpptrace
+	url = https://github.com/jeremy-rifkin/cpptrace.git

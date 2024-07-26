@@ -46,6 +46,7 @@ set(ENABLE_PROGRAMS         OFF CACHE INTERNAL "")
 set(ENABLE_TESTING          OFF CACHE INTERNAL "")
 set(MBEDTLS_FATAL_WARNINGS  OFF CACHE INTERNAL "") # Work around doc-comment syntax in 3.4
 
+add_subdirectory(vendor/cpptrace)
 add_subdirectory(vendor/libuv)
 add_subdirectory(vendor/llhttp)
 add_subdirectory(vendor/mbedtls)
@@ -101,6 +102,7 @@ endif()
 
 
 include_directories( SYSTEM
+    vendor/cpptrace/include/
     vendor/libuv/include/
     vendor/llhttp/include/
     vendor/mbedtls/include/
@@ -142,8 +144,7 @@ add_library( LibCrouton STATIC
     src/io/uv/UVBase.cc
 
     src/support/Backtrace.cc
-    src/support/Backtrace+Unix.cc
-    src/support/Backtrace+Windows.cc
+    src/support/Backtrace_cpptrace.cc
     src/support/betterassert.cc
     src/support/Logging.cc
     src/support/Memoized.cc
@@ -163,10 +164,11 @@ target_include_directories( LibCrouton PRIVATE
 )
 
 target_link_libraries( LibCrouton INTERFACE
-    uv_a
+    cpptrace::cpptrace
     llhttp_static
     mbedtls
     spdlog
+    uv_a
 )
 
 set_property(TARGET LibCrouton  PROPERTY OUTPUT_NAME Crouton)

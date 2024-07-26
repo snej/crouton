@@ -17,7 +17,7 @@
 //
 
 #include "Memoized.hh"
-#include "support/Backtrace.hh"
+#include "crouton/util/Backtrace.hh"
 #include "support/StringUtils.hh"
 
 namespace crouton {
@@ -44,7 +44,7 @@ namespace crouton {
     string const& GetTypeName(type_info const& info) {
 #if CROUTON_RTTI
         static Memoized sTypeNames([](const void* addr) -> string {
-            string name = fleece::Unmangle(*(type_info*)addr);      // Get unmangled name
+            string name = Unmangle(*(type_info*)addr);      // Get unmangled name
             cleanup(name);
             return name;
         });
@@ -58,7 +58,7 @@ namespace crouton {
 
     string const& GetFunctionName(const void* addr) {
         static Memoized sFnNames([](const void* addr) -> string {
-            string name = fleece::FunctionName(addr);
+            string name = FunctionName(addr);
             if (name.ends_with(" (.resume)"))
                 name = name.substr(0, name.size() - 10);
             else if (name.ends_with(" (.destroy)"))

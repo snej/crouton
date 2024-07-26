@@ -1,7 +1,7 @@
 //
 // Backtrace.cc
 //
-// Copyright © 2018-Present Couchbase, Inc. All rights reserved.
+// 
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,45 +16,17 @@
 // limitations under the License.
 //
 
-#include "support/Backtrace.hh"
-#include <csignal>
-#include <exception>
-#include "crouton/util/MiniOStream.hh"
-#include <mutex>
-#include <string.h>
-#include <algorithm>
+#include "crouton/util/Backtrace.hh"
+#include "support/StringUtils.hh"
 #include "crouton/util/betterassert.hh"
+#include "crouton/util/MiniOStream.hh"
+#include "crouton/util/MiniFormat.hh"
+#include <exception>
+#include <iostream>
+#include <sstream>
 
-
-#pragma mark - COMMON CODE:
-
-
-namespace fleece {
+namespace crouton {
     using namespace std;
-    using ostream = crouton::mini::ostream;
-    using stringstream = crouton::mini::stringstream;
-
-
-    string Unmangle(const char *name) {
-        char* unmangled = internal::unmangle(name);
-        string result = unmangled;
-        if (unmangled != name)
-            free(unmangled);
-        return result;
-    }
-
-
-    string Unmangle(const std::type_info &type) {
-        return Unmangle(type.name());
-    }
-
-
-    std::string FunctionName(const void *pc) {
-        if (std::string raw = RawFunctionName(pc); !raw.empty())
-            return Unmangle(raw.c_str());
-        else
-            return "";
-    }
 
 
     shared_ptr<Backtrace> Backtrace::capture(unsigned skipFrames, unsigned maxFrames) {
@@ -64,33 +36,74 @@ namespace fleece {
         return bt;
     }
 
-    Backtrace::Backtrace(unsigned skipFrames, unsigned maxFrames) {
-        if (maxFrames > 0)
-            _capture(skipFrames + 1, maxFrames);
-    }
+
+    // If any of these strings occur in a backtrace, suppress further frames.
+    static constexpr const char* kTerminalFunctions[] = {
+        "_C_A_T_C_H____T_E_S_T_",
+        "Catch::(anonymous namespace)::TestInvokerAsFunction::invoke() const",
+    };
+
+    static constexpr struct {const char *old, *nuu;} kAbbreviations[] = {
+        {"(anonymous namespace)",   "(anon)"},
+        {"std::__1::",              "std::"},
+        {"std::basic_string<char, std::char_traits<char>, std::allocator<char> >",
+                                    "string"},
+    };
 
 
-    void Backtrace::_capture(unsigned skipFrames, unsigned maxFrames) {
-        _addrs.resize(++skipFrames + maxFrames);        // skip this frame
-        auto n = internal::backtrace(&_addrs[0], skipFrames + maxFrames);
-        _addrs.resize(n);
-        skip(skipFrames);
-    }
+    bool Backtrace::writeTo(crouton::mini::ostream &out) const {
+        size_t n = size();
+        for (unsigned i = 0; i < n; ++i) {
+            auto frame = getFrame(i);
+            bool stop = false;
 
-
-    void Backtrace::skip(unsigned nFrames) {
-        _addrs.erase(_addrs.begin(), _addrs.begin() + min(size_t(nFrames), _addrs.size()));
+            if (i > 0)
+                out << '\n';
+            crouton::mini::format_to(out, "\t{:2d}  ", i);
+            if (frame.library)
+                crouton::mini::format_to(out, "{:<25s} ", frame.library);
+            if (frame.function) {
+                string name = Unmangle(frame.function);
+                // Stop when we hit a unit test, or other known functions:
+                for (auto fn : kTerminalFunctions) {
+                    if (name.find(fn) != string::npos)
+                        stop = true;
+                }
+                // Abbreviate some C++ verbosity:
+                for (auto &abbrev : kAbbreviations)
+                    crouton::replaceStringInPlace(name, abbrev.old, abbrev.nuu);
+                out << name;
+            }
+            if (frame.filename)
+                crouton::mini::format_to(out, " // {}:{}", frame.filename, frame.line);
+            else
+                crouton::mini::format_to(out, " + {}", frame.offset);
+            if (stop) {
+                out << "\n\t ... (" << (n - i - 1) << " more suppressed) ...";
+                break;
+            }
+        }
+        return true;
     }
 
 
     string Backtrace::toString() const {
-        stringstream out;
+        crouton::mini::stringstream out;
         writeTo(out);
         return out.str();
     }
 
 
-    void Backtrace::writeCrashLog(ostream &out) {
+    bool Backtrace::writeTo(std::ostream &out) const {
+        out << toString();
+        return true;
+    }
+
+
+#pragma mark - CRASH LOG:
+
+
+    void Backtrace::writeCrashLog(std::ostream &out) {
         Backtrace bt(4);
         auto xp = current_exception();
         if (xp) {
@@ -100,10 +113,7 @@ namespace fleece {
             } catch(const exception& x) {
 #if __cpp_rtti
                 const char *name = typeid(x).name();
-                char *unmangled = internal::unmangle(name);
-                out << unmangled << ": " <<  x.what() << "\n";
-                if (unmangled != name)
-                    free(unmangled);
+                out << Unmangle(name) << ": " <<  x.what() << "\n";
 #else
                 out << x.what() << "\n";
 #endif
@@ -111,8 +121,7 @@ namespace fleece {
                 out << "unknown exception type\n";
             }
         }
-        out << "Backtrace:";
-        bt.writeTo(out);
+        out << "Backtrace:\n" << bt.toString();
     }
 
 
@@ -123,12 +132,12 @@ namespace fleece {
             static terminate_handler const sOldHandler = set_terminate([] {
                 // ---- Code below gets called by C++ runtime on an uncaught exception ---
                 if (sLogger) {
-                    stringstream out;
+                    std::stringstream out;
                     writeCrashLog(out);
                     sLogger(out.str());
                 } else {
                     crouton::mini::cerr << "\n\n******************** C++ fatal error ********************\n";
-                    writeCrashLog(crouton::mini::cerr);
+                    writeCrashLog(std::cerr);
                     crouton::mini::cerr << "\n******************** Now terminating ********************\n";
                 }
                 // Chain to old handler:

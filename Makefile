@@ -24,7 +24,7 @@ test: debug
 release:
 	mkdir -p build_cmake/release/
 	cd build_cmake/release && cmake -DCMAKE_BUILD_TYPE=MinSizeRel ../..
-	cd build_cmake/release && cmake --build . --target LibCrouton --target uv_a --target mbedtls
+	cd build_cmake/release && cmake --build . --target LibCrouton --target CroutonXcodeDependencies
 
 xcode_deps: debug release
 	mkdir -p build_cmake/debug/xcodedeps

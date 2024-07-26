@@ -19,14 +19,18 @@
 #pragma once
 #include <functional>
 #include <memory>
+#include <iosfwd>
 #include <string>
 #include <typeinfo>
 #include <vector>
 
-namespace crouton::mini {
-    class ostream;
+namespace cpptrace {
+    struct stacktrace;
 }
-namespace fleece {
+namespace crouton {
+    namespace mini {
+        class ostream;
+    }
 
     /** Captures a backtrace of the current thread, and can convert it to human-readable form. */
     class Backtrace {
@@ -38,11 +42,13 @@ namespace fleece {
         /// @param skipFrames  Number of frames to skip at top of stack
         /// @param maxFrames  Maximum number of frames to capture
         explicit Backtrace(unsigned skipFrames =0, unsigned maxFrames =50);
+        ~Backtrace();
 
         /// Removes frames from the top of the stack.
         void skip(unsigned nFrames);
 
         /// Writes the human-readable backtrace to a stream.
+        bool writeTo(std::ostream&) const;
         bool writeTo(crouton::mini::ostream&) const;
 
         /// Returns the human-readable backtrace.
@@ -55,10 +61,12 @@ namespace fleece {
             size_t offset;          ///< Byte offset of pc in function
             const char *function;   ///< Name of (nearest) known function
             const char *library;    ///< Name of dynamic library containing the function
+            const char *filename;   ///< Name of source file, if known
+            uint32_t line;          ///< Line number in source file, if known
         };
 
         /// The number of stack frames captured.
-        unsigned size() const                   {return (unsigned)_addrs.size();}
+        size_t size() const;
 
         /// Returns info about a stack frame. 0 is the top.
         frameInfo getFrame(unsigned) const;
@@ -77,9 +85,10 @@ namespace fleece {
     private:
         void _capture(unsigned skipFrames =0, unsigned maxFrames =50);
         char* printFrame(unsigned i) const;
-        static void writeCrashLog(crouton::mini::ostream&);
+        static void writeCrashLog(std::ostream&);
 
-        std::vector<void*> _addrs;          // Array of PCs in backtrace, top first
+        struct impl;
+        std::unique_ptr<impl> _impl;
     };
 
 
@@ -96,9 +105,4 @@ namespace fleece {
     /// The name will be unmangled, if possible.
     std::string FunctionName(const void *pc);
 
-
-    namespace internal {
-        int backtrace(void** buffer, size_t max);
-        char* unmangle(const char*);
-    }
 }

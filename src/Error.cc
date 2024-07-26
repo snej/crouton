@@ -16,9 +16,9 @@
 // limitations under the License.
 //
 
-#include "crouton/Error.hh"
-#include "support/Backtrace.hh"
 #include "Internal.hh"
+#include "crouton/Error.hh"
+#include "crouton/util/Backtrace.hh"
 #include "crouton/util/Logging.hh"
 #include <cstring>
 #include "crouton/util/MiniOStream.hh"
@@ -190,7 +190,7 @@ namespace crouton {
 
     static CppError exceptionToCppError(std::exception const& x) {
 #if CROUTON_RTTI
-        string name = fleece::Unmangle(typeid(x));
+        string name = Unmangle(typeid(x));
         for (auto &entry : kExceptionNames) {
             if (0 == strcmp(entry.name, name.c_str()))
                 return CppError{entry.code};

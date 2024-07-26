@@ -20,15 +20,29 @@
 #include "crouton/Actor.hh"
 #include "crouton/Misc.hh"
 #include "crouton/Producer.hh"
+#include "crouton/util/Backtrace.hh"
 #include "crouton/util/Relation.hh"
 #include "crouton/io/uv/UVBase.hh"
 
 
-void RunCoroutine(std::function<Future<void>()> test) {
-    InitLogging();
-    Future<void> f = test();
-    Scheduler::current().runUntil([&]{return f.hasResult();});
-    f.result(); // check exception
+static void test_backtrace() {
+    {
+        cout << "Backtrace with default constructor:\n";
+        Backtrace bt;
+        bt.writeTo(cout);
+        cout << endl;
+    }
+    {
+        cout << "Backtrace with capture:\n";
+        auto bt = Backtrace::capture();
+        bt->writeTo(cout);
+        cout << endl;
+    }
+}
+
+
+TEST_CASE("Backtrace") {
+    test_backtrace();
 }
 
 
@@ -206,6 +220,14 @@ TEST_CASE("ToMany") {
         CHECK(names == std::vector<string>{"Ringo", "George"});
     }
     CHECK(beatles._members.empty());
+}
+
+
+void RunCoroutine(std::function<Future<void>()> test) {
+    InitLogging();
+    Future<void> f = test();
+    Scheduler::current().runUntil([&]{return f.hasResult();});
+    f.result(); // check exception
 }
 
 
