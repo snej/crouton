@@ -26,7 +26,7 @@
 
 /*
  A string formatting API mostly compatible with `std::format`, but optimized for small code size.
- https://en.cppreference.com/w/cpp/utility/format/formatter
+ https://en.cppreference.com/w/cpp/utility/format/spec
 
  Missing functionality and limitations:
  - You can't create custom formatters that interpret custom field specs. (But you can format
@@ -85,7 +85,7 @@ namespace crouton::mini {
             "cbBdoxX",      // Char
             "bBcdoxX", "bBcdoxX", "bBcdoxX", "bBcdoxX", "bBcdoxX", "bBcdoxX",  // integers
             "aAeEfFgG",     // Double
-            "s", "s", "s"   // strings
+            "s", "s", "s",  // strings
             "pP",           // Pointer
             "s"             // Arg
         };

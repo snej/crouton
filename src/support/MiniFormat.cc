@@ -132,14 +132,15 @@ namespace crouton::mini {
     {
         if (d >= 0.0)
             writeNonNegativeSign(out, spec.sign);
+        bool precise = (spec.precision != BaseFormatString::kDefaultPrecision);
+        int precision = precise ? spec.precision : 6;
         char buf[60];   // big enough for all but absurdly large precisions
 #if FLOAT_TO_CHARS_AVAILABLE
         std::to_chars_result result;
-        if (spec.type == 0 && spec.precision == BaseFormatString::kDefaultPrecision) {
+        if (spec.type == 0 && !precise) {
             result = std::to_chars(&buf[0], &buf[sizeof(buf)], d);
         } else {
             std::chars_format format;
-            int precision = (spec.precision != BaseFormatString::kDefaultPrecision) ? spec.precision : 6;
             switch (spec.type) {
                 case 'a': case 'A': format = std::chars_format::hex; break;
                 case 'e': case 'E': format = std::chars_format::scientific; break;
@@ -164,9 +165,53 @@ namespace crouton::mini {
         }
 
         out.write(&buf[0], result.ptr);
+
 #else
-        // lame fallback if to_chars isn't available:
-        snprintf(buf, sizeof(buf), "%g", d);
+        // fallback if floating-point std::to_chars isn't available:
+        switch (spec.type) {
+            case 'a':
+                snprintf(buf, sizeof(buf), "%.*a", precision, d);
+                if (auto x = strstr(buf, "0x"))
+                    ::memmove(x, x + 2, strlen(x));
+                break;
+            case 'A':
+                snprintf(buf, sizeof(buf), "%.*A", precision, d);
+                if (auto x = strstr(buf, "0X"))
+                    ::memmove(x, x + 2, strlen(x));
+                break;
+            case 'e':   snprintf(buf, sizeof(buf), "%.*e", precision, d); break;
+            case 'E':   snprintf(buf, sizeof(buf), "%.*E", precision, d); break;
+            case 'f':
+            case 'F':   snprintf(buf, sizeof(buf), "%.*f", precision, d); break;
+            case 'g':   snprintf(buf, sizeof(buf), "%.*g", precision, d); break;
+            case 'G':   snprintf(buf, sizeof(buf), "%.*G", precision, d); break;
+            case 0:
+                if (precise) {
+                    snprintf(buf, sizeof(buf), "%.*g", precision, d);
+                } else {
+                    if (auto x = log10(abs(d)); d == 0.0 || (x > -5 && x < 10))
+                        snprintf(buf, sizeof(buf), "%.8f", d);
+                    else
+                        snprintf(buf, sizeof(buf), "%.8e", d);
+                }
+                break;
+            default:
+                throw format_error("invalid format type for vformat_double");
+        }
+        if ((spec.type == 'g' || spec.type == 0) && !precise) {
+            // Trim trailing 0s after decimal point, and a trailing decimal point:
+            if (strchr(buf, '.') && !strchr(buf, 'e')) {
+                for (auto p = strlen(buf) - 1; buf[p] == '0'; --p)
+                    buf[p] = '\0';
+            }
+            if (auto& last = buf[strlen(buf) - 1]; last == '.')
+                last = '\0';
+        }
+        if (spec.alternate) {
+            // Alt '#' spec means to ensure there's a decimal point:
+            if (!strchr(buf, '.'))
+                strcat(buf, ".");
+        }
         out.write(buf);
 #endif
     }

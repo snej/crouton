@@ -24,21 +24,27 @@ TEST_CASE("FormatString Spec", "[mini]") {
     InitLogging(); //FIXME: Put this somewhere where it gets run before any test
     using enum mini::BaseFormatString::align_t;
     using enum mini::BaseFormatString::sign_t;
+    using enum mini::i::ArgType;
 
-    static constexpr struct {const char* str; mini::BaseFormatString::Spec spec;} kTests[] = {
-        {"{}", {}},
-        {"{:}", {}},
-        {"{:d}", {.type = 'd'}},
-        {"{:^}", {.fill = ' ', .align = center}},
-        {"{:*>}", {.fill = '*', .align = right}},
-        {"{:+0}", {.fill = '0', .align = right, .sign = minusPlus}},
-        {"{:+3.4f}", {.type = 'f', .width = 3, .precision = 4, .sign = minusPlus}},
-        {"{:+0.4z}", {.type = 'z', .fill = '0', .precision = 4, .align = right, .sign = minusPlus}},
+    static constexpr struct {
+        const char* str;
+        mini::i::ArgType argType;
+        mini::BaseFormatString::Spec spec;
+    } kTests[] = {
+        {"{}",      None, {}},
+        {"{:}",     None, {}},
+        {"{:d}",    Int, {.type = 'd', .align = right}},
+        {"{:p}",    Pointer, {.type = 'p'}},
+        {"{:^}",    None, {.fill = ' ', .align = center}},
+        {"{:*>}",   None, {.fill = '*', .align = right}},
+        {"{:+0}",   None, {.fill = '0', .align = right, .sign = minusPlus}},
+        {"{:+3.4f}",Double, {.type = 'f', .width = 3, .precision = 4, .align = right, .sign = minusPlus}},
+        {"{:+0.4a}", Double, {.type = 'a', .fill = '0', .precision = 4, .align = right, .sign = minusPlus}},
     };
     for (auto const& test : kTests) {
         INFO("Testing " << test.str);
         mini::BaseFormatString::Spec spec;
-        spec.parse(test.str + 1, mini::i::ArgType::None);
+        spec.parse(test.str + 1, test.argType);
         CHECK(spec == test.spec);
     }
 }
@@ -135,6 +141,8 @@ TEST_CASE("MiniFormat", "[mini]") {
           == "cstr 'C string', C++ str 'C++ string', string_view 'C++ string'");
     cstr = nullptr;
     CHECK(mini::format("cstr '{}'", cstr)  == "cstr ''");
+
+    CHECK(mini::format("ptr {:p}", (const void*)0x1234)  == "ptr 0x1234");
 
     // excess args:
     CHECK(mini::format("One {} two {} three", 1, 2, 3)
@@ -241,6 +249,7 @@ TEST_CASE("MiniFormat Floats", "[mini]") {
         {"{:-}",  -1234.5678,  "-1234.5678"},
         {"{:+}",  -1234.5678,  "-1234.5678"},
         {"{: }",  -1234.5678,  "-1234.5678"},
+        {"{:}",    0.0,        "0"},
         {"{:-}",   0.0,        "0"},
         {"{:+}",   0.0,        "+0"},
         {"{: }",   0.0,        " 0"},
