@@ -233,9 +233,15 @@ namespace crouton::io::apple {
     Future<void> NWConnection::_writeOrShutdown(ConstBytes src, bool shutdown) {
         auto onWrite = Future<void>::provider();
         dispatch_sync(_queue, ^{
-            __block __unused bool released = false;
-            dispatch_data_t content = dispatch_data_create(src.data(), src.size(), _queue,
-                                                           ^{ released = true; });
+            __block __unused bool released = true;
+            dispatch_data_t content = nullptr;
+            if (src.empty()) {
+                assert(shutdown);
+            } else {
+                released = false;
+                content = dispatch_data_create(src.data(), src.size(), _queue,
+                                               ^{ released = true; });
+            }
             nw_connection_send(_conn, content, NW_CONNECTION_DEFAULT_STREAM_CONTEXT, shutdown,
                                ^(nw_error_t error) {
                 assert(released);
@@ -244,7 +250,8 @@ namespace crouton::io::apple {
                 else
                     onWrite->setResult();
             });
-            dispatch_release(content);
+            if (content)
+                dispatch_release(content);
         });
         return Future(onWrite);
     }
