@@ -23,6 +23,7 @@
 #include "crouton/util/MiniFormat.hh"
 #include <exception>
 #include <iostream>
+#include <mutex>
 #include <sstream>
 
 namespace crouton {

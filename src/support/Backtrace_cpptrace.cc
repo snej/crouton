@@ -18,6 +18,7 @@
 
 #include "crouton/util/Backtrace.hh"
 #include "cpptrace/cpptrace.hpp"
+#include <cstring>
 #include <dlfcn.h>      // for dladdr()
 
 namespace crouton {
