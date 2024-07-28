@@ -72,15 +72,17 @@ namespace crouton::io::fs {
         return result;
     }
 
-    statBuf stat(const char* path, bool followSymlink) {
+    Result<statBuf> try_stat(const char* path, bool followSymlink) {
         fs_request req;
         int err;
         if (followSymlink)
             err = uv_fs_stat(curLoop(), &req, path, nullptr);
         else
             err = uv_fs_lstat(curLoop(), &req, path, nullptr);
-        check(err, "stat");
-        return copyStatBuf(req);
+        if (err == 0)
+            return copyStatBuf(req);
+        else
+            return Error(UVError(err));
     }
 
 

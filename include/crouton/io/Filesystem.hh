@@ -17,6 +17,7 @@
 //
 
 #pragma once
+#include "crouton/Result.hh"
 #include "crouton/Generator.hh"
 
 namespace crouton::io {
@@ -87,7 +88,12 @@ namespace crouton::io::fs {
     };
 
     /// Returns all the metadata for the item at that path.
-    statBuf stat(const char* path, bool followSymlink =true);
+    Result<statBuf> try_stat(const char* path, bool followSymlink =true);
+
+    /// Returns all the metadata for the item at that path.
+    inline statBuf stat(const char* path, bool followSymlink =true) {
+        return try_stat(path, followSymlink).value();
+    }
 
     /// Returns all the metadata for an open file.
     statBuf fstat(FileStream const&);
