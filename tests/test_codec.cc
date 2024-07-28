@@ -103,12 +103,20 @@ TEST_CASE_METHOD(CodecTest, "Codec small", "[blip][codec]") {
 
 TEST_CASE_METHOD(CodecTest, "Codec large compressible", "[blip][codec]") {
     init(GENERATE(false, true));
-    roundTrip(ReadFile("/Users/snej/Projects/Couchbase/DataSets/travel.json").waitForResult());
+    // This is the largest file in the source tree...
+    Result<string> contents = ReadFile("vendor/mbedtls/tests/suites/test_suite_psa_crypto_op_fail.generated.data").wait();
+    if (!contents.ok())
+        SKIP("Test file not found");
+    roundTrip(contents.value());
 }
 
 
 TEST_CASE_METHOD(CodecTest, "Codec large uncompressible", "[blip][codec]") {
     init(GENERATE(false, true));
-    roundTrip(ReadFile("/Library/Desktop Pictures/Abstract Shapes 2.jpg").waitForResult());
+    // This file exists on macOS but not other platforms...
+    Result<string> contents = ReadFile("/Library/Desktop Pictures/Abstract Shapes 2.jpg").wait();
+    if (!contents.ok())
+        SKIP("Test file not found");
+    roundTrip(contents.value());
 }
 
