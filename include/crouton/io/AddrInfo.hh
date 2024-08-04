@@ -38,7 +38,7 @@ namespace crouton::io {
 #endif
 
         /// Does a DNS lookup of the given hostname, returning an AddrInfo or an error.
-        staticASYNC<AddrInfo> lookup(string hostname, uint16_t port =0);
+        static ASYNC<AddrInfo> lookup(string hostname, uint16_t port =0);
 
         /// Returns the primary address, which may be either IPv4 or IPv6.
         RawAddress const& primaryAddress() const;

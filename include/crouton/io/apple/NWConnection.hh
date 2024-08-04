@@ -46,7 +46,7 @@ namespace crouton::io::apple {
         void useTLS(bool tls)                               {_useTLS = tls;}
 
         /// Opens the socket to the bound address. Resolves once opened.
-        virtualASYNC<void> open() override;
+        virtual ASYNC<void> open() override;
 
         bool isOpen() const override                        {return _isOpen;}
 
@@ -60,12 +60,12 @@ namespace crouton::io::apple {
         ~NWConnection();
 
     private:
-        virtualASYNC<ConstBytes> readNoCopy(size_t maxLen = 65536) override;
-        virtualASYNC<ConstBytes> peekNoCopy() override;
+        virtual ASYNC<ConstBytes> readNoCopy(size_t maxLen = 65536) override;
+        virtual ASYNC<ConstBytes> peekNoCopy() override;
         ASYNC<void> write(ConstBytes b) override;
         using IStream::write;
         
-        virtualASYNC<ConstBytes> _readNoCopy(size_t maxLen, bool peek);
+        virtual ASYNC<ConstBytes> _readNoCopy(size_t maxLen, bool peek);
         ASYNC<void> _writeOrShutdown(ConstBytes, bool shutdown);
         void _close();
         void clearReadBuf();

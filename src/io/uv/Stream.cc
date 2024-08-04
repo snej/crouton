@@ -30,7 +30,7 @@ namespace crouton::io {
     Stream::Stream() = default;
 
     Stream::~Stream() {
-        close();
+        _close();
     }
 
 

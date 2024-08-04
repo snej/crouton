@@ -84,11 +84,11 @@ namespace crouton::io::blip {
         else
             _io.closeSend();
         auto& j = _outputTask->join();
-        AWAIT j;
+        (void) AWAIT j;
         LBLIP->debug("Connection now sending WebSocket CLOSE...");
         AWAIT _socket->send(ws::Message{code, message});
         auto& j2 = _inputTask->join();
-        AWAIT j2;
+        (void) AWAIT j2;
         AWAIT _socket->close();
         RETURN noerror;
     }

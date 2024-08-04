@@ -70,6 +70,30 @@
 #endif
 
 
+// These will be helpful for detecting bugs, but AppleClang doesn't support them yet as of Xcode 16.
+// <https://clang.llvm.org/docs/AttributeReference.html#id488>
+#if __has_attribute(coro_return_type)
+#   define coro_return_type_ [[clang::coro_return_type]]
+#else
+#   define coro_return_type_
+#endif
+#if __has_attribute(coro_wrapper)
+#   define coro_wrapper_ [[clang::coro_wrapper]]
+#else
+#   define coro_wrapper_
+#endif
+#if __has_attribute(coro_lifetimebound)
+#   define coro_lifetimebound_ [[clang::coro_lifetimebound]]
+#else
+#   define coro_lifetimebound_
+#endif
+#if __has_attribute(coro_disable_lifetimebound)
+#   define coro_disable_lifetimebound_ [[clang::coro_disable_lifetimebound]]
+#else
+#   define coro_disable_lifetimebound_
+#endif
+
+
 // Synonyms for coroutine primitives. Optional, but they're more visible in the code.
 #define AWAIT  co_await
 #define YIELD  co_yield

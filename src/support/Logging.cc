@@ -120,7 +120,7 @@ namespace crouton {
             assert_failed_hook = [](const char* message) {
                 Log->critical(message);
             };
-            Log->info("---------- Welcome to Crouton ----------");
+            //Log->info("---------- Welcome to Crouton ----------");
         });
     }
 

@@ -31,7 +31,7 @@ using namespace crouton::io;
 /* NOTE to newbies: this file uses some simple/optional macros that are used everywhere in Crouton
    to highlight suspend points and use of asynchronous code:
 
-    staticASYNC     --> [[nodiscard]] static Future
+    static ASYNC     --> [[nodiscard]] static Future
     AWAIT           --> co_await
     RETURN          --> co_return
 */
@@ -39,14 +39,14 @@ using namespace crouton::io;
 static constexpr uint16_t kPort = 34567;
 
 
-staticASYNC<void> serveRoot(http::Handler::Request const& req, http::Handler::Response& res) {
+static ASYNC<void> serveRoot(http::Handler::Request const& req, http::Handler::Response& res) {
     res.writeHeader("Content-Type", "text/plain");
     AWAIT res.writeToBody("Hi!\r\n");
     RETURN noerror;
 }
 
 
-staticASYNC<void> serveWebSocket(http::Handler::Request const& req, http::Handler::Response& res) {
+static ASYNC<void> serveWebSocket(http::Handler::Request const& req, http::Handler::Response& res) {
     ws::ServerWebSocket socket;
     if (! AWAIT socket.connect(req, res))
         RETURN noerror;

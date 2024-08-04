@@ -94,7 +94,7 @@ namespace crouton {
 
         Blocker supports only one waiting coroutine. If you need more, use a CoCondition. */
     template <typename T>
-    class Blocker : public BlockerBase {
+    class [[nodiscard]] Blocker : public BlockerBase {
     public:
         T await_resume() noexcept {
             assert(_state == Ready);
@@ -116,7 +116,7 @@ namespace crouton {
 
 
     template <>
-    class Blocker<void> : public BlockerBase {
+    class [[nodiscard]] Blocker<void> : public BlockerBase {
     public:
         void notify()   {BlockerBase::notify();}
     };

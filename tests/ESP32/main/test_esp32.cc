@@ -73,7 +73,7 @@ static void testCodec() {
 }
 
 
-staticASYNC<void> testBLIP() {
+static ASYNC<void> testBLIP() {
     // Send HTTP request:
     auto ws = make_unique<ws::ClientWebSocket>("ws://work.local:4985/travel-sample/_blipsync");
     ws->setHeader("Sec-WebSocket-Protocol", "BLIP_3+CBMobile_2");
@@ -235,5 +235,3 @@ static void initialize() {
     esp_log_level_set("example_common", ESP_LOG_WARN);
     ESP_ERROR_CHECK(example_connect());
 }
-
-

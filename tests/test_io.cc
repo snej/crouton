@@ -239,7 +239,7 @@ TEST_CASE("readdir", "[uv]") {
 
 #ifdef __APPLE__
 
-staticASYNC<string> readNWSocket(const char* hostname, bool tls) {
+static ASYNC<string> readNWSocket(const char* hostname, bool tls) {
     cerr << "Connecting...\n";
     auto socket = apple::NWConnection::create();
     socket->bind(hostname, (tls ? 443 : 80));

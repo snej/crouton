@@ -48,10 +48,10 @@ namespace crouton::io {
         virtual void keepAlive(unsigned intervalSecs)   {_binding->keepAlive = intervalSecs;}
 
         /// Opens the socket to the bound address. Resolves once opened.
-        virtualASYNC<void> open() =0;
+        virtual ASYNC<void> open() =0;
 
         /// Equivalent to bind + open.
-        virtualASYNC<void> connect(string const& address, uint16_t port);
+        virtual ASYNC<void> connect(string const& address, uint16_t port);
 
         /// True if the socket is open/connected.
         virtual bool isOpen() const =0;
@@ -59,7 +59,7 @@ namespace crouton::io {
         /// The socket's data stream.
         virtual std::shared_ptr<IStream> stream() =0;
 
-        virtualASYNC<void> close() =0;
+        virtual ASYNC<void> close() =0;
 
         virtual ~ISocket() = default;
 

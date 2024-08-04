@@ -60,7 +60,7 @@ namespace crouton::io {
 
         ASYNC<ConstBytes> readNoCopy(size_t maxLen = 65536) override;
         ASYNC<ConstBytes> peekNoCopy() override;
-        virtualASYNC<string> readAll() override;
+        virtual ASYNC<string> readAll() override;
 
         ASYNC<void> write(ConstBytes) override;
         ASYNC<void> write(const ConstBytes buffers[], size_t nBuffers) override;

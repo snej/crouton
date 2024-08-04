@@ -53,7 +53,8 @@ namespace crouton {
 
         A regular function that gets a Future can call `then()` to register a callback. */
     template <typename T>
-    class Future : public Coroutine<FutureImpl<T>>, public ISelectable {
+    class [[nodiscard("Future must be AWAITed or returned")]]
+    Future : public Coroutine<FutureImpl<T>>, public ISelectable {
     public:
         using nonvoidT = std::conditional_t<std::is_void_v<T>, std::byte, T>;
 

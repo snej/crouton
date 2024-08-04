@@ -99,7 +99,7 @@ namespace crouton {
 
         //==== Awaitable:
 
-        class SchedAwaiter  {
+        class SchedAwaiter {
         public:
             explicit SchedAwaiter(Scheduler* sched)     :_sched(sched) { }
             bool await_ready() noexcept                 {return _sched->isCurrent();}
@@ -138,12 +138,12 @@ namespace crouton {
         void resumed(coro_handle h);
 
         /// Returns the coroutine that should be resumed, or else `dflt`.
-        coro_handle nextOr(coro_handle dflt);
+        [[nodiscard]] coro_handle nextOr(coro_handle dflt);
 
         /// Adds a coroutine handle to the suspension set.
         /// To make it runnable again, call the returned Suspension's `wakeUp` method
         /// from any thread.
-        Suspension suspend(coro_handle h);
+        [[nodiscard]] Suspension suspend(coro_handle h);
 
         /// Tells the Scheduler a coroutine is about to be destroyed, so it can manage it
         /// correctly if it's in the suspended set.

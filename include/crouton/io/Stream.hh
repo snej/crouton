@@ -36,8 +36,8 @@ namespace crouton::io {
         /// Closes the write stream, leaving the read stream open until the peer closes it.
         ASYNC<void> closeWrite() override;
 
-        /// Closes the stream entirely. (Called by the destructor.)
-        virtual Future<void> close() override;
+        /// Closes the stream entirely.
+        virtual ASYNC<void> close() override;
 
         //---- READING
 

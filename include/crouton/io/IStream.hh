@@ -38,13 +38,13 @@ namespace crouton::io {
         virtual bool isOpen() const =0;
 
         /// Opens the stream, if it wasn't already open; resolves when it's open.
-        virtualASYNC<void> open() =0;
+        virtual ASYNC<void> open() =0;
 
         /// Closes the stream; resolves when it's closed.
-        virtualASYNC<void> close() =0;
+        virtual ASYNC<void> close() =0;
 
         /// Closes the write side, but not the read side. (Like a socket's `shutdown`.)
-        virtualASYNC<void> closeWrite() =0;
+        virtual ASYNC<void> closeWrite() =0;
 
         //---- Reading:
 
@@ -53,7 +53,7 @@ namespace crouton::io {
         /// @warning The returned buffer belongs to the stream, and is only valid until the next
         ///          read or close call.
         /// @note This is an abstract method that subclasses must implement.
-        virtualASYNC<ConstBytes> readNoCopy(size_t maxLen = 65536) =0;
+        virtual ASYNC<ConstBytes> readNoCopy(size_t maxLen = 65536) =0;
 
         /// Returns the next available unread bytes, always at least 1 byte except at EOF.
         /// Unlike `readNoCopy`, the returned bytes are _not consumed_ -- they will
@@ -62,11 +62,11 @@ namespace crouton::io {
         /// @warning The returned buffer belongs to the stream, and is only valid until the next
         ///          read or close call.
         /// @note This is an abstract method that subclasses must implement.
-        virtualASYNC<ConstBytes> peekNoCopy() =0;
+        virtual ASYNC<ConstBytes> peekNoCopy() =0;
 
         /// Reads `len` bytes, copying into memory starting at `dst` (which must remain valid.)
         /// Will always read the full number of bytes unless it hits EOF.
-        virtualASYNC<size_t> read(MutableBytes buf);
+        virtual ASYNC<size_t> read(MutableBytes buf);
 
         /// Reads `len` bytes, returning them as a string.
         /// Will always read the full number of bytes unless it hits EOF.
@@ -81,7 +81,7 @@ namespace crouton::io {
         ASYNC<string> readUntil(string end, size_t maxLen = SIZE_MAX);
 
         /// Reads until EOF.
-        virtualASYNC<string> readAll();
+        virtual ASYNC<string> readAll();
 
         /// Returns a `Generator` that produces chunks of data read from the stream.
         /// This is a wrapper around `readNoCopy()` that makes `IStream` satisfy the concept
@@ -94,7 +94,7 @@ namespace crouton::io {
         /// Writes all the bytes.
         /// @warning The memory must remain valid until this call completes.
         /// @note This is the abstract write method that subclasses must implement.
-        virtualASYNC<void> write(ConstBytes) =0;
+        virtual ASYNC<void> write(ConstBytes) =0;
 
         /// Writes data, fully. The string is copied, so the caller doesn't need to keep it.
         ASYNC<void> write(string);
@@ -104,7 +104,7 @@ namespace crouton::io {
         /// @note  The default implementation makes `nBuffers` calls to `write(ConstBytes)`.
         ///        A subclass that natively supports multi-buffer write ("writev") may override
         ///        this method as an optimization.
-        virtualASYNC<void> write(const ConstBytes buffers[], size_t nBuffers);
+        virtual ASYNC<void> write(const ConstBytes buffers[], size_t nBuffers);
 
         ASYNC<void> write(std::initializer_list<ConstBytes> buffers);
     };

@@ -270,7 +270,7 @@ TEST_CASE("Producer Consumer") {
 
 
 #if 0
-staticASYNC<void> waitFor(chrono::milliseconds ms) {
+static ASYNC<void> waitFor(chrono::milliseconds ms) {
     FutureProvider<void> f;
     Timer::after(ms.count() / 1000.0, [f] {
         cerr << "\tTimer fired\n";
@@ -303,7 +303,7 @@ TEST_CASE("Waiter coroutine") {
 }
 
 
-staticASYNC<int> futuristicSquare(int n) {
+static ASYNC<int> futuristicSquare(int n) {
     AWAIT waitFor(500ms);
     RETURN n * n;
 }

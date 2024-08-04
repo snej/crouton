@@ -65,7 +65,7 @@ namespace crouton {
 
     /** Error holds an error code as a type-erased enum value, of any type that matches `ErrorDomain`.
         There's also a default empty state. */
-    class Error {
+    class [[nodiscard("check for error")]] Error {
     public:
         /// The default no-error value. Available as the constant `noerror`.
         constexpr Error() = default;

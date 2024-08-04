@@ -82,7 +82,7 @@ TEST_CASE("BLIP Receive Message", "[blip]") {
 }
 
 
-staticASYNC<void> testSendReceive(std::initializer_list<MessageBuilder::property> properties,
+static ASYNC<void> testSendReceive(std::initializer_list<MessageBuilder::property> properties,
                                   string body,
                                   bool compressed)
 {

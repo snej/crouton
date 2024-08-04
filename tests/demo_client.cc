@@ -26,13 +26,13 @@ using namespace crouton::io;
 /* NOTE to newbies: this file uses some simple/optional macros that are used everywhere in Crouton
    to highlight suspend points and use of asynchronous code:
 
-    staticASYNC     --> [[nodiscard]] static Future
+    static ASYNC     --> [[nodiscard]] static Future
     AWAIT           --> co_await
     RETURN          --> co_return
 */
 
 
-staticASYNC<int> run() {
+static ASYNC<int> run() {
     // Read flags:
     auto args = MainArgs();
     bool includeHeaders = false;

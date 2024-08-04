@@ -82,7 +82,7 @@ namespace crouton {
         static void after(double delaySecs, std::function<void()> fn);
 
         /// Static method that returns a Future that completes after the given delay.
-        staticASYNC<void> sleep(double delaySecs);
+        static ASYNC<void> sleep(double delaySecs);
 
     private:
         friend class EventLoop;

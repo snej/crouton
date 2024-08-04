@@ -28,7 +28,7 @@ namespace crouton {
         (A `Result<void>` has no explicit value, but still distinguishes between empty/nonempty.)
         It's commonly used as a return type, and in the implementation of `Future<T>`. */
     template <typename T>
-    class Result {
+    class [[nodiscard("check Result for error")]] Result {
     public:
         using TT = std::conditional_t<std::is_void_v<T>, std::monostate, T>;
 

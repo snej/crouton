@@ -24,12 +24,8 @@
    To be #include'd in header files instead of Crouton.hh, when possible. */
 
 
-/// Macros for declaring a function that returns a Future, e.g. `ASYNC<void> close();`
-/// It's surprisingly easy to forget to await the Future, especially `Future<void>`,
-/// hence the `[[nodiscard]]` annotation.
-#define        ASYNC [[nodiscard("Future must be AWAITed or returned")]]         ::crouton::Future
-#define  staticASYNC [[nodiscard("Future must be AWAITed or returned")]] static  ::crouton::Future
-#define virtualASYNC [[nodiscard("Future must be AWAITed or returned")]] virtual ::crouton::Future
+/// Marker macro for declaring a function that returns a Future, e.g. `ASYNC<void> close();`
+#define ASYNC  ::crouton::Future
 
 
 namespace crouton {

@@ -138,7 +138,7 @@ namespace crouton::ps {
 
         /// Abstract method that handles an item received from the Publisher.
         /// @warning  You must override either this method or `run`.
-        virtualASYNC<void> handle(T)            {return CroutonError::Unimplemented;}
+        virtual ASYNC<void> handle(T)            {return CroutonError::Unimplemented;}
 
         /// Handles the final Error/noerror item from the publisher.
         /// Default implementation sets the `error` property; make sure to call through.
