@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-13, ubuntu-latest, windows-latest]
+        os: [macos-latest, ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -29,21 +29,8 @@ jobs:
         uses: Dup4/actions-setup-gcc@v1
         with:
           version: latest
-          
-      - name: Install Ninja (Linux)
-        if: runner.os == 'Linux'
-        run: sudo apt-get install -y ninja-build
-      - name: Install Ninja (macOS)
-        if: runner.os == 'macOS'
-        run: brew install ninja
-      - name: Install Ninja (Windows)
-        if: runner.os == 'Windows'
-        shell: powershell
-        run: |
-          Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
-          scoop install ninja --global
-          # Scoop modifies the PATH so we make the modified PATH global.
-          echo "PATH=$env:PATH" >> $GITHUB_ENV
+      - name: Install Ninja
+        uses: seanmiddleditch/gha-setup-ninja@v5
 
       - name: build debug
         run: make debug
