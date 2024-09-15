@@ -191,6 +191,7 @@ namespace crouton::io::apple {
             auto onRead = Future<ConstBytes>::provider();
             dispatch_sync(_queue, ^{
                 clearReadBuf();
+                __block auto selfRetain = this->shared_from_this();
                 nw_connection_receive(_conn, 1, uint32_t(min(maxLen, size_t(UINT32_MAX))),
                                       ^(dispatch_data_t content,
                                         nw_content_context_t context,
@@ -213,6 +214,7 @@ namespace crouton::io::apple {
                     } else if (is_complete) {
                         onRead->setResult(ConstBytes{});
                     }
+                    selfRetain = nullptr;
                 });
             });
             return Future(onRead);
