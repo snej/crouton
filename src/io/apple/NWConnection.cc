@@ -233,7 +233,7 @@ namespace crouton::io::apple {
 
 
     Future<void> NWConnection::_writeOrShutdown(ConstBytes src, bool shutdown) {
-        auto onWrite = Future<void>::provider();
+        __block auto onWrite = Future<void>::provider();
         dispatch_sync(_queue, ^{
             __block __unused bool released = true;
             dispatch_data_t content = nullptr;
@@ -251,6 +251,7 @@ namespace crouton::io::apple {
                     onWrite->setResult(toError(error));
                 else
                     onWrite->setResult();
+                onWrite = nullptr;
             });
             if (content)
                 dispatch_release(content);

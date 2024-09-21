@@ -137,13 +137,13 @@
 		275A5F162AAFB3B1009791E8 /* Memoized.cc in Sources */ = {isa = PBXBuildFile; fileRef = 275A5F142AAFB3B1009791E8 /* Memoized.cc */; };
 		275A5F172AB105EE009791E8 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278F7E312AA015B0005B12F2 /* CoreFoundation.framework */; };
 		275A5F182AB105F4009791E8 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 278F7E332AA015C0005B12F2 /* Security.framework */; };
-		275EB3F22ACDCC5D0022ED53 /* MessageOut.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330612AB373430066C8DA /* MessageOut.hh */; settings = {ATTRIBUTES = (Private, ); }; };
-		275EB3F32ACDCC5D0022ED53 /* Message.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B3304D2AB2763B0066C8DA /* Message.hh */; settings = {ATTRIBUTES = (Public, ); }; };
-		275EB3F42ACDCC5D0022ED53 /* MessageBuilder.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B3305B2AB36F1D0066C8DA /* MessageBuilder.hh */; settings = {ATTRIBUTES = (Public, ); }; };
-		275EB3FE2ACDCC5D0022ED53 /* Connection.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330712AB8FF790066C8DA /* Connection.hh */; settings = {ATTRIBUTES = (Public, ); }; };
-		275EB4012ACDCC5D0022ED53 /* BLIPIO.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B3304E2AB2763B0066C8DA /* BLIPIO.hh */; settings = {ATTRIBUTES = (Public, ); }; };
-		275EB4022ACDCC5D0022ED53 /* Codec.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330662AB384880066C8DA /* Codec.hh */; settings = {ATTRIBUTES = (Private, ); }; };
-		275EB40C2ACDCC5D0022ED53 /* Protocol.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330512AB2763B0066C8DA /* Protocol.hh */; settings = {ATTRIBUTES = (Public, ); }; };
+		275EB3F22ACDCC5D0022ED53 /* MessageOut.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330612AB373430066C8DA /* MessageOut.hh */; };
+		275EB3F32ACDCC5D0022ED53 /* Message.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B3304D2AB2763B0066C8DA /* Message.hh */; };
+		275EB3F42ACDCC5D0022ED53 /* MessageBuilder.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B3305B2AB36F1D0066C8DA /* MessageBuilder.hh */; };
+		275EB3FE2ACDCC5D0022ED53 /* Connection.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330712AB8FF790066C8DA /* Connection.hh */; };
+		275EB4012ACDCC5D0022ED53 /* BLIPIO.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B3304E2AB2763B0066C8DA /* BLIPIO.hh */; };
+		275EB4022ACDCC5D0022ED53 /* Codec.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330662AB384880066C8DA /* Codec.hh */; };
+		275EB40C2ACDCC5D0022ED53 /* Protocol.hh in Headers */ = {isa = PBXBuildFile; fileRef = 27B330512AB2763B0066C8DA /* Protocol.hh */; };
 		275EB4152ACDCC5D0022ED53 /* MessageBuilder.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B3305A2AB36F1D0066C8DA /* MessageBuilder.cc */; };
 		275EB41B2ACDCC5D0022ED53 /* MessageOut.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B330622AB373430066C8DA /* MessageOut.cc */; };
 		275EB4262ACDCC5D0022ED53 /* Message.cc in Sources */ = {isa = PBXBuildFile; fileRef = 27B3304F2AB2763B0066C8DA /* Message.cc */; };
@@ -1880,14 +1880,14 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				275EB3FE2ACDCC5D0022ED53 /* Connection.hh in Headers */,
-				275EB4012ACDCC5D0022ED53 /* BLIPIO.hh in Headers */,
 				27BCD31F2AF19BA5009DFCED /* Dispatcher.hh in Headers */,
+				275EB4022ACDCC5D0022ED53 /* Codec.hh in Headers */,
+				275EB3FE2ACDCC5D0022ED53 /* Connection.hh in Headers */,
+				275EB3F22ACDCC5D0022ED53 /* MessageOut.hh in Headers */,
+				275EB4012ACDCC5D0022ED53 /* BLIPIO.hh in Headers */,
 				275EB40C2ACDCC5D0022ED53 /* Protocol.hh in Headers */,
 				275EB3F32ACDCC5D0022ED53 /* Message.hh in Headers */,
 				275EB3F42ACDCC5D0022ED53 /* MessageBuilder.hh in Headers */,
-				275EB4022ACDCC5D0022ED53 /* Codec.hh in Headers */,
-				275EB3F22ACDCC5D0022ED53 /* MessageOut.hh in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
