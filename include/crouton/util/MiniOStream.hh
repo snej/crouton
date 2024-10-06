@@ -18,6 +18,7 @@
 
 #pragma once
 #include <concepts>
+#include <cstdint>
 #include <cstring>
 #include <span>
 #include <stdexcept>
