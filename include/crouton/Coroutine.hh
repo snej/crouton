@@ -94,7 +94,7 @@ namespace crouton {
 
 
 
-    class coro_wrapper_ CoroutineImplBase {
+    class coro_return_type_ CoroutineImplBase {
     public:
         CoroutineImplBase() = default;
         ~CoroutineImplBase();

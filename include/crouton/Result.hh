@@ -73,7 +73,7 @@ namespace crouton {
         }
 
         /// True if there's a value, false if empty. If there's an error, throws it.
-        /// @throws Exception
+        /// @throws Exception  if the Result holds an error.
         explicit operator bool() const {
             if (Error const* err = std::get_if<Error>(&_value)) [[unlikely]] {
                 if (*err) [[unlikely]]
@@ -91,35 +91,35 @@ namespace crouton {
         }
 
         /// Returns the value, or throws the error as an exception.
-        /// @throws Exception
+        /// @throws Exception  if the Result holds an error.
         TT const& value() const &  requires (!std::is_void_v<T>) {
             raise_if();
             return std::get<T>(_value);
         }
 
         /// Returns the value, or throws the error as an exception.
-        /// @throws Exception
+        /// @throws Exception  if the Result holds an error.
         TT& value() &  requires (!std::is_void_v<T>) {
             raise_if();
             return std::get<T>(_value);
         }
 
         /// Returns the value, or throws the error as an exception.
-        /// @throws Exception
+        /// @throws Exception  if the Result holds an error.
         TT&& value() &&  requires (!std::is_void_v<T>) {
             raise_if();
             return std::get<T>(std::move(_value));
         }
 
         /// There's no value to return, but this checks for an error and if so throws it.
-        /// @throws Exception
+        /// @throws Exception  if the Result holds an error.
         void value() const &  requires (std::is_void_v<T>) {
             raise_if();
         }
 
         /// The `*` and `->` operators can be used to access the value.
         /// @note  Unlike `std::optional`, these _do_ check whether there's a value.
-        /// @throws Exception
+        /// @throws Exception  if the Result does not contain a value.
         TT& operator*()              requires (!std::is_void_v<T>)  {return value();}
         TT const& operator*() const  requires (!std::is_void_v<T>)  {return value();}
         TT* operator->()             requires (!std::is_void_v<T>)  {return &value();}

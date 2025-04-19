@@ -21,6 +21,7 @@
 #include "crouton/util/Base.hh"
 #include "support/Availability.hh"
 #include <charconv>
+#include <cmath>
 
 namespace crouton::mini {
     using namespace std;
