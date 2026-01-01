@@ -3,6 +3,8 @@
 export CMAKE_GENERATOR = Ninja
 export CMAKE_COLOR_DIAGNOSTICS = ON
 
+CMakeOpts := -DCMAKE_POLICY_VERSION_MINIMUM=3.5 # Until submodules are updated
+
 all: debug release
 
 clean:
@@ -15,7 +17,7 @@ clean_cache:
 
 debug:
 	mkdir -p build_cmake/debug/
-	cd build_cmake/debug && cmake -DCMAKE_BUILD_TYPE=Debug ../..
+	cd build_cmake/debug && cmake -DCMAKE_BUILD_TYPE=Debug $(CMakeOpts) ../..
 	cd build_cmake/debug && cmake --build .
 
 test: debug
@@ -23,7 +25,7 @@ test: debug
 
 release:
 	mkdir -p build_cmake/release/
-	cd build_cmake/release && cmake -DCMAKE_BUILD_TYPE=MinSizeRel ../..
+	cd build_cmake/release && cmake -DCMAKE_BUILD_TYPE=MinSizeRel $(CMakeOpts) ../..
 	cd build_cmake/release && cmake --build . --target LibCrouton --target CroutonXcodeDependencies
 
 xcode_deps: debug release
@@ -36,10 +38,10 @@ xcode_deps: debug release
 
 blip:
 	mkdir -p build_cmake/debug/
-	cd build_cmake/debug && cmake -DCMAKE_BUILD_TYPE=Debug -DCROUTON_BUILD_BLIP=1 ../..
+	cd build_cmake/debug && cmake -DCMAKE_BUILD_TYPE=Debug -DCROUTON_BUILD_BLIP=1 $(CMakeOpts) ../..
 	cd build_cmake/debug && cmake --build . --target BLIP --target CroutonTests
 	mkdir -p build_cmake/release/
-	cd build_cmake/release && cmake -DCMAKE_BUILD_TYPE=MinSizeRel -DCROUTON_BUILD_BLIP=1 ../..
+	cd build_cmake/release && cmake -DCMAKE_BUILD_TYPE=MinSizeRel -DCROUTON_BUILD_BLIP=1 $(CMakeOpts) ../..
 	cd build_cmake/release && cmake --build . --target BLIP
 
 esp:
