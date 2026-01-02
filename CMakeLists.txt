@@ -138,6 +138,7 @@ add_library( LibCrouton STATIC
     src/io/uv/LocalSocket.cc
     src/io/uv/Pipe.cc
     src/io/uv/Stream.cc
+    src/io/uv/Subprocess.cc
     src/io/uv/TCPServer.cc
     src/io/uv/TCPSocket.cc
 

@@ -66,9 +66,13 @@ namespace crouton::io {
         ASYNC<void> write(const ConstBytes buffers[], size_t nBuffers) override;
 
     protected:
+        friend class Subprocess;
+
         Stream();
 
         void opened(uv_stream_s*);
+
+        uv_stream_s* uv_stream() const noexcept {return _stream;}   // for Subprocess
 
     private:
         using BufferRef = std::unique_ptr<Buffer>;
@@ -77,7 +81,6 @@ namespace crouton::io {
         Stream& operator=(Stream const&) = delete;
         void _close();
 
-        ASYNC<int64_t> _read(size_t len, void* dst);
         ASYNC<std::unique_ptr<Buffer>> readBuf();
         ASYNC<ConstBytes> fillInputBuf();
 

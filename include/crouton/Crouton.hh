@@ -38,6 +38,7 @@
 #include "crouton/io/HTTPHandler.hh"
 #include "crouton/io/ISocket.hh"
 #include "crouton/io/Process.hh"
+#include "crouton/io/Subprocess.hh"
 #include "crouton/io/URL.hh"
 #include "crouton/io/WebSocket.hh"
 

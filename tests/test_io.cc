@@ -20,6 +20,7 @@
 #include "crouton/io/HTTPParser.hh"
 #include "crouton/io/apple/NWConnection.hh"
 #include "crouton/io/mbed/TLSSocket.hh"
+#include <vector>
 
 #if defined(_WIN32)
 #   include <winsock2.h>
@@ -233,6 +234,48 @@ TEST_CASE("readdir", "[uv]") {
     auto dir = fs::readdir(".");
     while (auto ent = dir.next()) {
         cerr << ent->name << " (" << int(ent->type) << ")\n";
+    }
+}
+
+
+TEST_CASE("Subprocess", "[uv]") {
+    InitLogging(); //FIXME: Put this somewhere where it gets run before any test
+    SECTION("Subprocess outlives Future") {
+        Subprocess sp("ls");
+        REQUIRE(sp.args == std::vector<string>{"ls"});
+        sp.inherit(stdio::out);
+        auto status = sp.execute().waitForResult();
+        CHECK(status == 0);
+    }
+    SECTION("Future outlives Subprocess") {
+        auto future = Subprocess("ls").execute();
+        CHECK(future.waitForResult() == 0);
+    }
+    SECTION("Nonzero status") {
+        Subprocess sp("ls", {"-l", "non_existent"});
+        REQUIRE(sp.args == std::vector<string>{"ls", "-l", "non_existent"});
+        auto future = sp.execute();
+        CHECK(future.waitForResult() != 0);
+    }
+    SECTION("Pipe stdout") {
+        auto test = []() -> Future<void> {
+            auto [reader, writer] = Pipe::createPair();
+            AWAIT reader->open();
+            AWAIT writer->open();
+            Subprocess sp("ls");
+            sp.redirect(stdio::out, writer.get());
+            auto status = AWAIT sp.execute();
+            cout << "Subprocess status: " << status << "\n";
+            CHECK(status == 0);
+            CHECK(reader->isReadable());
+            cout << "Reading output...\n";
+            string output = AWAIT reader->readAvailable();
+            cout << "Process output:\n--------\n" << output << "--------\n";
+            CHECK(!output.empty());
+            RETURN noerror;
+        };
+        test().waitForResult();
+        REQUIRE(Scheduler::current().assertEmpty());
     }
 }
 
