@@ -30,7 +30,15 @@ namespace crouton::io {
         (void) stream->close().then([=]() mutable {stream.reset();});
     }
 
-    
+
+    Future<size_t> IStream::readSome(MutableBytes buf) {
+        ConstBytes bytes = AWAIT readNoCopy(buf.size());
+        if (bytes.size() > 0)
+            ::memcpy(buf.data(), bytes.data(), bytes.size());
+        RETURN bytes.size();
+    }
+
+
     Future<size_t> IStream::read(MutableBytes buf) {
         size_t bytesRead = 0;
         while (bytesRead < buf.size()) {
@@ -116,6 +124,12 @@ namespace crouton::io {
 
 
     ASYNC<string> IStream::readAll() {return readString(SIZE_MAX);}
+
+
+    Future<string> IStream::readAvailable() {
+        ConstBytes bytes = AWAIT readNoCopy();
+        RETURN string{(const char*)bytes.data(), bytes.size()};
+    }
 
 
     Generator<string> IStream::generate() {

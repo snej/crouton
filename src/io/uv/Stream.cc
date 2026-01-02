@@ -135,7 +135,7 @@ namespace crouton::io {
             if (err == UV_EOF || err == UV_EINVAL)
                 return BufferRef();
             else
-                return Error(uv::UVError(err), "reading from the network");
+                return Error(uv::UVError(err), "reading from the stream");
         } else {
             // Start an async read:
             read_start();
@@ -157,7 +157,7 @@ namespace crouton::io {
             auto read = [](uv_stream_t* h, intptr_t nread, const uv_buf_t* uvbuf) {
                 static_cast<Stream*>(h->data)->_readCallback(nread, uvbuf);
             };
-            check(uv_read_start(_stream, alloc, read), "reading from the network");
+            check(uv_read_start(_stream, alloc, read), "reading from the stream");
             _reading = true;
         }
     }
@@ -202,7 +202,7 @@ namespace crouton::io {
                 LNet->debug("Stream read EOF");
                 _readFuture->setResult(nullptr);
             } else {
-                Error error(uv::UVError{err}, "reading from the network");
+                Error error(uv::UVError{err}, "reading from the stream");
                 LNet->error("Stream read error: {}", error);
                 _readFuture->setError(error);
             }
@@ -237,9 +237,9 @@ namespace crouton::io {
         for (size_t i = 0; i < nbufs; ++i)
             uvbufs[i] = uv_buf_t(bufs[i]);
 
-        write_request req("sending to the network");
+        write_request req("sending to the stream");
         check(uv_write(&req, _stream, uvbufs, unsigned(nbufs), req.callback),
-              "sending to the network");
+              "sending to the stream");
         AWAIT req;
         RETURN noerror;
     }
@@ -256,7 +256,7 @@ namespace crouton::io {
         if (result == UV_EAGAIN)
             return 0;
         else
-            check(result, "sending to the network");
+            check(result, "sending to the stream");
         return size_t(result);
     }
 

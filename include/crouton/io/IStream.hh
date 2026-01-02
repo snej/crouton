@@ -64,8 +64,16 @@ namespace crouton::io {
         /// @note This is an abstract method that subclasses must implement.
         virtual ASYNC<ConstBytes> peekNoCopy() =0;
 
-        /// Reads `len` bytes, copying into memory starting at `dst` (which must remain valid.)
-        /// Will always read the full number of bytes unless it hits EOF.
+        /// Reads at least one byte into a buffer (which must remain valid during the operation.)
+        /// If the stream's buffer is empty, this will block until bytes become available or EOF
+        /// or EOF is reached; but it won't block after that so it may not return enough to fill
+        /// the buffer, even if not at EOF.
+        /// @returns the number of bytes written
+        virtual ASYNC<size_t> readSome(MutableBytes buf);
+
+        /// Reads bytes into a buffer (which must remain valid during the operation.)
+        /// Always fills the buffer, blocking if necessary, unless it reaches EOF.
+        /// @returns the number of bytes written
         virtual ASYNC<size_t> read(MutableBytes buf);
 
         /// Reads `len` bytes, returning them as a string.
@@ -82,6 +90,10 @@ namespace crouton::io {
 
         /// Reads until EOF.
         virtual ASYNC<string> readAll();
+
+        /// Waits for data to become available; then returns the available data.
+        /// If at EOF, returns an empty string.
+        ASYNC<string> readAvailable();
 
         /// Returns a `Generator` that produces chunks of data read from the stream.
         /// This is a wrapper around `readNoCopy()` that makes `IStream` satisfy the concept
