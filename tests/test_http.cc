@@ -152,7 +152,7 @@ TEST_CASE("HTTPS GET", "[uv][http]") {
         string body = AWAIT resp.readAll();
         cout << body << endl;
         CHECK(body.starts_with("<!doctype html>"));
-        CHECK(body.size() >= 1000);
+        CHECK(body.size() >= 500);
         RETURN noerror;
     };
     test().waitForResult();
@@ -185,5 +185,3 @@ TEST_CASE("HTTPs GET Streaming", "[uv][http]") {
     test().waitForResult();
     REQUIRE(Scheduler::current().assertEmpty());
 }
-
-

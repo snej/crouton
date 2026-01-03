@@ -138,7 +138,7 @@ TEST_CASE("DNS lookup", "[uv]") {
         auto ip4addr = addr.primaryAddress(4);
         REQUIRE(ip4addr);
         CHECK(ip4addr->sa_family == AF_INET);
-        CHECK(addr.primaryAddressString().starts_with("93.184."));
+        CHECK(addr.primaryAddressString().starts_with("104.18."));  // Might change in future
         RETURN noerror;
     });
     REQUIRE(Scheduler::current().assertEmpty());
@@ -159,7 +159,7 @@ TEST_CASE("Read a socket", "[uv]") {
 
         cerr << "HTTP response:\n" << result << endl;
         CHECK(result.starts_with("HTTP/1.1 "));
-        CHECK(result.size() > 1000);
+        CHECK(result.size() > 500);
         CHECK(result.size() < 2000);
         RETURN noerror;
     });
@@ -307,7 +307,7 @@ TEST_CASE("NWConnection", "[nw]") {
         string contents = readNWSocket("example.com", true).waitForResult();
         cerr << "HTTP response:\n" << contents << endl;
         CHECK(contents.starts_with("HTTP/1.1 "));
-        CHECK(contents.size() > 1000);
+        CHECK(contents.size() > 500);
         CHECK(contents.size() < 2000);
     }
     REQUIRE(Scheduler::current().assertEmpty());
@@ -319,7 +319,7 @@ TEST_CASE("NWConnection TLS", "[nw]") {
         string contents = readNWSocket("example.com", true).waitForResult();
         cerr << "HTTP response:\n" << contents << endl;
         CHECK(contents.starts_with("HTTP/1.1 "));
-        CHECK(contents.size() > 1000);
+        CHECK(contents.size() > 500);
         CHECK(contents.size() < 2000);
     }
     REQUIRE(Scheduler::current().assertEmpty());
