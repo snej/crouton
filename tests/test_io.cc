@@ -82,6 +82,7 @@ static Future<string> readFileSlowly(string const& path) {
     Result<void> r = AWAIT NoThrow(f.open());
     if (!r.ok())
         RETURN r.error();
+    CHECK(!f.atEOF());
     char buffer[100];
     while (true) {
         auto readFuture = f.read({&buffer[0], sizeof(buffer)});
@@ -94,6 +95,7 @@ static Future<string> readFileSlowly(string const& path) {
         contents.append(buffer, len);
     }
     cerr << endl;
+    CHECK(f.atEOF());
     RETURN contents;
 }
 

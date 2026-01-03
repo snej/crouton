@@ -68,6 +68,7 @@ namespace crouton::io {
 
         /// Ignores the current stream position and reads from an absolute offset in the file
         /// into one or more buffers.
+        /// @note  This method will not set `atEOF`, even if it reads to EOF.
         ASYNC<size_t> preadv(const MutableBytes bufs[], size_t nbufs, int64_t offset);
 
         /// Ignores the current stream position and writes to an absolute offset in the file

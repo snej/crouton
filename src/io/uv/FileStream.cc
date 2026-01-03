@@ -36,7 +36,7 @@ namespace crouton::io {
     // Subclass of libuv file request that resolves to a Future<size_t>.
     class fs_request : public uv_fs_s {
     public:
-        fs_request(const char* what)        :_what(what) { }
+        explicit fs_request(const char* what)        :_what(what) { }
 
         void check(int r) {
             if (r < 0)
@@ -123,6 +123,8 @@ namespace crouton::io {
             RETURN err;
         _readBuf->size = uint32_t(n.value());
         _readBuf->used = 0;
+        if (_readBuf->empty())
+            _atEOF = true;
         RETURN _readBuf->bytes();
     }
 

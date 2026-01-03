@@ -86,10 +86,12 @@ namespace crouton::io {
             return _inputBuf->read(maxLen);
         } else {
             return fillInputBuf().then([this,maxLen](ConstBytes bytes) -> ConstBytes {
-                if (_inputBuf)
+                if (_inputBuf) {
                     return _inputBuf->read(maxLen);
-                else
+                } else {
+                    _atEOF = true;
                     return ConstBytes{};  // Reached EOF
+                }
             });
         }
     }

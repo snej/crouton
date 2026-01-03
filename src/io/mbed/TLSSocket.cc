@@ -324,8 +324,10 @@ namespace crouton::io::mbed {
             auto len = AWAIT _impl->read(_inputBuf->data, _inputBuf->kCapacity);
             _inputBuf->size = uint32_t(len);
             _inputBuf->used = 0;
-            if (_inputBuf->empty())
+            if (_inputBuf->empty()) {
+                _atEOF = true;
                 RETURN ConstBytes{};  // Reached EOF
+            }
         }
         RETURN peek ? _inputBuf->data : _inputBuf->read(maxLen);
     }

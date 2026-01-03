@@ -183,7 +183,7 @@ namespace crouton::io::apple {
             _contentUsed += len;
             return result;
 
-        } else if (_eof) {
+        } else if (_atEOF) {
             return ConstBytes{};
             
         } else {
@@ -199,7 +199,7 @@ namespace crouton::io::apple {
                                         nw_error_t error) {
                     if (is_complete) {
                         LNet->debug("NWConnection read EOF");
-                        _eof = true;
+                        _atEOF = true;
                     }
                     if (content) {
                         const void* data;

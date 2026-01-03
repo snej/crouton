@@ -174,6 +174,8 @@ namespace crouton::io::http {
         if (_bufUsed >= _buf.size()) {
             _buf = AWAIT _parser.readBody();
             _bufUsed = 0;
+            if (_buf.empty())
+                _atEOF = true;
         }
         ConstBytes result(&_buf[_bufUsed], std::min(maxLen, _buf.size() - _bufUsed));
         _bufUsed += result.size();
@@ -184,6 +186,8 @@ namespace crouton::io::http {
         if (_bufUsed >= _buf.size()) {
             _buf = AWAIT _parser.readBody();
             _bufUsed = 0;
+            if (_buf.empty())
+                _atEOF = true;
         }
         RETURN ConstBytes(&_buf[_bufUsed], _buf.size() - _bufUsed);
     }

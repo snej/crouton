@@ -42,6 +42,7 @@ namespace crouton::io::mbed {
 
         TLSSocket();
         ~TLSSocket();
+
     private:
         ASYNC<ConstBytes> readNoCopy(size_t maxLen = 65536) override;
         ASYNC<ConstBytes> peekNoCopy() override;

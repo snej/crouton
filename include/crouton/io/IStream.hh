@@ -46,22 +46,26 @@ namespace crouton::io {
         /// Closes the write side, but not the read side. (Like a socket's `shutdown`.)
         virtual ASYNC<void> closeWrite() =0;
 
+        /// True if no more data can be read from the stream.
+        /// @note It may not be possible to know this until a read/peek returns zero bytes.
+        ///       Simply reading all n bytes of a file of length n will not set this to true.
+        virtual bool atEOF() const      {return _atEOF;}
+
         //---- Reading:
 
-        /// Reads at least 1 byte, except at EOF, and no more than `maxLen`.
+        /// The basic abstract read operation that subclasses must implement. All others call this.
+        /// - If no data is available, waits for data or EOF. Then:
+        /// - At EOF, returns 0.
+        /// - Otherwise consumes and returns from 1 to `maxLen` bytes.
         /// The bytes are read into an internal buffer that's returned to the caller.
         /// @warning The returned buffer belongs to the stream, and is only valid until the next
         ///          read or close call.
-        /// @note This is an abstract method that subclasses must implement.
         virtual ASYNC<ConstBytes> readNoCopy(size_t maxLen = 65536) =0;
 
-        /// Returns the next available unread bytes, always at least 1 byte except at EOF.
-        /// Unlike `readNoCopy`, the returned bytes are _not consumed_ -- they will
-        /// be returned again by the next read operation.
+        /// Equivalent to `readNoCopy` except that the bytes returned are not consumed.
         /// To consume _n_ bytes after peeking, call `readNoCopy(n)`.
         /// @warning The returned buffer belongs to the stream, and is only valid until the next
         ///          read or close call.
-        /// @note This is an abstract method that subclasses must implement.
         virtual ASYNC<ConstBytes> peekNoCopy() =0;
 
         /// Reads at least one byte into a buffer (which must remain valid during the operation.)
@@ -119,6 +123,10 @@ namespace crouton::io {
         virtual ASYNC<void> write(const ConstBytes buffers[], size_t nBuffers);
 
         ASYNC<void> write(std::initializer_list<ConstBytes> buffers);
+
+    protected:
+        // Subclass may set this when it reaches EOF.
+        bool        _atEOF = false;
     };
 
 
