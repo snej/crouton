@@ -26,7 +26,7 @@ namespace crouton {
     /** Pure-virtual interface declaring the coroutine methods needed to support `co_await`
         returning type `T`. */
     template <typename T>
-    class IAwaitable {
+    class [[nodiscard]] IAwaitable {
     public:
         virtual ~IAwaitable() = default;
 

@@ -72,8 +72,7 @@
 #endif
 
 
-// These will be helpful for detecting bugs, but AppleClang doesn't support them yet as of Xcode 16.
-// <https://clang.llvm.org/docs/AttributeReference.html#id488>
+// https://clang.llvm.org/docs/AttributeReference.html#coro-return-type-coro-wrapper
 #if __has_attribute(coro_return_type)
 #   define coro_return_type_ [[clang::coro_return_type]]
 #else
@@ -84,6 +83,7 @@
 #else
 #   define coro_wrapper_
 #endif
+// https://clang.llvm.org/docs/AttributeReference.html#coro-disable-lifetimebound-coro-lifetimebound
 #if __has_attribute(coro_lifetimebound)
 #   define coro_lifetimebound_ [[clang::coro_lifetimebound]]
 #else
@@ -93,6 +93,19 @@
 #   define coro_disable_lifetimebound_ [[clang::coro_disable_lifetimebound]]
 #else
 #   define coro_disable_lifetimebound_
+#endif
+// https://clang.llvm.org/docs/AttributeReference.html#coro-await-elidable
+#if __has_attribute(coro_await_elidable)    // Not yet available in Apple Clang as of Xcode 26.2
+#   define coro_await_elidable_ [[clang::coro_await_elidable]]
+#else
+#   define coro_await_elidable_
+#endif
+
+
+#if __has_attribute(lifetimebound)
+#   define lifetimebound_ [[clang::lifetimebound]]
+#else
+#   define lifetimebound_
 #endif
 
 

@@ -43,7 +43,7 @@ namespace crouton {
         }
 
         /// Return value of `produce()`. Must be awaited; result is false if consumer is gone.
-        class AwaitProduce {
+        class [[nodiscard]] AwaitProduce {
         public:
             bool await_ready() noexcept {
                 return !self._consumer || !self._consumer->_hasValue;
@@ -70,7 +70,7 @@ namespace crouton {
         /// Adds a value to the series, to be read by a waiting SeriesConsumer.
         /// **Must be awaited.** Suspends until the SeriesConsumer reads the previous value.
         /// `co_await` returns true if the SeriesConsumer still exists, false if it's been destroyed.
-        [[nodiscard]] AwaitProduce produce(Result<T> value) {
+        AwaitProduce produce(Result<T> value) {
             precondition(!_consumer || !_consumer->_eof);
             return AwaitProduce(this, std::move(value));
         }
@@ -101,7 +101,7 @@ namespace crouton {
             return lifecycle::suspendingTo(cur, CRTN_TYPEID(*this), this, nullptr);
         }
 
-        [[nodiscard]] Result<T> await_resume() override {
+        Result<T> await_resume() override {
             // Take the value from the SeriesProducer:
             assert(_hasValue);
             _hasValue = false;

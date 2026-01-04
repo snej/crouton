@@ -91,10 +91,10 @@ namespace crouton {
         using iterator = typename std::deque<T>::iterator;
         using const_iterator = typename std::deque<T>::const_iterator;
 
-        iterator begin()                            {return _queue.begin();}
-        iterator end()                              {return _queue.end();}
-        const_iterator begin() const                {return _queue.begin();}
-        const_iterator end() const                  {return _queue.end();}
+        iterator begin() lifetimebound_                           {return _queue.begin();}
+        iterator end() lifetimebound_                             {return _queue.end();}
+        const_iterator begin() const lifetimebound_               {return _queue.begin();}
+        const_iterator end() const lifetimebound_                 {return _queue.end();}
 
         /// True if the queue contains an item equal to `item`.
         bool contains(T const& item) const          {return find(item) != _queue.end();}

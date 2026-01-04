@@ -92,21 +92,21 @@ namespace crouton {
 
         /// Returns the value, or throws the error as an exception.
         /// @throws Exception  if the Result holds an error.
-        TT const& value() const &  requires (!std::is_void_v<T>) {
+        TT const& value() const & lifetimebound_ requires (!std::is_void_v<T>) {
             raise_if();
             return std::get<T>(_value);
         }
 
         /// Returns the value, or throws the error as an exception.
         /// @throws Exception  if the Result holds an error.
-        TT& value() &  requires (!std::is_void_v<T>) {
+        TT& value() &  lifetimebound_ requires (!std::is_void_v<T>) {
             raise_if();
             return std::get<T>(_value);
         }
 
         /// Returns the value, or throws the error as an exception.
         /// @throws Exception  if the Result holds an error.
-        TT&& value() &&  requires (!std::is_void_v<T>) {
+        TT&& value() &&  lifetimebound_ requires (!std::is_void_v<T>) {
             raise_if();
             return std::get<T>(std::move(_value));
         }
@@ -120,9 +120,9 @@ namespace crouton {
         /// The `*` and `->` operators can be used to access the value.
         /// @note  Unlike `std::optional`, these _do_ check whether there's a value.
         /// @throws Exception  if the Result does not contain a value.
-        TT& operator*()              requires (!std::is_void_v<T>)  {return value();}
-        TT const& operator*() const  requires (!std::is_void_v<T>)  {return value();}
-        TT* operator->()             requires (!std::is_void_v<T>)  {return &value();}
+        TT& operator*()              lifetimebound_ requires (!std::is_void_v<T>)  {return value();}
+        TT const& operator*() const  lifetimebound_ requires (!std::is_void_v<T>)  {return value();}
+        TT* operator->()             lifetimebound_ requires (!std::is_void_v<T>)  {return &value();}
 
         /// Writes either the value or the error to the stream.
         friend ostream& operator<<(ostream& out, Result const& r) {

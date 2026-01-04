@@ -39,7 +39,7 @@ namespace crouton {
         using super::span;       // inherits all of std::span's constructors
         using super::operator=;
 
-        Bytes(string& str) noexcept :super((T*)str.data(), str.size()) { }
+        Bytes(string& str lifetimebound_) noexcept :super((T*)str.data(), str.size()) { }
 
         explicit operator string_view() const noexcept Pure {
             return {(const char*)this->data(), this->size()};
@@ -65,12 +65,12 @@ namespace crouton {
         ConstBytes(string_view str) :Bytes((element_type*)str.data(), str.size()) { }
 
         template <typename T>
-        ConstBytes(const T* begin, size_t n)  :Bytes((element_type*)begin, n * sizeof(T)) { }
-        ConstBytes(const void* begin, size_t n) :Bytes((element_type*)begin, n) { }
+        ConstBytes(const T* begin lifetimebound_, size_t n)  :Bytes((element_type*)begin, n * sizeof(T)) { }
+        ConstBytes(const void* begin lifetimebound_, size_t n) :Bytes((element_type*)begin, n) { }
 
         template <typename T>
-        ConstBytes(const T* begin, const T* end)  :ConstBytes(begin, end - begin) { }
-        ConstBytes(const void* begin, const void* end) :ConstBytes(begin, uintptr_t(end) - uintptr_t(begin)) { }
+        ConstBytes(const T* begin lifetimebound_, const T* end lifetimebound_)  :ConstBytes(begin, end - begin) { }
+        ConstBytes(const void* begin lifetimebound_, const void* end lifetimebound_) :ConstBytes(begin, uintptr_t(end) - uintptr_t(begin)) { }
 
         ConstBytes(uv_buf_t);
         explicit operator uv_buf_t() const noexcept;
@@ -96,7 +96,7 @@ namespace crouton {
 
 
     /** Low-level struct pointing to mutable data.
-     Usually serves as the destination argument of a `read`. */
+        Usually serves as the destination argument of a `read`. */
     class MutableBytes : public Bytes<byte, MutableBytes> {
     public:
         using Bytes::Bytes;
@@ -105,12 +105,12 @@ namespace crouton {
         explicit MutableBytes(std::span<element_type> s) :Bytes(s.data(), s.size()) { }
 
         template <typename U>
-        MutableBytes(U* begin, size_t n)    :Bytes((byte*)begin, n * sizeof(U)) { }
-        MutableBytes(void* begin, size_t n) :Bytes((byte*)begin, n) { }
+        MutableBytes(U* begin lifetimebound_, size_t n)    :Bytes((byte*)begin, n * sizeof(U)) { }
+        MutableBytes(void* begin lifetimebound_, size_t n) :Bytes((byte*)begin, n) { }
 
         template <typename T>
-        MutableBytes(T* begin, T* end)  :MutableBytes(begin, end - begin) { }
-        MutableBytes(void* begin, void* end) :MutableBytes(begin, uintptr_t(end) - uintptr_t(begin)) { }
+        MutableBytes(T* begin lifetimebound_, T* end lifetimebound_)  :MutableBytes(begin, end - begin) { }
+        MutableBytes(void* begin lifetimebound_, void* end lifetimebound_) :MutableBytes(begin, uintptr_t(end) - uintptr_t(begin)) { }
 
         MutableBytes(uv_buf_t);
 
@@ -140,9 +140,9 @@ namespace crouton {
         size_t available() const noexcept Pure {return size - used;}
         bool empty() const noexcept Pure       {return size == used;}
 
-        ConstBytes bytes() const noexcept Pure {return {data + used, size - used};}
+        ConstBytes bytes() const noexcept lifetimebound_ Pure {return {data + used, size - used};}
 
-        ConstBytes read(size_t maxLen) {
+        ConstBytes read(size_t maxLen) lifetimebound_ {
             size_t n = std::min(maxLen, available());
             ConstBytes result(data + used, n);
             used += n;

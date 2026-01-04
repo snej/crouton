@@ -52,7 +52,7 @@ namespace crouton {
         void enable(unsigned index);
 
         /// Begins watching each source.
-        Select& enable();
+        Select& enable() lifetimebound_;
 
         //---- Awaitable methods. `co_await` returns the index of a ready source.
         bool await_ready() noexcept     {return _ready.any() || _enabled.none();}

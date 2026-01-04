@@ -134,7 +134,7 @@ namespace crouton {
 
         /// Blocks (by running the event loop) until the Future completes,
         /// then returns its result or error as a `Result<T>`.
-        [[nodiscard]] Result<T> wait() {
+        Result<T> wait() {
             Scheduler& sched = Scheduler::current();
             (void)sched.eventLoop(); // create it in advance
             (void) this->onReady([&]() {
@@ -264,7 +264,7 @@ namespace crouton {
     /** Wrap this around a Future before co_await'ing it, to get the value as a Result.
         This will not throw; instead, you have to check the Result for an error. */
     template <typename T>
-    class NoThrow {
+    class [[nodiscard]] NoThrow {
     public:
         NoThrow(Future<T>&& future)     :_handle(future.handle()), _state(std::move(future._state)) { }
 
@@ -276,7 +276,7 @@ namespace crouton {
         coro_handle await_suspend(coro_handle coro) noexcept {
             return lifecycle::suspendingTo(coro, _handle, _state->suspend(coro));
         }
-        [[nodiscard]] Result<T> await_resume() noexcept {
+        Result<T> await_resume() noexcept {
             Result<T> result(std::move(_state)->result());
             _state = nullptr;
             return result;
@@ -291,7 +291,7 @@ namespace crouton {
     /** Wrap this around a Future to turn it into a Series, so you can connect a Subscriber.
         The Series will, of course, only return at most a single value before EOF. */
     template <typename T>
-    class FutureSeries : public NoThrow<T>, public ISeries<T> {
+    class [[nodiscard]]  FutureSeries : public NoThrow<T>, public ISeries<T> {
     public:
         using NoThrow<T>::NoThrow;
 
@@ -301,13 +301,13 @@ namespace crouton {
         coro_handle await_suspend(coro_handle coro) noexcept override {
             return NoThrow<T>::await_suspend();
         }
-        [[nodiscard]] Result<T> await_resume() noexcept override {
+        Result<T> await_resume() noexcept override {
             if (this->_state)
                 return NoThrow<T>::await_resume();
             else
                 return Result<T>{};
         }
-        virtual void onReady(ISelectable::OnReadyFn fn) override {
+        void onReady(ISelectable::OnReadyFn fn) override {
             if (this->_state)
                 this->_state->onReady(std::move(fn));
             else
@@ -373,7 +373,8 @@ namespace crouton {
     // Future<T>::then, for T != void
     template <typename T>
     template <typename FN, typename U>  requires(!std::is_void_v<T>)
-    coro_wrapper_ coro_disable_lifetimebound_ Future<U> Future<T>::then(FN fn) {
+    coro_wrapper_ coro_disable_lifetimebound_
+    Future<U> Future<T>::then(FN fn) {
         return _state->template chain<U>([fn](std::shared_ptr<FutureStateBase> const& baseState,
                                               std::shared_ptr<FutureStateBase> const& myBaseState) mutable {
             auto& state = static_cast<FutureState<U>&>(*baseState);
@@ -390,7 +391,8 @@ namespace crouton {
     // Future<T>::then, for T == void
     template <typename T>
     template <typename FN, typename U>  requires(std::is_void_v<T>)
-    coro_wrapper_ coro_disable_lifetimebound_ Future<U> Future<T>::then(FN fn) {
+    coro_wrapper_ coro_disable_lifetimebound_
+    Future<U> Future<T>::then(FN fn) {
         return _state->template chain<U>([fn](std::shared_ptr<FutureStateBase> const& baseState,
                                               std::shared_ptr<FutureStateBase> const& myBaseState) mutable {
             auto& state = static_cast<FutureState<U>&>(*baseState);
