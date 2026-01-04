@@ -42,7 +42,8 @@ namespace crouton {
         A Generator can also be iterated synchronously via its begin/end methods,
         or with a `for(:)` loop.*/
     template <typename T>
-    class [[nodiscard]] Generator : public Coroutine<GeneratorImpl<T>>, public ISeries<T> {
+    class [[nodiscard]] coro_return_type_ coro_lifetimebound_
+    Generator : public Coroutine<GeneratorImpl<T>>, public ISeries<T> {
     public:
         Generator(Generator&&) noexcept = default;
         Generator& operator=(Generator&&) = default;

@@ -30,7 +30,7 @@ namespace crouton {
     /** Base class for the public object returned by a coroutine function.
         Most of the implementation is usually in the associated CoroutineImpl subclass (IMPL). */
     template <class IMPL>
-    class [[nodiscard]] coro_return_type_ Coroutine {
+    class [[nodiscard]] coro_return_type_ coro_lifetimebound_ Coroutine {
     public:
         // movable, but not copyable.
         Coroutine(Coroutine&& c) noexcept           :_handle(c._handle) {c._handle = {};}

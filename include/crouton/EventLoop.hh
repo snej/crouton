@@ -82,7 +82,7 @@ namespace crouton {
         static void after(double delaySecs, std::function<void()> fn);
 
         /// Static method that returns a Future that completes after the given delay.
-        static ASYNC<void> sleep(double delaySecs);
+        coro_wrapper_ static ASYNC<void> sleep(double delaySecs);
 
     private:
         friend class EventLoop;
@@ -97,7 +97,7 @@ namespace crouton {
 
 
     /// Calls the given function on an anonymous background thread.
-    ASYNC<void> OnBackgroundThread(std::function<void()> fn);
+    coro_wrapper_ ASYNC<void> OnBackgroundThread(std::function<void()> fn);
 
 
     /// Calls the given function on an anonymous background thread,

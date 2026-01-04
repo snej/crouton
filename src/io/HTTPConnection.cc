@@ -128,7 +128,7 @@ namespace crouton::io::http {
 
     Future<Response> Connection::send() {
         Request req;
-        return send(req);
+        RETURN AWAIT send(req);
     }
 
 
@@ -162,11 +162,11 @@ namespace crouton::io::http {
         return *this;
     }
 
-    Future<void> Response::close() {
+    coro_wrapper_ Future<void> Response::close() {
         return _connection->closeResponse();
     }
 
-    Future<void> Response::closeWrite() {
+    coro_wrapper_ Future<void> Response::closeWrite() {
         return Error(CroutonError::LogicError, "HTTPReponse is not writeable");
     }
 

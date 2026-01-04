@@ -53,7 +53,7 @@ namespace crouton {
 
         A regular function that gets a Future can call `then()` to register a callback. */
     template <typename T>
-    class [[nodiscard("Future must be AWAITed or returned")]]
+    class [[nodiscard("Future must be AWAITed or returned")]] coro_return_type_ coro_lifetimebound_
     Future : public Coroutine<FutureImpl<T>>, public ISelectable {
     public:
         using nonvoidT = std::conditional_t<std::is_void_v<T>, std::byte, T>;
@@ -183,7 +183,7 @@ namespace crouton {
                                                  std::shared_ptr<FutureStateBase> srcState)>;
 
         template <typename U>
-        Future<U> chain(ChainCallback fn) {
+        coro_wrapper_ Future<U> chain(ChainCallback fn) {
             auto provider = std::make_shared<FutureState<U>>();
             _chain(provider, fn);
             return Future<U>(std::move(provider));
@@ -373,7 +373,7 @@ namespace crouton {
     // Future<T>::then, for T != void
     template <typename T>
     template <typename FN, typename U>  requires(!std::is_void_v<T>)
-    Future<U> Future<T>::then(FN fn) {
+    coro_wrapper_ coro_disable_lifetimebound_ Future<U> Future<T>::then(FN fn) {
         return _state->template chain<U>([fn](std::shared_ptr<FutureStateBase> const& baseState,
                                               std::shared_ptr<FutureStateBase> const& myBaseState) mutable {
             auto& state = static_cast<FutureState<U>&>(*baseState);
@@ -390,7 +390,7 @@ namespace crouton {
     // Future<T>::then, for T == void
     template <typename T>
     template <typename FN, typename U>  requires(std::is_void_v<T>)
-    Future<U> Future<T>::then(FN fn) {
+    coro_wrapper_ coro_disable_lifetimebound_ Future<U> Future<T>::then(FN fn) {
         return _state->template chain<U>([fn](std::shared_ptr<FutureStateBase> const& baseState,
                                               std::shared_ptr<FutureStateBase> const& myBaseState) mutable {
             auto& state = static_cast<FutureState<U>&>(*baseState);

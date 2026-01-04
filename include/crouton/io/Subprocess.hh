@@ -36,6 +36,7 @@ namespace crouton::io {
         /// This Subprocess object may be deleted / go out of scope after this method is called;
         /// it doesn't affect the child process or the Future.
         /// @warning  It is illegal to call this while a subprocess is already running.
+        coro_wrapper_ coro_disable_lifetimebound_
         Future<int64_t> execute();
 
         /// True if the subprocess is running.

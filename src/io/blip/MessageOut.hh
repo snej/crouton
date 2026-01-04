@@ -46,7 +46,7 @@ namespace crouton::io::blip {
 
         MessageIn* createResponse();
         void       disconnected() override;
-        ASYNC<MessageInRef> onResponse();
+        coro_wrapper_ ASYNC<MessageInRef> onResponse();
         void noResponse();
 
         // for debugging/logging:

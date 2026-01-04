@@ -59,7 +59,7 @@ namespace crouton::io {
         closeHandle(_stream);
     }
 
-    Future<void> Stream::close() {
+    coro_wrapper_ Future<void> Stream::close() {
         _close();
         return Future<void>();
     }
@@ -78,7 +78,7 @@ namespace crouton::io {
     }
 
     
-    Future<ConstBytes> Stream::readNoCopy(size_t maxLen) {
+    coro_wrapper_ Future<ConstBytes> Stream::readNoCopy(size_t maxLen) {
         precondition(isOpen());
         NotReentrant nr(_readBusy);
         if (_inputBuf && !_inputBuf->empty()) {
@@ -97,7 +97,7 @@ namespace crouton::io {
     }
 
 
-    Future<ConstBytes> Stream::peekNoCopy() {
+    coro_wrapper_ Future<ConstBytes> Stream::peekNoCopy() {
         precondition(isOpen());
         NotReentrant nr(_readBusy);
         if (!_inputBuf || _inputBuf->empty())
@@ -229,15 +229,16 @@ namespace crouton::io {
         return _stream && uv_is_writable(_stream);
     }
 
-    Future<void> Stream::write(const ConstBytes bufs[], size_t nbufs) {
+    Future<void> Stream::write(std::span<ConstBytes const> buffers) {
         precondition(isOpen());
 
         static constexpr size_t kMaxBufs = 8;
+        size_t nbufs = buffers.size();
         if (nbufs > kMaxBufs)
             RETURN Error(CroutonError::InvalidArgument, "too many bufs");
         uv_buf_t uvbufs[kMaxBufs];
         for (size_t i = 0; i < nbufs; ++i)
-            uvbufs[i] = uv_buf_t(bufs[i]);
+            uvbufs[i] = uv_buf_t(buffers[i]);
 
         write_request req("sending to the stream");
         check(uv_write(&req, _stream, uvbufs, unsigned(nbufs), req.callback),
@@ -247,8 +248,8 @@ namespace crouton::io {
     }
 
 
-    Future<void> Stream::write(ConstBytes buf) {
-        return write(&buf, 1);
+    coro_wrapper_ Future<void> Stream::write(ConstBytes buf) {
+        return write({buf});
     }
 
 

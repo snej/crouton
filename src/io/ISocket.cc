@@ -48,7 +48,7 @@ namespace crouton::io {
     }
 
 
-    ASYNC<void> ISocket::connect(string const& address, uint16_t port) {
+    coro_wrapper_ ASYNC<void> ISocket::connect(string const& address, uint16_t port) {
         bind(address, port);
         return open();
     }

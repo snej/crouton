@@ -35,10 +35,10 @@ namespace crouton::io {
 
         /** Writes a message to the stream.
             @warning  The bytes must remain valid until completion. */
-        ASYNC<void> sendMessage(ConstBytes);
+        coro_wrapper_ ASYNC<void> sendMessage(ConstBytes);
 
-        ASYNC<void> closeWrite()            {return _stream.closeWrite();}
-        ASYNC<void> close()                 {return _stream.close();}
+        coro_wrapper_ ASYNC<void> closeWrite()            {return _stream.closeWrite();}
+        coro_wrapper_ ASYNC<void> close()                 {return _stream.close();}
 
     private:
         IStream& _stream;

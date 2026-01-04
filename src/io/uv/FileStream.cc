@@ -53,7 +53,7 @@ namespace crouton::io {
             delete self;
         }
 
-        Future<size_t> future() {
+        coro_wrapper_ Future<size_t> future() {
             Future<size_t> future(_futureP);
             if (_futureP->getError())
                 delete this;
@@ -78,7 +78,7 @@ namespace crouton::io {
     FileStream& FileStream::operator=(FileStream&& fs) noexcept = default;
 
 
-    Future<void> FileStream::open() {
+    coro_wrapper_ Future<void> FileStream::open() {
         auto req = new fs_request("opening file");
         req->check(uv_fs_open(curLoop(), req, _path.c_str(), _flags, _mode, req->callback));
         return req->future().then([this](ssize_t result) {_fd = int(result);});
@@ -91,9 +91,10 @@ namespace crouton::io {
 
 
     // This is FileStream's primitive read operation.
-    Future<size_t> FileStream::_preadv(const MutableBytes bufs[], size_t nbufs, int64_t offset) {
+    Future<size_t> FileStream::_preadv(std::span<MutableBytes const> bufs, int64_t offset) {
         precondition(isOpen());
         static constexpr size_t kMaxBufs = 8;
+        size_t nbufs = bufs.size();
         if (nbufs > kMaxBufs) 
             return Error(CroutonError::InvalidArgument, "too many bufs");
         uv_buf_t uvbufs[kMaxBufs];
@@ -107,9 +108,9 @@ namespace crouton::io {
     }
 
 
-    Future<size_t> FileStream::preadv(const MutableBytes bufs[], size_t nbufs, int64_t offset) {
+    Future<size_t> FileStream::preadv(std::span<MutableBytes const> buffers, int64_t offset) {
         NotReentrant nr(_busy);
-        return _preadv(bufs, nbufs, offset);
+        return _preadv(buffers, offset);
     }
 
 
@@ -118,7 +119,7 @@ namespace crouton::io {
             _readBuf = make_unique<Buffer>();
         assert(_readBuf->empty());
         MutableBytes buf(_readBuf->data, Buffer::kCapacity);
-        Result<size_t> n = AWAIT _preadv(&buf, 1, -1);
+        Result<size_t> n = AWAIT _preadv(span{&buf, 1}, -1);
         if (auto err = n.error())
             RETURN err;
         _readBuf->size = uint32_t(n.value());
@@ -130,7 +131,7 @@ namespace crouton::io {
 
 
     // IStream's primitive read operation.
-    Future<ConstBytes> FileStream::readNoCopy(size_t maxLen) {
+    coro_wrapper_ Future<ConstBytes> FileStream::readNoCopy(size_t maxLen) {
         NotReentrant nr(_busy);
         if (_readBuf && !_readBuf->empty())
             return _readBuf->read(maxLen);
@@ -142,7 +143,7 @@ namespace crouton::io {
     }
 
 
-    Future<ConstBytes> FileStream::peekNoCopy() {
+    coro_wrapper_ Future<ConstBytes> FileStream::peekNoCopy() {
         NotReentrant nr(_busy);
         if (_readBuf && !_readBuf->empty())
             return _readBuf->bytes();
@@ -163,13 +164,14 @@ namespace crouton::io {
 
 
     // This is FileStream's primitive write operation.
-    Future<void> FileStream::pwritev(const ConstBytes bufs[], size_t nbufs, int64_t offset) {
+    Future<void> FileStream::pwritev(std::span<ConstBytes const> bufs, int64_t offset) {
         NotReentrant nr(_busy);
         precondition(isOpen());
 
         _readBuf = nullptr; // because this write might invalidate it
 
         static constexpr size_t kMaxBufs = 8;
+        size_t nbufs = bufs.size();
         if (nbufs > kMaxBufs) 
             return Error(CroutonError::InvalidArgument, "too many bufs");
         uv_buf_t uvbufs[kMaxBufs];
@@ -184,18 +186,18 @@ namespace crouton::io {
 
 
     // IStream's primitive write operation.
-    Future<void> FileStream::write(ConstBytes buf) {
-        return pwritev(&buf, 1, -1);
+    coro_wrapper_ Future<void> FileStream::write(ConstBytes buf) {
+        return pwritev(span{&buf, 1}, -1);
     }
 
 
     // We also override this IStream method, because it's more efficient to do it with pwritev
     // than the overridden method's multiple calls to _write.
-    Future<void> FileStream::write(const ConstBytes buffers[], size_t nBuffers) {
-        return pwritev(buffers, nBuffers, -1);
+    coro_wrapper_ Future<void> FileStream::write(span<ConstBytes const> buffers) {
+        return pwritev(buffers, -1);
     }
 
-    ASYNC<void> FileStream::closeWrite() {
+    coro_wrapper_ ASYNC<void> FileStream::closeWrite() {
         return Future<void>(); // no-op
     }
 
@@ -211,7 +213,7 @@ namespace crouton::io {
         }
     }
 
-    Future<void> FileStream::close() {
+    coro_wrapper_ Future<void> FileStream::close() {
         _close();
         return Future<void>();
     }

@@ -31,7 +31,7 @@ namespace crouton::io {
     }
 
 
-    Future<void> Pipe::open() {
+    coro_wrapper_ Future<void> Pipe::open() {
         if (_fd >= 0) {
             auto pipe = new uv_pipe_t;
             int err = uv_pipe_init(curLoop(), pipe, false);

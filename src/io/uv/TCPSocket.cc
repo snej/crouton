@@ -67,6 +67,6 @@ namespace crouton::io::uv {
     }
 
     bool TCPSocket::isOpen() const                {return Stream::isOpen();}
-    ASYNC<void> TCPSocket::close()                {return Stream::close();}
+    coro_wrapper_ ASYNC<void> TCPSocket::close()                {return Stream::close();}
 
 }

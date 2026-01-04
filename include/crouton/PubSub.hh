@@ -138,7 +138,7 @@ namespace crouton::ps {
 
         /// Abstract method that handles an item received from the Publisher.
         /// @warning  You must override either this method or `run`.
-        virtual ASYNC<void> handle(T)            {return CroutonError::Unimplemented;}
+        virtual ASYNC<void> handle(T);
 
         /// Handles the final Error/noerror item from the publisher.
         /// Default implementation sets the `error` property; make sure to call through.
@@ -154,6 +154,9 @@ namespace crouton::ps {
         Error                           _error;     // Error received from the publisher
     };
 
+
+    template<typename T>
+    coro_wrapper_ Future<void> Subscriber<T>::handle(T) {return CroutonError::Unimplemented;}
 
 
     /** Simple base class implementing both Publisher and Subscriber.
@@ -230,7 +233,7 @@ namespace crouton::ps {
         using Subscriber<T>::Subscriber;
         std::vector<T> const& items()                       {return _items;}
     protected:
-        Future<void> handle(T result) override {
+        coro_wrapper_ Future<void> handle(T result) override {
             _items.emplace_back(std::move(result));
             return Future<void>{};
         }

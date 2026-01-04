@@ -123,7 +123,7 @@ namespace crouton::io {
     }
 
 
-    ASYNC<string> IStream::readAll() {return readString(SIZE_MAX);}
+    coro_wrapper_ ASYNC<string> IStream::readAll() {return readString(SIZE_MAX);}
 
 
     Future<string> IStream::readAvailable() {
@@ -151,22 +151,27 @@ namespace crouton::io {
     }
 
 
-    Future<void> IStream::write(const ConstBytes buffers[], size_t nBuffers) {
-        if (nBuffers == 1) {
-            AWAIT write(buffers[0]);
-        } else if (nBuffers > 1) {
-            // After the first AWAIT the caller's stack frame will be gone,
-            // and also the buffers[] C array. So copy it into a vector:
-            vector<ConstBytes> buffersCopy(&buffers[0], &buffers[nBuffers]);
-            for (auto& buffer : buffersCopy)
-                AWAIT write(buffer);
+    Future<void> IStream::write(span<ConstBytes const> buffers) {
+        switch (buffers.size()) {
+            case 0:
+                break;
+            case 1:
+                AWAIT write(buffers[0]);
+                break;
+            default: {
+                // After the first AWAIT the caller's stack frame will be gone,
+                // and also the buffers[] C array. So copy it into a vector:
+                vector buffersCopy(buffers.begin(), buffers.end());
+                for (auto& buffer : buffersCopy)
+                    AWAIT write(buffer);
+            }
         }
         RETURN noerror;
     }
 
 
     Future<void> IStream::write(std::initializer_list<ConstBytes> buffers) {
-        return write(buffers.begin(), buffers.size());
+        return write(span{buffers.begin(), buffers.size()});
     }
 
 

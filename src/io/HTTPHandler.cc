@@ -65,7 +65,7 @@ namespace crouton::io::http {
 
 
     Future<void> Handler::handleRequest(Headers responseHeaders,
-                                            HandlerFunction const& handler)
+                                        HandlerFunction const& handler)
     {
         string body = AWAIT _parser.entireBody();   //TODO: Let handler fn read at its own pace
         Request request {
@@ -75,7 +75,12 @@ namespace crouton::io::http {
             std::move(body)
         };
         Response response(this, std::move(responseHeaders));
-        Future<void> handled = handler(request, response); // split in 2 lines bc MSVC bug
+
+        // We have to extract the function pointer from the std::function and call that;
+        // otherwise Clang complains that std::function<T>::operator() is neither a coroutine nor
+        // a coroutine wrapper.
+        auto target = handler.target<handlerfn>();
+        Future<void> handled = target(request, response);
         AWAIT handled;
         AWAIT response.finishHeaders();
         AWAIT endBody();

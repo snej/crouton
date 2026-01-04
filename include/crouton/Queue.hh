@@ -227,7 +227,7 @@ namespace crouton {
             RETURN push(std::move(t));
         }
 
-        ASYNC<bool> asyncPush(Result<T> r) {
+        coro_wrapper_ ASYNC<bool> asyncPush(Result<T> r) {
             if (r.ok())
                 return asyncPush(r.value());
             else

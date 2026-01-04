@@ -25,7 +25,7 @@ struct uv_stream_s;
 
 namespace crouton::io {
 
-    /** An asynchronous bidirectional stream. Abstract base class of Pipe and TCPSocket. */
+    /** An asynchronous bidirectional stream. Abstract base class of Pipe, LocalSocket, TCPSocket. */
     class Stream : public IStream {
     public:
         virtual ~Stream();
@@ -63,7 +63,7 @@ namespace crouton::io {
 
         using IStream::write;
         ASYNC<void> write(ConstBytes) override;
-        ASYNC<void> write(const ConstBytes buffers[], size_t nBuffers) override;
+        ASYNC<void> write(std::span<ConstBytes const> buffers) override;
 
     protected:
         friend class Subprocess;
@@ -81,7 +81,7 @@ namespace crouton::io {
         Stream& operator=(Stream const&) = delete;
         void _close();
 
-        ASYNC<std::unique_ptr<Buffer>> readBuf();
+        coro_wrapper_ ASYNC<std::unique_ptr<Buffer>> readBuf();
         ASYNC<ConstBytes> fillInputBuf();
 
         void read_start();

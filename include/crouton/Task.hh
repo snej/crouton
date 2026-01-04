@@ -28,7 +28,8 @@ namespace crouton {
 
 
     /** Return type for a coroutine that doesn't return a value, just runs indefinitely. */
-    class Task : public Coroutine<TaskImpl> {
+    class [[nodiscard]] coro_return_type_ coro_lifetimebound_
+    Task : public Coroutine<TaskImpl> {
     public:
         Task(Task&&) = default;
 

@@ -27,7 +27,13 @@ using namespace crouton::mini;
 
 
 // Runs a coroutine that returns `Future<void>`, returning once it's completed.
-void RunCoroutine(std::function<Future<void>()>);
+template <typename FN>
+void RunCoroutine(FN test) {
+    InitLogging();
+    Future<void> f = test();
+    Scheduler::current().runUntil([&]{return f.hasResult();});
+    f.result(); // check exception
+}
 
 // Reads the contents of a file into a string.
 Future<string> ReadFile(string const& path);

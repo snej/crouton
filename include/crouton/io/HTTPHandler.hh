@@ -69,7 +69,8 @@ namespace crouton::io::http {
 
 
         /// A function that handles a request, writing a response.
-        using HandlerFunction = std::function<Future<void>(Request const&, Response&)>;
+        using handlerfn = Future<void>(Request const&, Response&);
+        using HandlerFunction = std::function<handlerfn>;
 
         /// An HTTP method and path regex, with the function that should be called.
         struct Route {
@@ -87,11 +88,11 @@ namespace crouton::io::http {
     private:
         ASYNC<void> handleRequest(Headers responseHeaders,
                                   HandlerFunction const& handler);
-        ASYNC<void> writeHeaders(Status status,
+        coro_wrapper_ ASYNC<void> writeHeaders(Status status,
                                  string_view statusMsg,
                                  Headers const& headers);
-        ASYNC<void> writeToBody(string);
-        ASYNC<void> endBody();
+        coro_wrapper_ ASYNC<void> writeToBody(string);
+        coro_wrapper_ ASYNC<void> endBody();
 
         std::shared_ptr<IStream> _stream;
         Parser                   _parser;

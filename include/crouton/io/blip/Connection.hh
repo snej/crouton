@@ -57,7 +57,7 @@ namespace crouton::io::blip {
         /// Queues a request to be sent over the WebSocket.
         /// The result resolves to the reply message when it arrives.
         /// If this message is NoReply, the result resolves to `nullptr` when it's sent.
-        ASYNC<MessageInRef> sendRequest(MessageBuilder&);
+        coro_wrapper_ ASYNC<MessageInRef> sendRequest(MessageBuilder&);
 
         /// Initiates the close protocol:
         /// 1. Sends all currently queued messages (but no more can be sent)

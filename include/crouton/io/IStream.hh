@@ -73,11 +73,13 @@ namespace crouton::io {
         /// or EOF is reached; but it won't block after that so it may not return enough to fill
         /// the buffer, even if not at EOF.
         /// @returns the number of bytes written
+        coro_disable_lifetimebound_
         virtual ASYNC<size_t> readSome(MutableBytes buf);
 
         /// Reads bytes into a buffer (which must remain valid during the operation.)
         /// Always fills the buffer, blocking if necessary, unless it reaches EOF.
         /// @returns the number of bytes written
+        coro_disable_lifetimebound_
         virtual ASYNC<size_t> read(MutableBytes buf);
 
         /// Reads `len` bytes, returning them as a string.
@@ -85,6 +87,7 @@ namespace crouton::io {
         ASYNC<string> readString(size_t len);
 
         /// Reads exactly `len` bytes; on EOF, returns/throws an error.
+        coro_disable_lifetimebound_ coro_wrapper_
         ASYNC<void> readExactly(MutableBytes);
 
         /// Reads up through the first occurrence of the string `end`,
@@ -116,12 +119,14 @@ namespace crouton::io {
         ASYNC<void> write(string);
 
         /// Writes data, fully, from multiple input buffers.
-        /// @warning The data pointed to by the buffers must remain valid until completion.
+        /// @warning The data pointed to by the buffers MUST remain valid until completion.
         /// @note  The default implementation makes `nBuffers` calls to `write(ConstBytes)`.
         ///        A subclass that natively supports multi-buffer write ("writev") may override
         ///        this method as an optimization.
-        virtual ASYNC<void> write(const ConstBytes buffers[], size_t nBuffers);
+        coro_disable_lifetimebound_
+        virtual ASYNC<void> write(std::span<ConstBytes const> buffers);
 
+        coro_disable_lifetimebound_ coro_wrapper_
         ASYNC<void> write(std::initializer_list<ConstBytes> buffers);
 
     protected:

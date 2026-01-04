@@ -48,7 +48,7 @@ namespace crouton::io::http {
 
     private:
         friend class Response;
-        ASYNC<void> closeResponse();
+        coro_wrapper_ ASYNC<void> closeResponse();
 
         URL                      _url;
         std::shared_ptr<IStream> _stream;
@@ -87,7 +87,7 @@ namespace crouton::io::http {
         /// The response headers.
         Headers const& headers() const noexcept Pure        {return _parser.headers;}
 
-        ASYNC<void> open() override             {return _parser.readHeaders();}
+        coro_wrapper_ ASYNC<void> open() override             {return _parser.readHeaders();}
         bool isOpen() const override            {return _parser.status != Status::Unknown;}
         ASYNC<void> close() override;
         ASYNC<void> closeWrite() override;

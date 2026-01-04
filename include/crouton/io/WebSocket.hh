@@ -94,8 +94,8 @@ namespace crouton::io::ws {
 
         /// Sends a binary message, asynchronously.
         /// @note The data is copied and does not need to remain valid after the call.
-        ASYNC<void> send(ConstBytes, Message::Type = Message::Binary);
-        ASYNC<void> send(Message const& m)   {return send(ConstBytes(m), m.type);}
+        coro_wrapper_ ASYNC<void> send(ConstBytes, Message::Type = Message::Binary);
+        coro_wrapper_ ASYNC<void> send(Message const& m)   {return send(ConstBytes(m), m.type);}
 
         /// Returns true once each side has sent a Close message.
         bool readyToClose() const       {return _closeSent && _closeReceived;}
@@ -118,7 +118,7 @@ namespace crouton::io::ws {
 
         bool handleFragment(std::byte*, size_t, size_t,uint8_t, bool);
         void protocolError(string_view logMessage);
-        ASYNC<void> handleCloseMessage(Message const& msg);
+        coro_wrapper_ ASYNC<void> handleCloseMessage(Message const& msg);
 
         IStream*                _stream = nullptr;
         std::deque<Message>     _incoming;

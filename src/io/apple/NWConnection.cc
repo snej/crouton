@@ -78,7 +78,7 @@ namespace crouton::io::apple {
             dispatch_release(_queue);
     }
 
-    Future<void> NWConnection::open() {
+    coro_wrapper_ Future<void> NWConnection::open() {
         string portStr = std::to_string(_binding->port);
         nw_endpoint_t endpoint = nw_endpoint_create_host(_binding->address.c_str(), portStr.c_str());
 
@@ -124,7 +124,7 @@ namespace crouton::io::apple {
     }
 
 
-    Future<void> NWConnection::close() {
+    coro_wrapper_ Future<void> NWConnection::close() {
         if (_conn) {
             if (!_canceled) {
                 LNet->info("NWConnection::close");
@@ -165,17 +165,17 @@ namespace crouton::io::apple {
     }
 
 
-    Future<ConstBytes> NWConnection::readNoCopy(size_t maxLen) {
+    coro_wrapper_ Future<ConstBytes> NWConnection::readNoCopy(size_t maxLen) {
         return _readNoCopy(maxLen, false);
     }
 
 
-    Future<ConstBytes> NWConnection::peekNoCopy() {
+    coro_wrapper_ Future<ConstBytes> NWConnection::peekNoCopy() {
         return _readNoCopy(65536, true);
     }
 
 
-    Future<ConstBytes> NWConnection::_readNoCopy(size_t maxLen, bool peek) {
+    coro_wrapper_ Future<ConstBytes> NWConnection::_readNoCopy(size_t maxLen, bool peek) {
         if (_content && _contentUsed < _contentBuf.size()) {
             // I can return some unRead data from the buffer:
             auto len = std::min(maxLen, _contentBuf.size() - _contentUsed);
@@ -222,17 +222,17 @@ namespace crouton::io::apple {
     }
 
 
-    ASYNC<void> NWConnection::closeWrite() {
+    coro_wrapper_ ASYNC<void> NWConnection::closeWrite() {
         LNet->info("NWConnection::closeWrite");
         return _writeOrShutdown({}, true);
     }
 
-    ASYNC<void> NWConnection::write(ConstBytes b) {
+    coro_wrapper_ ASYNC<void> NWConnection::write(ConstBytes b) {
         return _writeOrShutdown(b, false);
     }
 
 
-    Future<void> NWConnection::_writeOrShutdown(ConstBytes src, bool shutdown) {
+    coro_wrapper_ Future<void> NWConnection::_writeOrShutdown(ConstBytes src, bool shutdown) {
         __block auto onWrite = Future<void>::provider();
         dispatch_sync(_queue, ^{
             __block __unused bool released = true;

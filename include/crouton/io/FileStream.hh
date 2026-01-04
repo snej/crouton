@@ -63,17 +63,17 @@ namespace crouton::io {
         virtual ASYNC<string> readAll() override;
 
         ASYNC<void> write(ConstBytes) override;
-        ASYNC<void> write(const ConstBytes buffers[], size_t nBuffers) override;
+        ASYNC<void> write(std::span<ConstBytes const> buffers) override;
         using IStream::write;
 
         /// Ignores the current stream position and reads from an absolute offset in the file
         /// into one or more buffers.
         /// @note  This method will not set `atEOF`, even if it reads to EOF.
-        ASYNC<size_t> preadv(const MutableBytes bufs[], size_t nbufs, int64_t offset);
+        coro_wrapper_ ASYNC<size_t> preadv(std::span<MutableBytes const> buffers, int64_t offset);
 
         /// Ignores the current stream position and writes to an absolute offset in the file
         /// from one or more buffers.
-        ASYNC<void> pwritev(const ConstBytes bufs[], size_t nbufs, int64_t offset);
+        coro_wrapper_ ASYNC<void> pwritev(std::span<ConstBytes const> buffers, int64_t offset);
 
         int fileDescriptor() const {return _fd;}
 
@@ -81,7 +81,7 @@ namespace crouton::io {
         explicit FileStream(int fd);
         FileStream(FileStream const&) = delete;
         FileStream& operator=(FileStream const& fs) = delete;
-        ASYNC<size_t> _preadv(const MutableBytes bufs[], size_t nbufs, int64_t offset);
+        coro_wrapper_ ASYNC<size_t> _preadv(std::span<MutableBytes const> buffers, int64_t offset);
         ASYNC<ConstBytes> _fillBuffer();
         void _close();
 

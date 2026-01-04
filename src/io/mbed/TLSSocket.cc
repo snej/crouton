@@ -293,7 +293,7 @@ namespace crouton::io::mbed {
         return _impl && _impl->isOpen();
     }
 
-    Future<void> TLSSocket::open() {
+    coro_wrapper_ Future<void> TLSSocket::open() {
         precondition(!_impl);
         NotReentrant nr(_busy);
         auto socket = ISocket::newSocket(false);
@@ -310,11 +310,11 @@ namespace crouton::io::mbed {
     }
 
 
-    Future<ConstBytes> TLSSocket::readNoCopy(size_t maxLen)  {
+    coro_wrapper_ Future<ConstBytes> TLSSocket::readNoCopy(size_t maxLen)  {
         return _readNoCopy(maxLen, false);
     }
     
-    Future<ConstBytes> TLSSocket::peekNoCopy()  {
+    coro_wrapper_ Future<ConstBytes> TLSSocket::peekNoCopy()  {
         return _readNoCopy(0, true);
     }
 
@@ -332,7 +332,7 @@ namespace crouton::io::mbed {
         RETURN peek ? _inputBuf->data : _inputBuf->read(maxLen);
     }
 
-    Future<void> TLSSocket::write(ConstBytes buf)  {
+    coro_wrapper_ Future<void> TLSSocket::write(ConstBytes buf)  {
         NotReentrant nr(_busy);
         return _impl->write(buf);
     }

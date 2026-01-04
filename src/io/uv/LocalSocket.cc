@@ -33,7 +33,7 @@ namespace crouton::io {
     }
 
 
-    Future<void> LocalSocket::open() {
+    coro_wrapper_ Future<void> LocalSocket::open() {
         if (_fd >= 0) {
             auto tcpHandle = new uv_tcp_t;
             uv_tcp_init(curLoop(), tcpHandle);

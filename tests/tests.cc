@@ -223,14 +223,6 @@ TEST_CASE("ToMany") {
 }
 
 
-void RunCoroutine(std::function<Future<void>()> test) {
-    InitLogging();
-    Future<void> f = test();
-    Scheduler::current().runUntil([&]{return f.hasResult();});
-    f.result(); // check exception
-}
-
-
 TEST_CASE("Producer Consumer") {
     RunCoroutine([]() -> Future<void> {
         std::optional<SeriesProducer<int>> producer;

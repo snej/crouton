@@ -64,9 +64,9 @@ namespace crouton::io {
         virtual ~ISocket() = default;
 
         struct binding {
-            string address;
+            string   address;
             uint16_t port;
-            bool noDelay = false;
+            bool     noDelay = false;
             unsigned keepAlive = 0;
         };
 
@@ -78,6 +78,6 @@ namespace crouton::io {
 
     
     /// Convenience function that calls `close`, waits for completion, then deletes.
-    void closeThenRelease(std::shared_ptr<ISocket>&&);
+    coro_wrapper_ void closeThenRelease(std::shared_ptr<ISocket>&&);
 
 }

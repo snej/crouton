@@ -39,7 +39,7 @@ namespace crouton::io::blip {
         /// Queues a request to be sent.
         /// The result resolves to the reply message when it arrives.
         /// If this message is NoReply, the result resolves to `nullptr` when it's sent.
-        ASYNC<MessageInRef> sendRequest(MessageBuilder&);
+        coro_wrapper_ ASYNC<MessageInRef> sendRequest(MessageBuilder&);
 
         /// Call this when you're ready to close and have no more requests nor responses to send.
         /// The Generator (`output()`) will yield all remaining frames of already-queued messages,
