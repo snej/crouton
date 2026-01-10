@@ -79,8 +79,7 @@ namespace crouton::io::http {
         // We have to extract the function pointer from the std::function and call that;
         // otherwise Clang complains that std::function<T>::operator() is neither a coroutine nor
         // a coroutine wrapper.
-        auto target = handler.target<handlerfn>();
-        Future<void> handled = target(request, response);
+        Future<void> handled = handler(request, response);
         AWAIT handled;
         AWAIT response.finishHeaders();
         AWAIT endBody();

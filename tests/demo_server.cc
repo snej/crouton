@@ -92,7 +92,7 @@ static Task run() {
     static TCPServer server(kPort);
     Log->info("Listening at http://localhost:{}/ and ws://localhost:{}/ws", kPort, kPort);
     server.listen([](std::shared_ptr<ISocket> client) {
-        connectionTask(std::move(client));
+        (void)connectionTask(std::move(client));
     });
     RETURN;
 }

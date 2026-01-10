@@ -19,6 +19,7 @@
 #pragma once
 #include "crouton/io/HTTPParser.hh"
 #include "crouton/io/IStream.hh"
+#include "crouton/Future.hh"
 #include "crouton/Task.hh"
 
 #include <functional>
@@ -69,8 +70,7 @@ namespace crouton::io::http {
 
 
         /// A function that handles a request, writing a response.
-        using handlerfn = Future<void>(Request const&, Response&);
-        using HandlerFunction = std::function<handlerfn>;
+        using HandlerFunction = Future<void>(*)(Request const&, Response&);
 
         /// An HTTP method and path regex, with the function that should be called.
         struct Route {
